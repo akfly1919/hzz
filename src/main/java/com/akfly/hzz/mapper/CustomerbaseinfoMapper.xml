@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akfly.hzz.mapper.CustomerbaseinfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.CustomerbaseinfoVo">
+        <id column="cbi_id" property="cbiId" />
+        <result column="cbi_name" property="cbiName" />
+        <result column="cbi_idcard" property="cbiIdcard" />
+        <result column="cbi_phonenum" property="cbiPhonenum" />
+        <result column="cbi_email" property="cbiEmail" />
+        <result column="cbi_sex" property="cbiSex" />
+        <result column="cbi_username" property="cbiUsername" />
+        <result column="cbi_password" property="cbiPassword" />
+        <result column="cbi_valid" property="cbiValid" />
+        <result column="cbi_createtime" property="cbiCreatetime" />
+        <result column="cbi_updatetime" property="cbiUpdatetime" />
+        <result column="cbi_total" property="cbiTotal" />
+        <result column="cbi_balance" property="cbiBalance" />
+        <result column="cbi_frozen" property="cbiFrozen" />
+        <result column="cbi_type" property="cbiType" />
+        <result column="cbi_parentid" property="cbiParentid" />
+        <result column="cbi_isnew" property="cbiIsnew" />
+        <result column="cbi_goodsnum" property="cbiGoodsnum" />
+    </resultMap>
+
+</mapper>

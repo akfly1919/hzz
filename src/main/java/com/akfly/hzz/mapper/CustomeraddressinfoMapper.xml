@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akfly.hzz.mapper.CustomeraddressinfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.CustomeraddressinfoVo">
+        <id column="cai_id" property="caiId" />
+        <result column="cbi_id" property="cbiId" />
+        <result column="cai_recipients" property="caiRecipients" />
+        <result column="cai_phonenum" property="caiPhonenum" />
+        <result column="cai_province" property="caiProvince" />
+        <result column="cai_city" property="caiCity" />
+        <result column="cai_area" property="caiArea" />
+        <result column="cai_street" property="caiStreet" />
+        <result column="cai_sort" property="caiSort" />
+        <result column="cai_createtime" property="caiCreatetime" />
+        <result column="cai_updatetime" property="caiUpdatetime" />
+        <result column="cai_valid" property="caiValid" />
+    </resultMap>
+
+</mapper>

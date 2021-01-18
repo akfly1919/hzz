@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akfly.hzz.mapper.CustomercardinfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.CustomercardinfoVo">
+        <id column="cci_id" property="cciId" />
+        <result column="cbi_id" property="cbiId" />
+        <result column="cci_total" property="cciTotal" />
+        <result column="cci_balance" property="cciBalance" />
+        <result column="cci_pointreward" property="cciPointreward" />
+        <result column="cci_trainreword" property="cciTrainreword" />
+        <result column="cci_buynum" property="cciBuynum" />
+        <result column="cci_picknum" property="cciPicknum" />
+        <result column="cci_createtime" property="cciCreatetime" />
+        <result column="cci_updatetime" property="cciUpdatetime" />
+        <result column="cci_type" property="cciType" />
+    </resultMap>
+
+</mapper>

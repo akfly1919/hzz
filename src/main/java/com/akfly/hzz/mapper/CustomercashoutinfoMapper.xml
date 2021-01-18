@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akfly.hzz.mapper.CustomercashoutinfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.CustomercashoutinfoVo">
+        <id column="ccoi_id" property="ccoiId" />
+        <result column="cbi_id" property="cbiId" />
+        <result column="ccoi_account" property="ccoiAccount" />
+        <result column="ccoi_type" property="ccoiType" />
+        <result column="ccoi_amount" property="ccoiAmount" />
+        <result column="ccoi_desc" property="ccoiDesc" />
+        <result column="ccoi_status" property="ccoiStatus" />
+        <result column="ccoi_createtime" property="ccoiCreatetime" />
+        <result column="ccoi_updatetime" property="ccoiUpdatetime" />
+        <result column="ccoi_finishtime" property="ccoiFinishtime" />
+        <result column="ccoi_operator" property="ccoiOperator" />
+    </resultMap>
+
+</mapper>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akfly.hzz.mapper.BroadcastnoteinfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.BroadcastnoteinfoVo">
+        <id column="bni_id" property="bniId" />
+        <result column="bni_postion" property="bniPostion" />
+        <result column="bni_picture" property="bniPicture" />
+        <result column="bni_title" property="bniTitle" />
+        <result column="bni_desc" property="bniDesc" />
+        <result column="bni_url" property="bniUrl" />
+        <result column="bni_sort" property="bniSort" />
+        <result column="bni_createtime" property="bniCreatetime" />
+        <result column="bni_updatetime" property="bniUpdatetime" />
+        <result column="bni_valid" property="bniValid" />
+    </resultMap>
+
+</mapper>

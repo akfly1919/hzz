@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akfly.hzz.mapper.CustomerpickupinfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.CustomerpickupinfoVo">
+        <id column="cpui_orderid" property="cpuiOrderid" />
+        <result column="cbi_id" property="cbiId" />
+        <result column="gii_id" property="giiId" />
+        <result column="gbi_id" property="gbiId" />
+        <result column="cai_id" property="caiId" />
+        <result column="cpui_createtime" property="cpuiCreatetime" />
+        <result column="cpui_updatetime" property="cpuiUpdatetime" />
+        <result column="cpui_finishtime" property="cpuiFinishtime" />
+        <result column="cpui_status" property="cpuiStatus" />
+    </resultMap>
+
+</mapper>

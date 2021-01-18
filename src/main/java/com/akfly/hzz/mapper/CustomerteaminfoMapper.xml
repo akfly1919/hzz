@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akfly.hzz.mapper.CustomerteaminfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.CustomerteaminfoVo">
+        <id column="cti_id" property="ctiId" />
+        <result column="cti_owner" property="ctiOwner" />
+        <result column="cti_createtime" property="ctiCreatetime" />
+        <result column="cti_updatetime" property="ctiUpdatetime" />
+        <result column="cti_scale" property="ctiScale" />
+        <result column="cti_valid" property="ctiValid" />
+    </resultMap>
+
+</mapper>

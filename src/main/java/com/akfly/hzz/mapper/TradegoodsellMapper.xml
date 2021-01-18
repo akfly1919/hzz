@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akfly.hzz.mapper.TradegoodsellMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.TradegoodsellVo">
+        <id column="id" property="id" />
+        <result column="tgs_id" property="tgsId" />
+        <result column="gii_id" property="giiId" />
+        <result column="gbi_id" property="gbiId" />
+        <result column="tgs_sellerid" property="tgsSellerid" />
+        <result column="tgs_price" property="tgsPrice" />
+        <result column="tgs_status" property="tgsStatus" />
+        <result column="tgs_saleable" property="tgsSaleable" />
+        <result column="tgs_createtime" property="tgsCreatetime" />
+        <result column="tgs_publishtime" property="tgsPublishtime" />
+        <result column="tgs_updatetime" property="tgsUpdatetime" />
+        <result column="tgs_finshitime" property="tgsFinshitime" />
+        <result column="tgs_type" property="tgsType" />
+        <result column="tgs_owntype" property="tgsOwntype" />
+    </resultMap>
+
+</mapper>

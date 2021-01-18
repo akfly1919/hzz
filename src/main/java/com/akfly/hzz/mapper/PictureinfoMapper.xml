@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akfly.hzz.mapper.PictureinfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.PictureinfoVo">
+        <id column="pi_id" property="piId" />
+        <result column="gbi_id" property="gbiId" />
+        <result column="pi_path" property="piPath" />
+        <result column="pi_desc" property="piDesc" />
+        <result column="pi_type" property="piType" />
+        <result column="pi_valid" property="piValid" />
+        <result column="pi_sort" property="piSort" />
+        <result column="pi_createtime" property="piCreatetime" />
+        <result column="pi_updatetime" property="piUpdatetime" />
+        <result column="pi_operator" property="piOperator" />
+    </resultMap>
+
+</mapper>

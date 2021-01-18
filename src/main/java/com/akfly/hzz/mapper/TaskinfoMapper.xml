@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akfly.hzz.mapper.TaskinfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.TaskinfoVo">
+        <id column="task_id" property="taskId" />
+        <result column="cbi_id" property="cbiId" />
+        <result column="gbi_id" property="gbiId" />
+        <result column="ti_target" property="tiTarget" />
+        <result column="ti_count" property="tiCount" />
+        <result column="ti_status" property="tiStatus" />
+        <result column="ti_type" property="tiType" />
+        <result column="ti_starttime" property="tiStarttime" />
+        <result column="ti_endtime" property="tiEndtime" />
+        <result column="ti_createtime" property="tiCreatetime" />
+        <result column="ti_updatetime" property="tiUpdatetime" />
+    </resultMap>
+
+</mapper>

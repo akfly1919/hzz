@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akfly.hzz.mapper.TradeconfigMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.TradeconfigVo">
+        <id column="id" property="id" />
+        <result column="tc_rate" property="tcRate" />
+        <result column="tc_type" property="tcType" />
+        <result column="tc_valid" property="tcValid" />
+        <result column="tc_startime" property="tcStartime" />
+        <result column="tc_endtime" property="tcEndtime" />
+        <result column="tc_createtime" property="tcCreatetime" />
+        <result column="tc_updatetime" property="tcUpdatetime" />
+        <result column="tc_operator" property="tcOperator" />
+    </resultMap>
+
+</mapper>

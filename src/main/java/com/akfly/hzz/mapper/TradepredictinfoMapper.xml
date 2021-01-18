@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akfly.hzz.mapper.TradepredictinfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.TradepredictinfoVo">
+        <id column="id" property="id" />
+        <result column="tpi_id" property="tpiId" />
+        <result column="tgs_id" property="tgsId" />
+        <result column="gii_id" property="giiId" />
+        <result column="gbi_id" property="gbiId" />
+        <result column="tpi_buyerid" property="tpiBuyerid" />
+        <result column="tpi_sellerid" property="tpiSellerid" />
+        <result column="tpi_price" property="tpiPrice" />
+        <result column="tpi_type" property="tpiType" />
+        <result column="tpi_status" property="tpiStatus" />
+        <result column="tpi_createtime" property="tpiCreatetime" />
+        <result column="tpi_buytime" property="tpiBuytime" />
+        <result column="tpi_updatetime" property="tpiUpdatetime" />
+        <result column="tpi_finishtime" property="tpiFinishtime" />
+    </resultMap>
+
+</mapper>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akfly.hzz.mapper.GoodsiteminfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.GoodsiteminfoVo">
+        <id column="gii_id" property="giiId" />
+        <result column="gbi_id" property="gbiId" />
+        <result column="gii_createtime" property="giiCreatetime" />
+        <result column="gii_status" property="giiStatus" />
+        <result column="gii_ispickup" property="giiIspickup" />
+        <result column="gii_pickuptime" property="giiPickuptime" />
+        <result column="gii_receivetime" property="giiReceivetime" />
+        <result column="gii_updatetime" property="giiUpdatetime" />
+    </resultMap>
+
+</mapper>

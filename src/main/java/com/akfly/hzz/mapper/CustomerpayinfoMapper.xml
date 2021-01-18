@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akfly.hzz.mapper.CustomerpayinfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.CustomerpayinfoVo">
+        <id column="cpi_orderid" property="cpiOrderid" />
+        <result column="cai_amount" property="caiAmount" />
+        <result column="cbi_id" property="cbiId" />
+        <result column="cpi_createtime" property="cpiCreatetime" />
+        <result column="cpi_updatetime" property="cpiUpdatetime" />
+        <result column="cpi_paytime" property="cpiPaytime" />
+        <result column="cpi_finishtime" property="cpiFinishtime" />
+        <result column="cpi_paystatus" property="cpiPaystatus" />
+        <result column="cpi_valid" property="cpiValid" />
+        <result column="cpi_channel" property="cpiChannel" />
+        <result column="cpi_channelorderid" property="cpiChannelorderid" />
+        <result column="cpi_operator" property="cpiOperator" />
+    </resultMap>
+
+</mapper>

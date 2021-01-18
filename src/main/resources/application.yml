@@ -1,0 +1,16 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    dynamic:
+      #默认就是master可以不指定
+      primary: master
+      datasource:
+        master:
+#          url: jdbc:mysql://10.0.0.2:3306/hzzdev?useUnicode=true&characterEncoding=utf-8&useSSL=false
+#          username: hzzwork
+#          password: "@bgd5QoJtuYKrIih"
+          url: jdbc:mysql://192.144.230.48:3306/hzzdev?useUnicode=true&characterEncoding=utf-8
+          username: root
+          password: 3eufds983d
+#          driver-class-name: com.mysql.jdbc.Driver

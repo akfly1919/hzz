@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akfly.hzz.mapper.CustomeridcardinfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.CustomeridcardinfoVo">
+        <id column="id" property="id" />
+        <result column="cbi_id" property="cbiId" />
+        <result column="cii_idcardfront" property="ciiIdcardfront" />
+        <result column="cii_idcardback" property="ciiIdcardback" />
+        <result column="cii_createtime" property="ciiCreatetime" />
+        <result column="cii_updatetime" property="ciiUpdatetime" />
+        <result column="cii_status" property="ciiStatus" />
+        <result column="cii_operator" property="ciiOperator" />
+    </resultMap>
+
+</mapper>
