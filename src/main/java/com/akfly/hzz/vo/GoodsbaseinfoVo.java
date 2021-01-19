@@ -121,5 +121,10 @@ public class GoodsbaseinfoVo implements Serializable {
      */
     private Integer gbiSort;
 
+    /**
+     * 商品主图
+     */
+    private String gbiPicture;
+
 
 }

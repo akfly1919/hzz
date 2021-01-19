@@ -4,10 +4,12 @@ package com.akfly.hzz.conroller;
 import com.akfly.hzz.constant.CommonConstant;
 import com.akfly.hzz.service.BroadcastnoteinfoService;
 import com.akfly.hzz.service.GoodsbaseinfoService;
+import com.akfly.hzz.service.PictureinfoService;
 import com.akfly.hzz.util.CacheUtils;
 import com.akfly.hzz.util.JsonUtils;
 import com.akfly.hzz.vo.BroadcastnoteinfoVo;
 import com.akfly.hzz.vo.GoodsbaseinfoVo;
+import com.akfly.hzz.vo.PictureinfoVo;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 
 @Slf4j
@@ -29,6 +30,8 @@ public class ShouYeController {
     GoodsbaseinfoService goodsbaseinfoService;
     @Autowired
     BroadcastnoteinfoService broadcastnoteinfoService;
+    @Autowired
+    PictureinfoService pictureinfoService;
 
     /**
      * 兑换商品本期不实现
@@ -57,10 +60,18 @@ public class ShouYeController {
     }
 
     @GetMapping(value = "/goodInfo")
-    public String goodInfo(@Validated int goodId) {
+    public String goodInfo(@Validated String goodId) {
+        Map<String, Object> map = Maps.newHashMap();
         GoodsbaseinfoVo goodsbaseinfoVo = goodsbaseinfoService.lambdaQuery()
                 .eq(GoodsbaseinfoVo::getGbiId, goodId).one();
-        return JsonUtils.toJson(goodsbaseinfoVo == null ? "" : goodsbaseinfoVo);
+        map.put("gbi", goodsbaseinfoVo);
+        if (goodsbaseinfoVo == null) {
+            return JsonUtils.toJson(map);
+        }
+        List<PictureinfoVo> pictureinfoVos = pictureinfoService.lambdaQuery()
+                .eq(PictureinfoVo::getGbiId, goodsbaseinfoVo.getGbiId()).list();
+        map.put("pivs", pictureinfoVos);
+        return JsonUtils.toJson(map);
 
     }
 

@@ -25,6 +25,7 @@
         <result column="gbi_priceceiling" property="gbiPriceceiling" />
         <result column="gbi_servicerate" property="gbiServicerate" />
         <result column="gbi_sort" property="gbiSort" />
+        <result column="gbi_picture" property="gbiPicture" />
     </resultMap>
 
 </mapper>
