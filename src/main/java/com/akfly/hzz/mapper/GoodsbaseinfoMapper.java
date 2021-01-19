@@ -1,5 +1,6 @@
 package com.akfly.hzz.mapper;
 
+
 import com.akfly.hzz.vo.GoodsbaseinfoVo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -9,7 +10,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author wangfei
- * @since 2021-01-18
+ * @since 2021-01-19
  */
 public interface GoodsbaseinfoMapper extends BaseMapper<GoodsbaseinfoVo> {
 
