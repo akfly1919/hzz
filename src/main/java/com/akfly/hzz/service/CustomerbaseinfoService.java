@@ -1,5 +1,6 @@
 package com.akfly.hzz.service;
 
+import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,4 +14,15 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface CustomerbaseinfoService extends IService<CustomerbaseinfoVo> {
 
+    String userLoginByPsw(String phoneNum, String psw) throws HzzBizException;
+
+    String userLoginByCode(String phoneNum, String msgCode) throws HzzBizException;
+
+    void userRegisterByCode(String phoneNum, String psw) throws HzzBizException;
+
+    void userRegisterByPsw(String phoneNum, String psw) throws HzzBizException;
+
+    void updateUserInfo(CustomerbaseinfoVo customerbaseinfoVo) throws HzzBizException;
+
+    CustomerbaseinfoVo getUserInfo(String userToken) throws HzzBizException;
 }
