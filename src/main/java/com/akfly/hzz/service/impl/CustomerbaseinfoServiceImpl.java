@@ -23,10 +23,9 @@ import java.util.List;
 @Service
 public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMapper, CustomerbaseinfoVo> implements CustomerbaseinfoService {
 
-    private static final String MD5_KEY = "Jg7ZjmnxE8c7RCXy";
 
     @Override
-    public String userLoginByPsw(String phoneNum, String psw) throws HzzBizException {
+    public CustomerbaseinfoVo userLoginByPsw(String phoneNum, String psw) throws HzzBizException {
 
         List<CustomerbaseinfoVo> users = lambdaQuery()
                 .eq(CustomerbaseinfoVo::getCbiPhonenum, phoneNum)
@@ -34,20 +33,23 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
         if (CollectionUtils.isEmpty(users)) {
             throw new HzzBizException(HzzExceptionEnum.NAME_OR_PSW_ERROR);
         }
-        return generateUserToken(phoneNum); // TODO 后面需要放到redis里面
+        return users.get(0);
     }
 
     @Override
-    public String userLoginByCode(String phoneNum, String msgCode) throws HzzBizException {
+    public CustomerbaseinfoVo userLoginByCode(String phoneNum, String msgCode) throws HzzBizException {
 
-        List<CustomerbaseinfoVo> users = lambdaQuery()
-                .eq(CustomerbaseinfoVo::getCbiPhonenum, phoneNum).list();
         // TODO 从redis里面获取code跟msgCode比较
         String redisCode = "";
         if (!msgCode.equals(redisCode)) {
             throw new HzzBizException(HzzExceptionEnum.NAME_OR_PSW_ERROR);
         }
-        return generateUserToken(phoneNum); // TODO 后面需要放到redis里面
+        List<CustomerbaseinfoVo> users = lambdaQuery()
+                .eq(CustomerbaseinfoVo::getCbiPhonenum, phoneNum).list();
+        if (CollectionUtils.isEmpty(users)) {
+            throw new HzzBizException(HzzExceptionEnum.NAME_OR_PSW_ERROR);
+        }
+        return users.get(0); // TODO 后面需要放到redis里面
     }
 
     @Override
@@ -61,18 +63,13 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
     }
 
     @Override
-    public void updateUserInfo(CustomerbaseinfoVo customerbaseinfoVo) {
+    public void updateUserInfo(CustomerbaseinfoVo customerbaseinfoVo) throws HzzBizException {
 
     }
 
     @Override
     public CustomerbaseinfoVo getUserInfo(String userToken) throws HzzBizException {
         return null;
-    }
-
-    private String generateUserToken(String phoneNum) {
-
-        return EncryDecryUtils.md5(phoneNum + MD5_KEY);
     }
 
 }

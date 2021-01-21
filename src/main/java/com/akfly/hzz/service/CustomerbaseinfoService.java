@@ -14,9 +14,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface CustomerbaseinfoService extends IService<CustomerbaseinfoVo> {
 
-    String userLoginByPsw(String phoneNum, String psw) throws HzzBizException;
+    CustomerbaseinfoVo userLoginByPsw(String phoneNum, String psw) throws HzzBizException;
 
-    String userLoginByCode(String phoneNum, String msgCode) throws HzzBizException;
+    CustomerbaseinfoVo userLoginByCode(String phoneNum, String msgCode) throws HzzBizException;
 
     void userRegisterByCode(String phoneNum, String psw) throws HzzBizException;
 
