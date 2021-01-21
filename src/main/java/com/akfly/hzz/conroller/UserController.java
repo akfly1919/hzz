@@ -1,26 +1,21 @@
 package com.akfly.hzz.conroller;
 
 
+import com.akfly.hzz.constant.CommonConstant;
 import com.akfly.hzz.dto.BaseRspDto;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.service.CustomerbaseinfoService;
-import com.akfly.hzz.util.EncryDecryUtils;
-import com.akfly.hzz.util.JsonUtils;
-import com.akfly.hzz.util.RandomGenUtils;
-import com.akfly.hzz.util.RedisUtils;
-import com.akfly.hzz.util.SmsUtils;
+import com.akfly.hzz.util.*;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
-import com.google.common.collect.Maps;
-import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;git
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 
 @Slf4j
@@ -30,8 +25,6 @@ public class UserController {
 
 	private static final String MD5_KEY = "Jg7ZjmnxE8c7RCXy";
 
-	private static final String MSG_CODE_PRIFIX = "msg_code:login:";
-
 	@Autowired
 	private RedisUtils redisUtils;
 
@@ -39,7 +32,7 @@ public class UserController {
 	private CustomerbaseinfoService customerbaseinfoService;
 
 	@RequestMapping(value = "/login")
-	public String login(String phoneNum, String psw, String pswType) {
+	public String login(HttpServletResponse response, String phoneNum, String psw, String pswType) {
 
 		BaseRspDto<CustomerbaseinfoVo> rsp = new BaseRspDto<CustomerbaseinfoVo>();
 		try {
@@ -55,7 +48,8 @@ public class UserController {
 			} else {
 				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
 			}
-			customerbaseinfoVo.setUserToken(generateUserToken(phoneNum));
+			response.setHeader("token", TokenUtils.getToken(customerbaseinfoVo.getCbiId().toString(), customerbaseinfoVo.getCbiPassword()));
+			customerbaseinfoVo.setCbiPassword("");  // 去掉密码
 			rsp.setData(customerbaseinfoVo);
 		} catch (HzzBizException e) {
 			log.error("用户登录业务错误 msg={}", e.getErrorMsg(), e);
@@ -71,12 +65,65 @@ public class UserController {
 		return JsonUtils.toJson(rsp);
 	}
 
-	@RequestMapping(value = "/yanzhenma")
-	public String yanzhenma(String phoneName) {
+	@RequestMapping(value = "/register")
+	public String register(HttpServletResponse response, String phoneNum, String psw, String repeatPsw) {
+
+		BaseRspDto<CustomerbaseinfoVo> rsp = new BaseRspDto<CustomerbaseinfoVo>();
+		try {
+			if (StringUtils.isBlank(phoneNum) || StringUtils.isBlank(psw) || StringUtils.isBlank(repeatPsw)) {
+				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
+			}
+			if (!repeatPsw.equals(psw)) {
+				throw new HzzBizException(HzzExceptionEnum.PSW_NOT_SAME);
+			}
+			customerbaseinfoService.userRegister(phoneNum, psw);
+			CustomerbaseinfoVo customerbaseinfoVo = customerbaseinfoService.getUserInfo(phoneNum);
+			response.setHeader("token", TokenUtils.getToken(customerbaseinfoVo.getCbiId().toString(), customerbaseinfoVo.getCbiPassword()));
+			customerbaseinfoVo.setCbiPassword("");  // 去掉密码
+			rsp.setData(customerbaseinfoVo);
+		} catch (HzzBizException e) {
+			log.error("用户注册业务错误 msg={}", e.getErrorMsg(), e);
+			rsp.setCode(e.getErrorCode());
+			rsp.setMsg(e.getErrorMsg());
+		} catch (Exception e) {
+			log.error("用户注册系统异常", e);
+			rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+			rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+		}
+		String result = JsonUtils.toJson(rsp);
+		log.info("用户注册返回信息 result={}", result);
+		return JsonUtils.toJson(rsp);
+	}
+
+	@RequestMapping(value = "/logout")
+	public String logout(HttpServletResponse response, String token) {
+
+		BaseRspDto<CustomerbaseinfoVo> rsp = new BaseRspDto<CustomerbaseinfoVo>();
+		try {
+			if (StringUtils.isBlank(token)) {
+				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
+			}
+			redisUtils.del("token"); // 清除缓存
+		} catch (HzzBizException e) {
+			log.error("用户登录业务错误 msg={}", e.getErrorMsg(), e);
+			rsp.setCode(e.getErrorCode());
+			rsp.setMsg(e.getErrorMsg());
+		} catch (Exception e) {
+			log.error("用户登录系统异常", e);
+			rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+			rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+		}
+		String result = JsonUtils.toJson(rsp);
+		log.info("用户登出返回信息 result={}", result);
+		return JsonUtils.toJson(rsp);
+	}
+
+
+	@RequestMapping(value = "/sendMsgCode")
+	public String sendMsgCode(String phoneName) {
 		String code = RandomGenUtils.getRandomNumberInRange(100000, 999999)+"";
-		//todo code写入缓存redis确认之后删除
-		log.info("yanzhenma phoneName:{},code:{}",phoneName,code);
-		redisUtils.set(MSG_CODE_PRIFIX + phoneName, code, 300); // 有效期5分钟
+		log.info("sendMsgCode phoneName:{},code:{}", phoneName, code);
+		redisUtils.set(CommonConstant.MSG_CODE_PREFIX + phoneName, code, 300); // 有效期5分钟
 		//return ""+SmsUtils.smsSend(phoneName,code);
 		return code;
 	}

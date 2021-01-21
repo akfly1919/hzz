@@ -8,4 +8,8 @@ public  class CommonConstant {
     public static final String LUNBO_JY ="2";
     public static final String LUNBO_TZ ="3";
     public static final String LUNBO_HD ="4";
+
+
+    // redis 的key定义
+    public static final String MSG_CODE_PREFIX = "msg_code:login:";
 }

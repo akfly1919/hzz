@@ -1,5 +1,6 @@
 package com.akfly.hzz.dto;
 
+import com.akfly.hzz.exception.HzzExceptionEnum;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -14,9 +15,9 @@ import java.io.Serializable;
 @Data
 public class BaseRspDto<T> implements Serializable {
 
-    private String code;
+    private String code = HzzExceptionEnum.SUCCESS.getErrorCode();
 
-    private String msg;
+    private String msg = HzzExceptionEnum.SUCCESS.getErrorMsg();
 
     private T data;
 

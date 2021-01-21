@@ -9,12 +9,16 @@ public enum HzzExceptionEnum {
 
     /* 系统异常定义以1开头 */
     NAME_OR_PSW_ERROR("1001", "用户名或者密码错误"),
+    USER_NOTEXIST_ERROR("1002", "用户不存在"),
+    MSG_CODE_INVALID("1003", "验证码无效"),
 
     /* 业务异常定义以2-8开头，顺序往下排号 */
     PARAM_INVALID("2000", "参数不合法"),
+    PSW_NOT_SAME("2000", "密码不一致"),
 
     /* 未知异常定义以9开头 */
     SYSTEM_ERROR("9000", "系统异常"),
+    DB_ERROR("9001", "数据库异常"),
     UNKNOWN_ERROR("9999", "其他异常"),
 
     TEMP_ERROR("", "");////这个必须要留着

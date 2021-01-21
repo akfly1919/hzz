@@ -1,6 +1,7 @@
 package com.akfly.hzz.conroller;
 
 
+import com.akfly.hzz.annotation.VerifyToken;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +16,7 @@ public class LoginController {
 
 
 	@RequestMapping(value = "/login")
+	@VerifyToken
 	public String login(HttpServletRequest request, String phoneNum, String psw) {
 
 		if ("123".equals(phoneNum) && "456".equals(psw)) {

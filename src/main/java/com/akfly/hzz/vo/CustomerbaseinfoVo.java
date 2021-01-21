@@ -93,10 +93,5 @@ public class CustomerbaseinfoVo implements Serializable {
      */
     private Integer cbiGoodsnum;
 
-    /**
-     * 用户登录后生成的token
-     */
-    private String userToken;
-
 
 }
