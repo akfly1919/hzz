@@ -14,3 +14,13 @@ spring:
           username: root
           password: 3eufds983d
 #          driver-class-name: com.mysql.jdbc.Driver
+
+  redis:
+    host: localhost
+    port: 6379
+
+  #spring session使用存储类型，默认就是redis所以可以省略
+  session:
+    store-type: redis
+    redis:
+        flush-mode: on_save
