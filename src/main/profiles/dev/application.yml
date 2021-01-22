@@ -16,9 +16,9 @@ spring:
 #          driver-class-name: com.mysql.jdbc.Driver
 
   redis:
-    host: 10.0.0.4
+    host: 127.0.0.1
     port: 6379
-    password: work:3eufds983d
+    #password: work:3eufds983d
 
   #spring session使用存储类型，默认就是redis所以可以省略
   session:

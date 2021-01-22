@@ -79,6 +79,7 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
         vo.setCbiPassword(psw);
         vo.setCbiType(2);
         vo.setCbiName(phoneNum);
+        vo.setCbiUsername(phoneNum);
         if (!save(vo)) {
             throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
         }
@@ -96,7 +97,7 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
         List<CustomerbaseinfoVo> users = lambdaQuery()
                 .eq(CustomerbaseinfoVo::getCbiPhonenum, phoneNum).list();
         if (CollectionUtils.isEmpty(users)) {
-            throw new HzzBizException(HzzExceptionEnum.USER_NOTEXIST_ERROR);
+            return null;
         }
         return users.get(0);
     }

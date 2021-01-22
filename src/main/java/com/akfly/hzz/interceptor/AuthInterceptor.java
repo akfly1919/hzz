@@ -44,7 +44,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         if (! (handler instanceof HandlerMethod)) {
             return true;
         }
-        log.info("拦截器拦截并校验客户端token={}", token);
+        log.info("拦截器拦截并校验客户端token={}, path={}", token, request.getServletPath());
         HandlerMethod handlerMethod = (HandlerMethod)handler;
         Method method = handlerMethod.getMethod();
         if (method.isAnnotationPresent(VerifyToken.class)) {

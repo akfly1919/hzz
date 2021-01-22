@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.Date;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -54,9 +56,9 @@ public class CustomerbaseinfoVo implements Serializable {
      */
     private Integer cbiValid;
 
-    private LocalDateTime cbiCreatetime;
+    private Date cbiCreatetime;
 
-    private LocalDateTime cbiUpdatetime;
+    private Date cbiUpdatetime;
 
     /**
      * 总资产

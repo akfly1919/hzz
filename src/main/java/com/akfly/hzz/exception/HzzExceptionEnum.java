@@ -11,6 +11,7 @@ public enum HzzExceptionEnum {
     NAME_OR_PSW_ERROR("1001", "用户名或者密码错误"),
     USER_NOTEXIST_ERROR("1002", "用户不存在"),
     MSG_CODE_INVALID("1003", "验证码无效"),
+    PHONENUM_EXIST("1004", "该手机号已经注册过"),
 
     /* 业务异常定义以2-8开头，顺序往下排号 */
     PARAM_INVALID("2000", "参数不合法"),

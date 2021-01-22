@@ -3,6 +3,7 @@ package com.akfly.hzz.conroller;
 
 import com.akfly.hzz.constant.CommonConstant;
 import com.akfly.hzz.dto.BaseRspDto;
+import com.akfly.hzz.dto.MessageCodeDto;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.service.CustomerbaseinfoService;
@@ -10,12 +11,14 @@ import com.akfly.hzz.util.*;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
 
 
 @Slf4j
@@ -76,11 +79,17 @@ public class UserController {
 			if (!repeatPsw.equals(psw)) {
 				throw new HzzBizException(HzzExceptionEnum.PSW_NOT_SAME);
 			}
-			customerbaseinfoService.userRegister(phoneNum, psw);
-			CustomerbaseinfoVo customerbaseinfoVo = customerbaseinfoService.getUserInfo(phoneNum);
-			response.setHeader("token", TokenUtils.getToken(customerbaseinfoVo.getCbiId().toString(), customerbaseinfoVo.getCbiPassword()));
-			customerbaseinfoVo.setCbiPassword("");  // 去掉密码
-			rsp.setData(customerbaseinfoVo);
+			CustomerbaseinfoVo existUser = customerbaseinfoService.getUserInfo(phoneNum);
+			if (existUser == null) {
+				customerbaseinfoService.userRegister(phoneNum, psw);
+				CustomerbaseinfoVo customerbaseinfoVo = customerbaseinfoService.getUserInfo(phoneNum);
+				response.setHeader("token", TokenUtils.getToken(customerbaseinfoVo.getCbiId().toString(), customerbaseinfoVo.getCbiPassword()));
+				customerbaseinfoVo.setCbiPassword(null);  // 去掉密码
+				//customerbaseinfoVo.setCbiCreatetime(DateHandlerUtil.getDateTimeFromDate(customerbaseinfoVo.getCbiCreatetime(), "yyyy-MM-dd HH:mm:ss"));
+				rsp.setData(customerbaseinfoVo);
+			} else {
+				throw new HzzBizException(HzzExceptionEnum.PHONENUM_EXIST);
+			}
 		} catch (HzzBizException e) {
 			log.error("用户注册业务错误 msg={}", e.getErrorMsg(), e);
 			rsp.setCode(e.getErrorCode());
@@ -120,12 +129,18 @@ public class UserController {
 
 
 	@RequestMapping(value = "/sendMsgCode")
-	public String sendMsgCode(String phoneName) {
+	public String sendMsgCode(String phoneNum) {
+
 		String code = RandomGenUtils.getRandomNumberInRange(100000, 999999)+"";
-		log.info("sendMsgCode phoneName:{},code:{}", phoneName, code);
-		redisUtils.set(CommonConstant.MSG_CODE_PREFIX + phoneName, code, 300); // 有效期5分钟
+		log.info("sendMsgCode phoneName:{},code:{}", phoneNum, code);
+		redisUtils.set(CommonConstant.MSG_CODE_PREFIX + phoneNum, code, 300); // 有效期5分钟
 		//return ""+SmsUtils.smsSend(phoneName,code);
-		return code;
+		BaseRspDto<MessageCodeDto> rsp = new BaseRspDto<MessageCodeDto>();
+		MessageCodeDto messageCodeDto = new MessageCodeDto();
+		messageCodeDto.setPhoneNum(phoneNum);
+		messageCodeDto.setMsgCode(code);
+		rsp.setData(messageCodeDto);
+		return JsonUtils.toJson(rsp);
 	}
 
 
