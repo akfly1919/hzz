@@ -18,7 +18,12 @@ spring:
   redis:
     host: 127.0.0.1
     port: 6379
-    #password: work:3eufds983d
+    password: O%!I3Ad4nYGYTTIg
+    timeout: 3000
+    pool:
+      maxIdle: 10
+      minIdle: 5
+      maxActive: 20
 
   #spring session使用存储类型，默认就是redis所以可以省略
   session:
