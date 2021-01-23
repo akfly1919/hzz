@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
  * @Author
  * @Date 2021/1/21 21:50
  */
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target({ElementType.PARAMETER, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface VerifyToken {
 

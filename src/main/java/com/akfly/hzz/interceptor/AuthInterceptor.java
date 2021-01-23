@@ -7,6 +7,7 @@ package com.akfly.hzz.interceptor;  /**
  */
 
 import com.akfly.hzz.annotation.VerifyToken;
+import com.akfly.hzz.constant.CommonConstant;
 import com.akfly.hzz.service.CustomerbaseinfoService;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
 import com.auth0.jwt.JWT;
@@ -61,6 +62,7 @@ public class AuthInterceptor implements HandlerInterceptor {
                     return false;
                 }
                 CustomerbaseinfoVo vo = customerbaseinfoService.getUserInfoById(userId);
+                request.setAttribute(CommonConstant.USER_INFO, vo);
                 JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(vo.getCbiPassword())).build();
                 jwtVerifier.verify(token);
                 return true;
