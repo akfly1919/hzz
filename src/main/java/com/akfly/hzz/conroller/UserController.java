@@ -158,7 +158,7 @@ public class UserController {
 	@ResponseBody
 	public String realName(@RequestParam RealNameReqDto realNameReqDto) {
 
-		log.info("realName realNameReqDto:{}}", JsonUtils.toJson(realNameReqDto));
+		log.info("realName realNameReqDto:{}", JsonUtils.toJson(realNameReqDto));
 		BaseRspDto rsp = new BaseRspDto();
 		try {
 			if (StringUtils.isBlank(realNameReqDto.getName()) || StringUtils.isBlank(realNameReqDto.getIdentityCode()) ||
