@@ -34,7 +34,8 @@ public class AuthConfig implements WebMvcConfigurer {
                 "/hzz/user/logout",
                 "/hzz/user/sendMsgCode",
                 "/hzz/sy/hello",
-                "/hzz/user/register"
+                "/hzz/user/register",
+                "/swagger-ui.html"
         );
     }
 

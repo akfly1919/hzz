@@ -1,6 +1,7 @@
 package com.akfly.hzz.conroller;
 
 
+import com.akfly.hzz.annotation.LoggedIn;
 import com.akfly.hzz.annotation.VerifyToken;
 import com.akfly.hzz.constant.CommonConstant;
 import com.akfly.hzz.dto.BaseRspDto;
@@ -17,10 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -46,7 +44,7 @@ public class UserController {
 
 
 	@RequestMapping(value = "/login")
-	public String login(HttpServletResponse response, String phoneNum, String psw, String pswType) {
+	public BaseRspDto login(HttpServletResponse response, String phoneNum, String psw, String pswType) {
 
 		BaseRspDto<CustomerbaseinfoVo> rsp = new BaseRspDto<CustomerbaseinfoVo>();
 		try {
@@ -76,11 +74,11 @@ public class UserController {
 		}
 		String result = JsonUtils.toJson(rsp);
 		log.info("用户登录返回信息 result={}", result);
-		return JsonUtils.toJson(rsp);
+		return rsp;
 	}
 
 	@RequestMapping(value = "/register")
-	public String register(HttpServletResponse response, String phoneNum, String psw, String repeatPsw) {
+	public BaseRspDto register(HttpServletResponse response, String phoneNum, String psw, String repeatPsw) {
 
 		BaseRspDto<CustomerbaseinfoVo> rsp = new BaseRspDto<CustomerbaseinfoVo>();
 		try {
@@ -112,12 +110,12 @@ public class UserController {
 		}
 		String result = JsonUtils.toJson(rsp);
 		log.info("用户注册返回信息 result={}", result);
-		return JsonUtils.toJson(rsp);
+		return rsp;
 	}
 
 	@RequestMapping(value = "/logout")
 	@VerifyToken
-	public String logout(HttpServletResponse response, String token) {
+	public BaseRspDto logout(HttpServletResponse response, String token) {
 
 		BaseRspDto<CustomerbaseinfoVo> rsp = new BaseRspDto<CustomerbaseinfoVo>();
 		try {
@@ -136,12 +134,12 @@ public class UserController {
 		}
 		String result = JsonUtils.toJson(rsp);
 		log.info("用户登出返回信息 result={}", result);
-		return JsonUtils.toJson(rsp);
+		return rsp;
 	}
 
 
 	@RequestMapping(value = "/sendMsgCode")
-	public String sendMsgCode(String phoneNum) {
+	public BaseRspDto sendMsgCode(String phoneNum) {
 
 		String code = RandomGenUtils.getRandomNumberInRange(100000, 999999)+"";
 		log.info("sendMsgCode phoneName:{},code:{}", phoneNum, code);
@@ -152,14 +150,14 @@ public class UserController {
 		messageCodeDto.setPhoneNum(phoneNum);
 		messageCodeDto.setMsgCode(code);
 		rsp.setData(messageCodeDto);
-		return JsonUtils.toJson(rsp);
+		return rsp;
 	}
 
 
-	@RequestMapping(value = "/realName")
+	@PostMapping(value = "/realName")
 	@ResponseBody
 	@VerifyToken
-	public String realName(@RequestParam RealNameReqDto realNameReqDto) {
+	public BaseRspDto realName(@RequestBody RealNameReqDto realNameReqDto, @LoggedIn CustomerbaseinfoVo userInfo) {
 
 		log.info("realName realNameReqDto:{}}", JsonUtils.toJson(realNameReqDto));
 		BaseRspDto rsp = new BaseRspDto();
@@ -169,11 +167,12 @@ public class UserController {
 				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
 			}
 			CustomerbaseinfoVo vo = new CustomerbaseinfoVo();
+			vo.setCbiId(userInfo.getCbiId());
 			vo.setCbiName(realNameReqDto.getName());
 			vo.setCbiIdcard(realNameReqDto.getIdentityCode());
 			// TODO 需要放到一个事务
 			customerbaseinfoService.updateUserInfo(vo);
-			customeridcardinfoService.saveCardInfo(0, realNameReqDto.getIdFrontImgName(), realNameReqDto.getIdBackImgName());
+			customeridcardinfoService.saveCardInfo(userInfo.getCbiId(), realNameReqDto.getIdFrontImgName(), realNameReqDto.getIdBackImgName());
 		} catch (HzzBizException e) {
 			log.error("用户实名认证业务错误 msg={}", e.getErrorMsg(), e);
 			rsp.setCode(e.getErrorCode());
@@ -183,12 +182,12 @@ public class UserController {
 			rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
 			rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
 		}
-		return JsonUtils.toJson(rsp);
+		return rsp;
 	}
 
-	@RequestMapping(value = "/getRealName")
+	@PostMapping(value = "/getRealName")
 	@ResponseBody
-	public String getRealName() {
+	public BaseRspDto getRealName() {
 
 		BaseRspDto<RealNameRspDto> rsp = new BaseRspDto<RealNameRspDto>();
 		try {
@@ -207,7 +206,7 @@ public class UserController {
 			rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
 			rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
 		}
-		return JsonUtils.toJson(rsp);
+		return rsp;
 	}
 
 

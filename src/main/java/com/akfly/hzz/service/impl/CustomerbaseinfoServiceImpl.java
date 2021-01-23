@@ -89,6 +89,10 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
     @Override
     public void updateUserInfo(CustomerbaseinfoVo customerbaseinfoVo) throws HzzBizException {
 
+        if (!updateById(customerbaseinfoVo)) {
+            throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
+        }
+
     }
 
     @Override
