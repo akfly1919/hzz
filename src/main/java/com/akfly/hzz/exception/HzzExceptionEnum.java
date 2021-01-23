@@ -14,6 +14,7 @@ public enum HzzExceptionEnum {
     PHONENUM_EXIST("1004", "该手机号已经注册过"),
     IMAGE_NOT_EXIST("1005", "图片不存在"),
     USER_NOT_REALNAME("1006", "用户未实名"),
+    USER_NOT_LOGIN("1007", "用户未登录"),
 
     /* 业务异常定义以2-8开头，顺序往下排号 */
     PARAM_INVALID("2000", "参数不合法"),

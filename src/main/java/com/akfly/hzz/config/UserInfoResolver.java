@@ -1,5 +1,6 @@
 package com.akfly.hzz.config;
 
+import com.akfly.hzz.annotation.LoggedIn;
 import com.akfly.hzz.annotation.VerifyToken;
 import com.akfly.hzz.constant.CommonConstant;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
@@ -18,14 +19,14 @@ public class UserInfoResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterAnnotation(VerifyToken.class) != null && parameter.getParameterType() == CustomerbaseinfoVo.class;
+        return parameter.getParameterAnnotation(LoggedIn.class) != null && parameter.getParameterType() == CustomerbaseinfoVo.class;
     }
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 
         HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
-        log.info("MerchantArgumentResolver init...");
+        log.info("UserInfoResolver init...");
         CustomerbaseinfoVo vo = (CustomerbaseinfoVo) request.getAttribute(CommonConstant.USER_INFO);
         if (vo != null) {
             return vo;

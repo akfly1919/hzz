@@ -1,6 +1,7 @@
 package com.akfly.hzz.conroller;
 
 
+import com.akfly.hzz.annotation.VerifyToken;
 import com.akfly.hzz.constant.CommonConstant;
 import com.akfly.hzz.dto.BaseRspDto;
 import com.akfly.hzz.dto.MessageCodeDto;
@@ -115,6 +116,7 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/logout")
+	@VerifyToken
 	public String logout(HttpServletResponse response, String token) {
 
 		BaseRspDto<CustomerbaseinfoVo> rsp = new BaseRspDto<CustomerbaseinfoVo>();
@@ -156,6 +158,7 @@ public class UserController {
 
 	@RequestMapping(value = "/realName")
 	@ResponseBody
+	@VerifyToken
 	public String realName(@RequestParam RealNameReqDto realNameReqDto) {
 
 		log.info("realName realNameReqDto:{}}", JsonUtils.toJson(realNameReqDto));

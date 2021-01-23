@@ -8,7 +8,11 @@ package com.akfly.hzz.interceptor;  /**
 
 import com.akfly.hzz.annotation.VerifyToken;
 import com.akfly.hzz.constant.CommonConstant;
+import com.akfly.hzz.dto.BaseRspDto;
+import com.akfly.hzz.exception.HzzBizException;
+import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.service.CustomerbaseinfoService;
+import com.akfly.hzz.util.JsonUtils;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -18,13 +22,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @ClassName: AuthInterceptor
@@ -35,7 +42,7 @@ import java.lang.reflect.Method;
 @Slf4j
 public class AuthInterceptor implements HandlerInterceptor {
 
-    @Autowired
+    @Resource
     private CustomerbaseinfoService customerbaseinfoService;
 
     @Override
@@ -52,6 +59,11 @@ public class AuthInterceptor implements HandlerInterceptor {
             VerifyToken verifyToken = method.getAnnotation(VerifyToken.class);
             if (verifyToken.required()) {
                 if (StringUtils.isBlank(token)) {
+                    BaseRspDto rsp = new BaseRspDto();
+                    rsp.setCode(HzzExceptionEnum.USER_NOT_LOGIN.getErrorCode());
+                    rsp.setMsg(HzzExceptionEnum.USER_NOT_LOGIN.getErrorMsg());
+                    response.setCharacterEncoding("UTF-8");
+                    response.getWriter().write(JsonUtils.toJson(rsp));
                     return false;
                 }
                 String userId;
@@ -62,6 +74,7 @@ public class AuthInterceptor implements HandlerInterceptor {
                     return false;
                 }
                 CustomerbaseinfoVo vo = customerbaseinfoService.getUserInfoById(userId);
+                log.info("拦截器获取到用户信息 vo={}", JsonUtils.toJson(vo));
                 request.setAttribute(CommonConstant.USER_INFO, vo);
                 JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(vo.getCbiPassword())).build();
                 jwtVerifier.verify(token);
@@ -77,6 +90,15 @@ public class AuthInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable Exception ex) throws Exception {
+
+        log.error("111111111");
+        if (request.getAttribute(CommonConstant.USER_INFO) == null) {
+            log.error("33333333333");
+            //BaseRspDto rsp = new BaseRspDto();
+            //rsp.setCode(HzzExceptionEnum.USER_NOT_LOGIN.getErrorCode());
+            //rsp.setMsg(HzzExceptionEnum.USER_NOT_LOGIN.getErrorMsg());
+            throw new HzzBizException(HzzExceptionEnum.USER_NOT_LOGIN);
+        }
     }
 
 }
