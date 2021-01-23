@@ -1,7 +1,9 @@
 package com.akfly.hzz.config;
 
 import com.akfly.hzz.interceptor.AuthInterceptor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -16,18 +18,25 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class AuthConfig implements WebMvcConfigurer {
 
+    @Bean
+    public HandlerInterceptor getUserInfoResolver() {
+
+        return new AuthInterceptor();
+    }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 
-        InterceptorRegistration registration = registry.addInterceptor(new AuthInterceptor());
-        registration.addPathPatterns("/**");                      //所有路径都被拦截
+        InterceptorRegistration registration = registry.addInterceptor(getUserInfoResolver());
+        registration.addPathPatterns("/hzz/**");                      //所有路径都被拦截
         registration.excludePathPatterns(                         //添加不拦截路径
                 "/hzz/user/login",
                 "/hzz/user/logout",
                 "/hzz/user/sendMsgCode",
                 "/hzz/sy/hello",
-                "/hzz/user/register"
+                "/hzz/user/register",
+                "/swagger-ui.html",
+                "/swagger-resources/**"
         );
     }
 

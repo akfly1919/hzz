@@ -16,9 +16,9 @@ spring:
 #          driver-class-name: com.mysql.jdbc.Driver
 
   redis:
-    host: 10.0.0.4
+    host: 192.144.230.48
     port: 6379
-    password: "O%!I3Ad4nYGYTTIg"
+    password: hzzdevredis
     timeout: 3000
     pool:
       maxIdle: 10

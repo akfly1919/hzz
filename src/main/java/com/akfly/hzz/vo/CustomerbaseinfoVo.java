@@ -56,9 +56,9 @@ public class CustomerbaseinfoVo implements Serializable {
      */
     private Integer cbiValid;
 
-    private Date cbiCreatetime;
+    private LocalDateTime cbiCreatetime;
 
-    private Date cbiUpdatetime;
+    private LocalDateTime cbiUpdatetime;
 
     /**
      * 总资产

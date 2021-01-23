@@ -1,10 +1,16 @@
 package com.akfly.hzz.service.impl;
 
+import com.akfly.hzz.exception.HzzBizException;
+import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.vo.CustomeraddressinfoVo;
 import com.akfly.hzz.mapper.CustomeraddressinfoMapper;
 import com.akfly.hzz.service.CustomeraddressinfoService;
+import com.akfly.hzz.vo.CustomerbaseinfoVo;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
 
 /**
  * <p>
@@ -16,5 +22,14 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class CustomeraddressinfoServiceImpl extends ServiceImpl<CustomeraddressinfoMapper, CustomeraddressinfoVo> implements CustomeraddressinfoService {
+    @Override
+    public List<CustomeraddressinfoVo> getUserInfoById(Long cbiId) throws HzzBizException {
 
+        List<CustomeraddressinfoVo> adresslist = lambdaQuery()
+                .eq(CustomeraddressinfoVo::getCbiId, cbiId).list();
+        /*if (CollectionUtils.isEmpty(adresslist)) {
+            throw new HzzBizException(HzzExceptionEnum.USER_NOTEXIST_ERROR);
+        }*/
+        return adresslist;
+    }
 }
