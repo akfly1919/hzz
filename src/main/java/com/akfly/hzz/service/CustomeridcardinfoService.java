@@ -1,5 +1,6 @@
 package com.akfly.hzz.service;
 
+import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.vo.CustomeridcardinfoVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,4 +14,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface CustomeridcardinfoService extends IService<CustomeridcardinfoVo> {
 
+    void saveCardInfo(long userId, String idCardFront, String idCardBack) throws HzzBizException;
+
+    CustomeridcardinfoVo getCardInfo(long userId) throws HzzBizException;
 }

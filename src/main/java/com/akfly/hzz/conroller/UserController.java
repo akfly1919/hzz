@@ -4,9 +4,12 @@ package com.akfly.hzz.conroller;
 import com.akfly.hzz.constant.CommonConstant;
 import com.akfly.hzz.dto.BaseRspDto;
 import com.akfly.hzz.dto.MessageCodeDto;
+import com.akfly.hzz.dto.RealNameReqDto;
+import com.akfly.hzz.dto.RealNameRspDto;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.service.CustomerbaseinfoService;
+import com.akfly.hzz.service.CustomeridcardinfoService;
 import com.akfly.hzz.util.*;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
 import lombok.extern.slf4j.Slf4j;
@@ -14,8 +17,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
@@ -28,11 +34,15 @@ public class UserController {
 
 	private static final String MD5_KEY = "Jg7ZjmnxE8c7RCXy";
 
-	@Autowired
+	@Resource
 	private RedisUtils redisUtils;
 
-	@Autowired
+	@Resource
 	private CustomerbaseinfoService customerbaseinfoService;
+
+	@Resource
+	private CustomeridcardinfoService customeridcardinfoService;
+
 
 	@RequestMapping(value = "/login")
 	public String login(HttpServletResponse response, String phoneNum, String psw, String pswType) {
@@ -140,6 +150,60 @@ public class UserController {
 		messageCodeDto.setPhoneNum(phoneNum);
 		messageCodeDto.setMsgCode(code);
 		rsp.setData(messageCodeDto);
+		return JsonUtils.toJson(rsp);
+	}
+
+
+	@RequestMapping(value = "/realName")
+	@ResponseBody
+	public String realName(@RequestParam RealNameReqDto realNameReqDto) {
+
+		log.info("realName realNameReqDto:{}}", JsonUtils.toJson(realNameReqDto));
+		BaseRspDto rsp = new BaseRspDto();
+		try {
+			if (StringUtils.isBlank(realNameReqDto.getName()) || StringUtils.isBlank(realNameReqDto.getIdentityCode()) ||
+					StringUtils.isBlank(realNameReqDto.getPhoneNum())) {
+				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
+			}
+			CustomerbaseinfoVo vo = new CustomerbaseinfoVo();
+			vo.setCbiName(realNameReqDto.getName());
+			vo.setCbiIdcard(realNameReqDto.getIdentityCode());
+			// TODO 需要放到一个事务
+			customerbaseinfoService.updateUserInfo(vo);
+			customeridcardinfoService.saveCardInfo(0, realNameReqDto.getIdFrontImgName(), realNameReqDto.getIdBackImgName());
+		} catch (HzzBizException e) {
+			log.error("用户实名认证业务错误 msg={}", e.getErrorMsg(), e);
+			rsp.setCode(e.getErrorCode());
+			rsp.setMsg(e.getErrorMsg());
+		} catch (Exception e) {
+			log.error("用户实名认证系统异常", e);
+			rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+			rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+		}
+		return JsonUtils.toJson(rsp);
+	}
+
+	@RequestMapping(value = "/getRealName")
+	@ResponseBody
+	public String getRealName() {
+
+		BaseRspDto<RealNameRspDto> rsp = new BaseRspDto<RealNameRspDto>();
+		try {
+			CustomerbaseinfoVo vo = customerbaseinfoService.getUserInfoById("");
+			RealNameRspDto rnDto = new RealNameRspDto();
+			rnDto.setName(vo.getCbiName());
+			rnDto.setIdentityCode(vo.getCbiIdcard());
+			rnDto.setPhoneNum(vo.getCbiPhonenum());
+			rsp.setData(rnDto);
+		} catch (HzzBizException e) {
+			log.error("用户实名认证业务错误 msg={}", e.getErrorMsg(), e);
+			rsp.setCode(e.getErrorCode());
+			rsp.setMsg(e.getErrorMsg());
+		} catch (Exception e) {
+			log.error("用户实名认证系统异常", e);
+			rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+			rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+		}
 		return JsonUtils.toJson(rsp);
 	}
 
