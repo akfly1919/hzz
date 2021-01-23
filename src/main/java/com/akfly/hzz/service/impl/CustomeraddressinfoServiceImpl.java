@@ -23,7 +23,7 @@ import java.util.List;
 @Service
 public class CustomeraddressinfoServiceImpl extends ServiceImpl<CustomeraddressinfoMapper, CustomeraddressinfoVo> implements CustomeraddressinfoService {
     @Override
-    public List<CustomeraddressinfoVo> getUserInfoById(String cbiId) throws HzzBizException {
+    public List<CustomeraddressinfoVo> getUserInfoById(Long cbiId) throws HzzBizException {
 
         List<CustomeraddressinfoVo> adresslist = lambdaQuery()
                 .eq(CustomeraddressinfoVo::getCbiId, cbiId).list();
