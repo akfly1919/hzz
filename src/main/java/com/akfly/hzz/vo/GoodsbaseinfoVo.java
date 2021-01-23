@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author wangfei
- * @since 2021-01-19
+ * @since 2021-01-23
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -112,9 +112,14 @@ public class GoodsbaseinfoVo implements Serializable {
     private Double gbiPriceceiling;
 
     /**
-     * 商品服务费比例
+     * 商品买入服务费比例
      */
-    private Double gbiServicerate;
+    private Double gbiBuyservicerate;
+
+    /**
+     * 商品卖出服务比率
+     */
+    private Double gbiSellservicerate;
 
     /**
      * 排序
@@ -125,6 +130,11 @@ public class GoodsbaseinfoVo implements Serializable {
      * 商品主图
      */
     private String gbiPicture;
+
+    /**
+     * 提货最低限制
+     */
+    private Integer gbiLimitpickup;
 
 
 }
