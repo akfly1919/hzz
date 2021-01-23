@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -43,7 +44,7 @@ public class UserController {
 	private CustomeridcardinfoService customeridcardinfoService;
 
 
-	@RequestMapping(value = "/login")
+	@RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.POST})
 	public BaseRspDto login(HttpServletResponse response, String phoneNum, String psw, String pswType) {
 
 		BaseRspDto<CustomerbaseinfoVo> rsp = new BaseRspDto<CustomerbaseinfoVo>();
@@ -77,7 +78,7 @@ public class UserController {
 		return rsp;
 	}
 
-	@RequestMapping(value = "/register")
+	@RequestMapping(value = "/register", method = {RequestMethod.GET, RequestMethod.POST})
 	public BaseRspDto register(HttpServletResponse response, String phoneNum, String psw, String repeatPsw) {
 
 		BaseRspDto<CustomerbaseinfoVo> rsp = new BaseRspDto<CustomerbaseinfoVo>();
