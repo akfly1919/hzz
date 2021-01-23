@@ -17,6 +17,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -46,7 +47,7 @@ public class ShouYeController {
      *
      * @return
      */
-    @GetMapping(value = "/index")
+    @RequestMapping(value = "/index", method = {RequestMethod.GET, RequestMethod.POST})
     public String index() {
         try {
             return CacheUtils.graphs.get(CacheUtils.CACHEUTILS_SY, () -> shouye());
@@ -57,7 +58,7 @@ public class ShouYeController {
 
     }
 
-    @GetMapping(value = "/goodList")
+    @RequestMapping(value = "/goodList", method = {RequestMethod.GET, RequestMethod.POST})
     public String goodList(@Validated int beg, int size) {
         List<GoodsbaseinfoVo> zcgoods = goodsbaseinfoService.lambdaQuery()
                 .eq(GoodsbaseinfoVo::getGbiType, CommonConstant.GOODSTYPE_ZC)
@@ -66,7 +67,7 @@ public class ShouYeController {
 
     }
 
-    @GetMapping(value = "/goodInfo")
+    @RequestMapping(value = "/goodInfo", method = {RequestMethod.GET, RequestMethod.POST})
     public String goodInfo(@Validated String goodId) {
         Map<String, Object> map = Maps.newHashMap();
         GoodsbaseinfoVo goodsbaseinfoVo = goodsbaseinfoService.lambdaQuery()
@@ -82,7 +83,7 @@ public class ShouYeController {
 
     }
 
-    @GetMapping(value = "/xiaoxiList")
+    @RequestMapping(value = "/xiaoxiList", method = {RequestMethod.GET, RequestMethod.POST})
     public String xiaoxiList() {
         List<BroadcastnoteinfoVo> tzs = broadcastnoteinfoService.lambdaQuery()
                 .eq(BroadcastnoteinfoVo::getBniPostion, CommonConstant.LUNBO_TZ)
@@ -93,22 +94,23 @@ public class ShouYeController {
 
 
     private String shouye() {
+        //正常商品
         List<GoodsbaseinfoVo> zcgoods = goodsbaseinfoService.lambdaQuery()
                 .eq(GoodsbaseinfoVo::getGbiType, CommonConstant.GOODSTYPE_ZC)
                 .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit 3").list();
-
+        //新手商品
         List<GoodsbaseinfoVo> xsgoods = goodsbaseinfoService.lambdaQuery()
                 .eq(GoodsbaseinfoVo::getGbiType, CommonConstant.GOODSTYPE_XS)
                 .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit 3").list();
-
+        //首页轮播图
         List<BroadcastnoteinfoVo> sys = broadcastnoteinfoService.lambdaQuery()
                 .eq(BroadcastnoteinfoVo::getBniPostion, CommonConstant.LUNBO_SY)
                 .orderByDesc(BroadcastnoteinfoVo::getBniSort).last("limit 3").list();
-
+        //消息通知
         List<BroadcastnoteinfoVo> tzs = broadcastnoteinfoService.lambdaQuery()
                 .eq(BroadcastnoteinfoVo::getBniPostion, CommonConstant.LUNBO_TZ)
                 .orderByDesc(BroadcastnoteinfoVo::getBniSort).last("limit 5").list();
-
+        //活动图
         List<BroadcastnoteinfoVo> hds = broadcastnoteinfoService.lambdaQuery()
                 .eq(BroadcastnoteinfoVo::getBniPostion, CommonConstant.LUNBO_HD)
                 .orderByDesc(BroadcastnoteinfoVo::getBniSort).last("limit 1").list();
