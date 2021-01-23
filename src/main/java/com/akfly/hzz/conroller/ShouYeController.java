@@ -94,22 +94,23 @@ public class ShouYeController {
 
 
     private String shouye() {
+        //正常商品
         List<GoodsbaseinfoVo> zcgoods = goodsbaseinfoService.lambdaQuery()
                 .eq(GoodsbaseinfoVo::getGbiType, CommonConstant.GOODSTYPE_ZC)
                 .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit 3").list();
-
+        //新手商品
         List<GoodsbaseinfoVo> xsgoods = goodsbaseinfoService.lambdaQuery()
                 .eq(GoodsbaseinfoVo::getGbiType, CommonConstant.GOODSTYPE_XS)
                 .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit 3").list();
-
+        //首页轮播图
         List<BroadcastnoteinfoVo> sys = broadcastnoteinfoService.lambdaQuery()
                 .eq(BroadcastnoteinfoVo::getBniPostion, CommonConstant.LUNBO_SY)
                 .orderByDesc(BroadcastnoteinfoVo::getBniSort).last("limit 3").list();
-
+        //消息通知
         List<BroadcastnoteinfoVo> tzs = broadcastnoteinfoService.lambdaQuery()
                 .eq(BroadcastnoteinfoVo::getBniPostion, CommonConstant.LUNBO_TZ)
                 .orderByDesc(BroadcastnoteinfoVo::getBniSort).last("limit 5").list();
-
+        //活动图
         List<BroadcastnoteinfoVo> hds = broadcastnoteinfoService.lambdaQuery()
                 .eq(BroadcastnoteinfoVo::getBniPostion, CommonConstant.LUNBO_HD)
                 .orderByDesc(BroadcastnoteinfoVo::getBniSort).last("limit 1").list();
