@@ -14,6 +14,9 @@ import com.akfly.hzz.service.CustomerbaseinfoService;
 import com.akfly.hzz.service.CustomeridcardinfoService;
 import com.akfly.hzz.util.*;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -44,6 +47,12 @@ public class UserController {
 	private CustomeridcardinfoService customeridcardinfoService;
 
 
+	@ApiOperation(value="用户登录",notes="同时支持手机验证码或者密码登录")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name="phoneNum",value="手机号",required=true),
+			@ApiImplicitParam(name="psw",value="密码或者验证码",required=true),
+			@ApiImplicitParam(name="pswType",value="密码类型(0: 代表密码登录 1: 代表手机验证码登录)",required=true)
+	})
 	@RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.POST})
 	public BaseRspDto login(HttpServletResponse response, String phoneNum, String psw, String pswType) {
 
@@ -78,6 +87,12 @@ public class UserController {
 		return rsp;
 	}
 
+	@ApiOperation(value="用户注册",notes="密码注册")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name="phoneNum",value="手机号",required=true),
+			@ApiImplicitParam(name="psw",value="密码",required=true),
+			@ApiImplicitParam(name="repeatPsw",value="确认密码",required=true)
+	})
 	@RequestMapping(value = "/register", method = {RequestMethod.GET, RequestMethod.POST})
 	public BaseRspDto register(HttpServletResponse response, String phoneNum, String psw, String repeatPsw) {
 
@@ -114,13 +129,14 @@ public class UserController {
 		return rsp;
 	}
 
+	@ApiOperation(value="退出登录",notes="用户退出登录")
 	@PostMapping(value = "/logout")
 	@VerifyToken
-	public BaseRspDto logout(HttpServletResponse response, String token) {
+	public BaseRspDto logout(HttpServletResponse response, @LoggedIn CustomerbaseinfoVo vo) {
 
 		BaseRspDto<CustomerbaseinfoVo> rsp = new BaseRspDto<CustomerbaseinfoVo>();
 		try {
-			if (StringUtils.isBlank(token)) {
+			if (vo.getCbiId() == null) {
 				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
 			}
 			redisUtils.del("token"); // 清除缓存
@@ -139,6 +155,10 @@ public class UserController {
 	}
 
 
+	@ApiOperation(value="发送验证码",notes="目前没有真实发送，将验证码直接返回给前端")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name="phoneNum",value="手机号",required=true)
+	})
 	@RequestMapping(value = "/sendMsgCode")
 	public BaseRspDto sendMsgCode(String phoneNum) {
 
@@ -155,6 +175,14 @@ public class UserController {
 	}
 
 
+	@ApiOperation(value="用户实名认证",notes="目前暂未用OCR识别身份证")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name="name",value="姓名",required=true),
+			@ApiImplicitParam(name="identityCode",value="身份证号码",required=true),
+			@ApiImplicitParam(name="phoneNum",value="手机号",required=true),
+			@ApiImplicitParam(name="idBackImgName",value="身份证反面照片名称",required=true),
+			@ApiImplicitParam(name="idFrontImgName",value="身份证正面照片名称",required=true)
+	})
 	@PostMapping(value = "/realName")
 	@ResponseBody
 	@VerifyToken
@@ -186,6 +214,7 @@ public class UserController {
 		return rsp;
 	}
 
+	@ApiOperation(value="用户实名认证查询",notes="要求登录就可以")
 	@PostMapping(value = "/getRealName")
 	@ResponseBody
 	public BaseRspDto getRealName() {

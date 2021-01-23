@@ -8,6 +8,9 @@ import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.service.CustomeraddressinfoService;
 import com.akfly.hzz.vo.CustomeraddressinfoVo;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +26,8 @@ public class AddressInfoController {
 
     @Autowired
     CustomeraddressinfoService customeraddressinfoService;
+
+    @ApiOperation(value="获取收货地址",notes="用户登录就可以")
     @GetMapping
     @VerifyToken
     public BaseRspDto<List<CustomeraddressinfoVo>> getCustomerAddressInfo(@LoggedIn CustomerbaseinfoVo vo){
