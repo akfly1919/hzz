@@ -113,7 +113,7 @@ public class UserController {
 		return rsp;
 	}
 
-	@RequestMapping(value = "/logout")
+	@PostMapping(value = "/logout")
 	@VerifyToken
 	public BaseRspDto logout(HttpServletResponse response, String token) {
 

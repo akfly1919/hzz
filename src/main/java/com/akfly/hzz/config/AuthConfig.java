@@ -28,14 +28,15 @@ public class AuthConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
 
         InterceptorRegistration registration = registry.addInterceptor(getUserInfoResolver());
-        registration.addPathPatterns("/**");                      //所有路径都被拦截
+        registration.addPathPatterns("/hzz/**");                      //所有路径都被拦截
         registration.excludePathPatterns(                         //添加不拦截路径
                 "/hzz/user/login",
                 "/hzz/user/logout",
                 "/hzz/user/sendMsgCode",
                 "/hzz/sy/hello",
                 "/hzz/user/register",
-                "/swagger-ui.html"
+                "/swagger-ui.html",
+                "/swagger-resources/**"
         );
     }
 

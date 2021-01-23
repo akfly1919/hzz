@@ -15,5 +15,5 @@ import java.util.List;
  * @since 2021-01-18
  */
 public interface CustomeraddressinfoService extends IService<CustomeraddressinfoVo> {
-    public List<CustomeraddressinfoVo> getUserInfoById(String cbiId) throws HzzBizException;
+    public List<CustomeraddressinfoVo> getUserInfoById(Long cbiId) throws HzzBizException;
 }
