@@ -79,10 +79,10 @@ public class MyBatisPlusGenerator {
         strategy.setNaming(NamingStrategy.underline_to_camel);
 
         // 需要生成的表
-//        strategy.setInclude(new String[]{"goodsbaseinfo"});
-//        strategy.setSuperServiceClass(null);
-//        strategy.setSuperServiceImplClass(null);
-//        strategy.setSuperMapperClass(null);
+        //strategy.setInclude(new String[]{"customerbillrelated"});
+        //strategy.setSuperServiceClass(null);
+        //strategy.setSuperServiceImplClass(null);
+        //strategy.setSuperMapperClass(null);
         strategy.setEntityLombokModel(true);
 
         //去除表前缀

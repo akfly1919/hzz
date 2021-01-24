@@ -3,7 +3,7 @@
 <mapper namespace="com.akfly.hzz.mapper.TradeorderinfoMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.TradeorderinfoVo">
+    <resultMap id="BaseResultMap" type="com.qianxian.api.vo.TradeorderinfoVo">
         <id column="id" property="id" />
         <result column="toi_orderid" property="toiOrderid" />
         <result column="tgs_id" property="tgsId" />
@@ -13,9 +13,10 @@
         <result column="toi_sellerid" property="toiSellerid" />
         <result column="toi_price" property="toiPrice" />
         <result column="toi_status" property="toiStatus" />
-        <result column="toi_buytime" property="toiBuytime" />
+        <result column="toi_tradetime" property="toiTradetime" />
         <result column="toi_updatetime" property="toiUpdatetime" />
-        <result column="toi_finishtime" property="toiFinishtime" />
+        <result column="toi_buyservicefee" property="toiBuyservicefee" />
+        <result column="toi_sellservicefee" property="toiSellservicefee" />
     </resultMap>
 
 </mapper>

@@ -83,7 +83,8 @@ public class UserController {
 	@ApiImplicitParams({
 			@ApiImplicitParam(name="phoneNum",value="手机号",required=true),
 			@ApiImplicitParam(name="psw",value="密码",required=true),
-			@ApiImplicitParam(name="msgCode",value="短信验证码",required=true)
+			@ApiImplicitParam(name="msgCode",value="短信验证码",required=true),
+			@ApiImplicitParam(name="invitationCode",value="邀请码",required=false)
 	})
 	@RequestMapping(value = "/register", method = {RequestMethod.GET, RequestMethod.POST})
 	public BaseRspDto register(HttpServletResponse response, String phoneNum, String psw, String msgCode, String invitationCode) {
