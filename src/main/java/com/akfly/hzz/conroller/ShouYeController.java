@@ -36,6 +36,7 @@ public class ShouYeController {
     PictureinfoService pictureinfoService;
     @Autowired
     private RedisTemplate<String,Object> redisTemplate;
+
     @GetMapping(value = "/hello")
     public String hello(){
         return redisTemplate.opsForValue().get("a")+"";
