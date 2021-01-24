@@ -186,7 +186,7 @@ public class UserController {
 	@PostMapping(value = "/realName")
 	@ResponseBody
 	@VerifyToken
-	public BaseRspDto realName(@RequestBody RealNameReqDto realNameReqDto, @LoggedIn CustomerbaseinfoVo userInfo) {
+	public BaseRspDto realName(RealNameReqDto realNameReqDto, @LoggedIn CustomerbaseinfoVo userInfo) {
 
 		log.info("realName realNameReqDto:{}", JsonUtils.toJson(realNameReqDto));
 		BaseRspDto rsp = new BaseRspDto();
