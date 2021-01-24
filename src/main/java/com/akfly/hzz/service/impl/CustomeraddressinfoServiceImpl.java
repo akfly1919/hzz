@@ -23,13 +23,25 @@ import java.util.List;
 @Service
 public class CustomeraddressinfoServiceImpl extends ServiceImpl<CustomeraddressinfoMapper, CustomeraddressinfoVo> implements CustomeraddressinfoService {
     @Override
-    public List<CustomeraddressinfoVo> getUserInfoById(Long cbiId) throws HzzBizException {
+    public List<CustomeraddressinfoVo> getAddressInfoById(Long cbiId) throws HzzBizException {
 
         List<CustomeraddressinfoVo> adresslist = lambdaQuery()
                 .eq(CustomeraddressinfoVo::getCbiId, cbiId).list();
-        /*if (CollectionUtils.isEmpty(adresslist)) {
-            throw new HzzBizException(HzzExceptionEnum.USER_NOTEXIST_ERROR);
-        }*/
         return adresslist;
+    }
+    @Override
+    public void createAddressInfo(CustomeraddressinfoVo customeraddressinfoVo) throws HzzBizException {
+        if (!save(customeraddressinfoVo)) {
+            throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
+        }
+
+    }
+    @Override
+    public void updateAddressInfo(CustomeraddressinfoVo customeraddressinfoVo) throws HzzBizException {
+
+        if (!updateById(customeraddressinfoVo)) {
+            throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
+        }
+
     }
 }

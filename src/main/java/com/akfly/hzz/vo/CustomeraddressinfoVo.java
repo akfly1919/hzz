@@ -5,8 +5,12 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 /**
  * <p>
@@ -31,16 +35,18 @@ public class CustomeraddressinfoVo implements Serializable {
      */
     private Long cbiId;
 
+    @NotNull(message = "不能为空")
     private String caiRecipients;
-
+    @NotNull(message = "不能为空")
+    @Pattern(regexp = "^1[3456789]\\d{9}$",message = "手机号格式不正确")
     private String caiPhonenum;
-
+    @NotNull(message = "不能为空")
     private String caiProvince;
-
+    @NotNull(message = "不能为空")
     private String caiCity;
-
+    @NotNull(message = "不能为空")
     private String caiArea;
-
+    @NotNull(message = "不能为空")
     private String caiStreet;
 
     /**

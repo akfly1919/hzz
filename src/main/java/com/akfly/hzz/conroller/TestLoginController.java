@@ -6,8 +6,10 @@ import com.akfly.hzz.annotation.VerifyToken;
 import com.akfly.hzz.constant.CommonConstant;
 import com.akfly.hzz.util.JsonUtils;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,10 +18,12 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 @RestController
 @RequestMapping(value = "/hzz/")
-public class LoginController {
+public class TestLoginController {
 
 
-	@RequestMapping(value = "/login")
+	@ApiOperation(value="自测使用 - 忽略",notes="忽略")
+
+	@RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.POST})
 	@VerifyToken
 	public String login(@LoggedIn CustomerbaseinfoVo vo, HttpServletRequest request, String phoneNum, String psw) {
 
@@ -38,7 +42,8 @@ public class LoginController {
 		}
 	}
 
-	@RequestMapping(value = "/get")
+	@ApiOperation(value="自测使用 - 忽略",notes="忽略")
+	@RequestMapping(value = "/get", method = {RequestMethod.GET, RequestMethod.POST})
 	public String get(HttpServletRequest request, String phoneNum) {
 
 		String currentPhoneNum = (String)(request.getSession().getAttribute("phoneNum"));
