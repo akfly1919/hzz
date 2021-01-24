@@ -1,5 +1,8 @@
 package com.akfly.hzz.service.impl;
 
+import com.akfly.hzz.exception.HzzBizException;
+import com.akfly.hzz.exception.HzzExceptionEnum;
+import com.akfly.hzz.vo.CustomeraddressinfoVo;
 import com.akfly.hzz.vo.CustomercashoutinfoVo;
 import com.akfly.hzz.mapper.CustomercashoutinfoMapper;
 import com.akfly.hzz.service.CustomercashoutinfoService;
@@ -16,5 +19,11 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class CustomercashoutinfoServiceImpl extends ServiceImpl<CustomercashoutinfoMapper, CustomercashoutinfoVo> implements CustomercashoutinfoService {
+    @Override
+    public void createcustomercashoutinfo(CustomercashoutinfoVo customercashoutinfoVo) throws HzzBizException {
+        if (!save(customercashoutinfoVo)) {
+            throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
+        }
 
+    }
 }
