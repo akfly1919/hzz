@@ -22,6 +22,7 @@
         <result column="cbi_parentid" property="cbiParentid" />
         <result column="cbi_isnew" property="cbiIsnew" />
         <result column="cbi_goodsnum" property="cbiGoodsnum" />
+        <result column="cbi_shareurl" property="cbiShareurl" />
     </resultMap>
 
 </mapper>

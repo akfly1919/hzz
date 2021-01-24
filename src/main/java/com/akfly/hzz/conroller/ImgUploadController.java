@@ -1,19 +1,21 @@
 package com.akfly.hzz.conroller;
 
+import com.akfly.hzz.annotation.LoggedIn;
+import com.akfly.hzz.annotation.VerifyToken;
 import com.akfly.hzz.dto.BaseRspDto;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
+import com.akfly.hzz.interceptor.AuthInterceptor;
 import com.akfly.hzz.service.CustomercardinfoService;
 import com.akfly.hzz.service.CustomeridcardinfoService;
 import com.akfly.hzz.util.JsonUtils;
+import com.akfly.hzz.vo.CustomerbaseinfoVo;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -24,8 +26,9 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-@Log4j2
-@Controller(value = "/hzz")
+@Slf4j
+@RestController
+@RequestMapping(value = "/hzz/file")
 public class ImgUploadController {
 
     @Resource
@@ -43,33 +46,43 @@ public class ImgUploadController {
      */
     @PostMapping(value = "/imgUp")
     @ResponseBody
-    public String imgUp(HttpSession session, @RequestParam MultipartFile file, HttpServletResponse response) {
+    @VerifyToken
+    public String imgUp(@RequestParam MultipartFile file, HttpServletResponse response) {
 
         BaseRspDto rsp = new BaseRspDto();
         ServletOutputStream outputStream = null;
-        String userId = "";
+        CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+        String userId = String.valueOf(userInfo.getCbiId());
         try {
-            userId = "";
-
             String fileName = file.getOriginalFilename();
             checkImgSuffixAndSize(file, fileName);
-
-            String userId2 = userId;
             InputStream imageStream = file.getInputStream();
             threadPool.submit(() -> {
+                OutputStream outputStream1 = null;
                 try {
                     //SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
                     //String dateStr = sdf.format(new Date());
                     //File image = new File(path + userId2 + File.separator + userId2 +"_" + dateStr +  fileName);
-                    File image = new File(path + userId2 + File.separator + fileName);
-                    OutputStream outputStream1 = new FileOutputStream(image);
-                    byte[] buffer = new byte[2048];
-                    int i = -1;
-                    while ((i = imageStream.read(buffer)) != -1) {
-                        outputStream1.write(buffer, 0, i);
+                    File dir = new File(path + userId);
+                    if (!dir.isDirectory()) {
+                        dir.mkdir();
                     }
+                    File image = new File(path + userId + File.separator + fileName);
+                    byte[] data = new byte[imageStream.available()];
+                    imageStream.read(data);
+                    outputStream1 = new FileOutputStream(image);
+                    outputStream1.write(data);
                 } catch (Exception e) {
-                    log.error("上传原图异常,userId={}" + userId2, e);
+                    log.error("上传原图异常,userId={}" + userId, e);
+                } finally {
+                    if (outputStream1 != null) {
+                        try {
+                            outputStream1.flush();
+                            outputStream1.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             });
 
@@ -96,6 +109,7 @@ public class ImgUploadController {
                     outputStream.flush();
                 if (outputStream != null)
                     outputStream.close();
+
             } catch (IOException e) {
                 log.error("读写文件异常,userId=" + userId, e);
             }
@@ -112,14 +126,15 @@ public class ImgUploadController {
      */
     @GetMapping(value = "/showImage")
     @ResponseBody
-    public String showImage(HttpSession session, String fileName, HttpServletResponse response) {
+    //@VerifyToken
+    public String showImage(String fileName, HttpServletResponse response) {
         log.info("图片展示前端请求参数fileName:{}", fileName);
         BaseRspDto rsp = new BaseRspDto();
         ServletOutputStream outputStream = null;
         InputStream inputStream = null;
-        String userId = "";
+        CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+        String userId = String.valueOf(userInfo.getCbiId());
         try {
-            userId = "";
             if (StringUtils.isBlank(fileName)) {
                 log.info("图片名称为空");
                 throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
@@ -133,26 +148,26 @@ public class ImgUploadController {
                 outputStream = response.getOutputStream();
 
                 //复制InputStream流
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                byte[] buffer = new byte[1024];
-                int len;
-                while ((len = inputStream.read(buffer)) > -1) {
-                    baos.write(buffer, 0, len);
-                }
-                baos.flush();
-
-                //判断文件头
-                InputStream stream1 = new ByteArrayInputStream(baos.toByteArray());
-
-                byte[] bufferHeader = new byte[7];
-                stream1.read(bufferHeader, 0, bufferHeader.length);
-                String headString = bytesToHexString(bufferHeader);
-                headString = headString.toUpperCase();
-                //展示到前端
-                InputStream stream2 = new ByteArrayInputStream(baos.toByteArray());
-                byte[] buffer2Front = new byte[1024];
+                //ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                //byte[] buffer = new byte[1024];
+                //int len;
+                //while ((len = inputStream.read(buffer)) > -1) {
+                //    baos.write(buffer, 0, len);
+                //}
+                //baos.flush();
+                //
+                ////判断文件头
+                //InputStream stream1 = new ByteArrayInputStream(baos.toByteArray());
+                //
+                //byte[] bufferHeader = new byte[7];
+                //stream1.read(bufferHeader, 0, bufferHeader.length);
+                //String headString = bytesToHexString(bufferHeader);
+                //headString = headString.toUpperCase();
+                ////展示到前端
+                //InputStream stream2 = new ByteArrayInputStream(baos.toByteArray());
+                byte[] buffer2Front = new byte[2048];
                 int i = -1;
-                while ((i = stream2.read(buffer2Front)) != -1) {
+                while ((i = inputStream.read(buffer2Front)) != -1) {
                     outputStream.write(buffer2Front, 0, i);
                 }
 

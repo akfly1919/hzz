@@ -31,7 +31,6 @@ public class AuthConfig implements WebMvcConfigurer {
         registration.addPathPatterns("/hzz/**");                      //所有路径都被拦截
         registration.excludePathPatterns(                         //添加不拦截路径
                 "/hzz/user/login",
-                "/hzz/user/logout",
                 "/hzz/user/sendMsgCode",
                 "/hzz/sy/hello",
                 "/hzz/user/register",

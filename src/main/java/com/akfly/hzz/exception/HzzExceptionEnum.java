@@ -7,7 +7,6 @@ public enum HzzExceptionEnum {
     FAILED("0001", "失败"),
     PROCESSING("0002", "处理中"),
 
-    /* 系统异常定义以1开头 */
     NAME_OR_PSW_ERROR("1001", "用户名或者密码错误"),
     USER_NOTEXIST_ERROR("1002", "用户不存在"),
     MSG_CODE_INVALID("1003", "验证码无效"),
@@ -15,6 +14,8 @@ public enum HzzExceptionEnum {
     IMAGE_NOT_EXIST("1005", "图片不存在"),
     USER_NOT_REALNAME("1006", "用户未实名"),
     USER_NOT_LOGIN("1007", "用户未登录"),
+    USER_NOT_SET("1008", "用户未设置过登录密码"),
+    USER_OLDPSW_ERROR("1009", "原始密码错误"),
 
     /* 业务异常定义以2-8开头，顺序往下排号 */
     PARAM_INVALID("2000", "参数不合法"),

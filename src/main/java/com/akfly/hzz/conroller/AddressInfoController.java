@@ -1,15 +1,13 @@
 package com.akfly.hzz.conroller;
 
-import com.akfly.hzz.annotation.LoggedIn;
 import com.akfly.hzz.annotation.VerifyToken;
 import com.akfly.hzz.dto.BaseRspDto;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
+import com.akfly.hzz.interceptor.AuthInterceptor;
 import com.akfly.hzz.service.CustomeraddressinfoService;
 import com.akfly.hzz.vo.CustomeraddressinfoVo;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +15,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 @Slf4j
@@ -31,10 +28,11 @@ public class AddressInfoController {
     @ApiOperation(value="获取收货地址",notes="用户登录就可以")
     @GetMapping
     @VerifyToken
-    public BaseRspDto<List<CustomeraddressinfoVo>> getCustomerAddressInfo(@LoggedIn CustomerbaseinfoVo vo){
+    public BaseRspDto<List<CustomeraddressinfoVo>> getCustomerAddressInfo(){
         BaseRspDto<List<CustomeraddressinfoVo>> rsp = new BaseRspDto<List<CustomeraddressinfoVo>>();
         try {
-            List<CustomeraddressinfoVo> list = customeraddressinfoService.getAddressInfoById(vo.getCbiId());
+            CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+            List<CustomeraddressinfoVo> list = customeraddressinfoService.getAddressInfoById(userInfo.getCbiId());
             rsp.setData(list);
         } catch (HzzBizException e) {
             log.error("查询地址列表业务错误 msg={}", e.getErrorMsg(), e);
@@ -49,10 +47,11 @@ public class AddressInfoController {
     }
     @PutMapping
     @VerifyToken
-    public  BaseRspDto<String> createCustomerAddressInfo(@LoggedIn CustomerbaseinfoVo vo,@Validated CustomeraddressinfoVo customeraddressinfoVo){
+    public  BaseRspDto<String> createCustomerAddressInfo(@Validated CustomeraddressinfoVo customeraddressinfoVo){
         BaseRspDto<String> rsp = new BaseRspDto<String>();
         try {
-            customeraddressinfoVo.setCbiId(vo.getCbiId());
+            CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+            customeraddressinfoVo.setCbiId(userInfo.getCbiId());
             customeraddressinfoVo.setCaiUpdatetime(LocalDateTime.now());
             customeraddressinfoVo.setCaiValid(1);
             customeraddressinfoVo.setCaiSort(1);
@@ -70,10 +69,11 @@ public class AddressInfoController {
     }
     @PostMapping
     @VerifyToken
-    public  BaseRspDto<String> updateCustomerAddressInfo(@LoggedIn CustomerbaseinfoVo vo,@Validated CustomeraddressinfoVo customeraddressinfoVo){
+    public  BaseRspDto<String> updateCustomerAddressInfo(@Validated CustomeraddressinfoVo customeraddressinfoVo){
         BaseRspDto<String> rsp = new BaseRspDto<String>();
         try {
-            customeraddressinfoVo.setCbiId(vo.getCbiId());
+            CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+            customeraddressinfoVo.setCbiId(userInfo.getCbiId());
             customeraddressinfoVo.setCaiUpdatetime(LocalDateTime.now());
             customeraddressinfoVo.setCaiValid(1);
             customeraddressinfoVo.setCaiSort(1);

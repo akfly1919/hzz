@@ -20,13 +20,15 @@ public interface CustomerbaseinfoService extends IService<CustomerbaseinfoVo> {
 
     void userRegisterByCode(String phoneNum, String msgCode) throws HzzBizException;
 
-    void userRegister(String phoneNum, String psw) throws HzzBizException;
+    void userRegister(String phoneNum, String psw, String invitationCode) throws HzzBizException;
 
     void updateUserInfo(CustomerbaseinfoVo customerbaseinfoVo) throws HzzBizException;
 
     CustomerbaseinfoVo getUserInfo(String phoneNum) throws HzzBizException;
 
     CustomerbaseinfoVo getUserInfoById(String cbiId) throws HzzBizException;
+
+    Long getInvitationCode(long cbiId) throws HzzBizException;
 
 
 }

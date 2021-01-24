@@ -12,6 +12,7 @@ public  class CommonConstant {
 
     // redis 的key定义
     public static final String MSG_CODE_PREFIX = "msg_code:login:";
+    public static final String USER_PREFIX = "user:";
 
 
     public static final String USER_INFO = "user_info";

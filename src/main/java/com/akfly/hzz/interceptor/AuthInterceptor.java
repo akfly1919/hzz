@@ -20,9 +20,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -31,7 +29,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
 
 /**
  * @ClassName: AuthInterceptor
@@ -41,6 +38,8 @@ import java.nio.charset.StandardCharsets;
  */
 @Slf4j
 public class AuthInterceptor implements HandlerInterceptor {
+
+    private static final ThreadLocal<CustomerbaseinfoVo> userInfo = new ThreadLocal<>();
 
     @Resource
     private CustomerbaseinfoService customerbaseinfoService;
@@ -76,6 +75,7 @@ public class AuthInterceptor implements HandlerInterceptor {
                 CustomerbaseinfoVo vo = customerbaseinfoService.getUserInfoById(userId);
                 log.info("拦截器获取到用户信息 vo={}", JsonUtils.toJson(vo));
                 request.setAttribute(CommonConstant.USER_INFO, vo);
+                userInfo.set(vo);
                 JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(vo.getCbiPassword())).build();
                 jwtVerifier.verify(token);
                 return true;
@@ -91,14 +91,18 @@ public class AuthInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable Exception ex) throws Exception {
 
-        log.error("111111111");
+        userInfo.remove();
         if (request.getAttribute(CommonConstant.USER_INFO) == null) {
-            log.error("33333333333");
+            log.error("afterCompletion 用户未登录");
             //BaseRspDto rsp = new BaseRspDto();
             //rsp.setCode(HzzExceptionEnum.USER_NOT_LOGIN.getErrorCode());
             //rsp.setMsg(HzzExceptionEnum.USER_NOT_LOGIN.getErrorMsg());
             throw new HzzBizException(HzzExceptionEnum.USER_NOT_LOGIN);
         }
+    }
+
+    public static CustomerbaseinfoVo getUserInfo() {
+        return userInfo.get();
     }
 
 }
