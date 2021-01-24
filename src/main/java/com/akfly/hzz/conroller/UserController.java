@@ -159,7 +159,7 @@ public class UserController {
 	@ApiImplicitParams({
 			@ApiImplicitParam(name="phoneNum",value="手机号",required=true)
 	})
-	@RequestMapping(value = "/sendMsgCode")
+	@RequestMapping(value = "/sendMsgCode", method = {RequestMethod.GET, RequestMethod.POST})
 	public BaseRspDto sendMsgCode(String phoneNum) {
 
 		String code = RandomGenUtils.getRandomNumberInRange(100000, 999999)+"";
