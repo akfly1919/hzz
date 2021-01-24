@@ -52,7 +52,7 @@ public class AccountInfoController {
             //vo.setCpiFinishtime(copy.getCpiFinishtime());
             vo.setCpiPaystatus(PayStatus.UN_PAY.getStatus());
             vo.setCpiValid(ValidEnum.VALID.getStatus());
-            vo.setCpiChannel(PayChannelEnum.);
+            //vo.setCpiChannel(PayChannelEnum.);
             //vo.setCpiChannelorderid(copy.getCpiChannelorderid());
             //vo.setCpiOperator(copy.getCpiOperator());
 
