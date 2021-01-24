@@ -1,5 +1,6 @@
 package com.akfly.hzz.vo;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -9,6 +10,7 @@ import java.util.Date;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * <p>
@@ -56,6 +58,7 @@ public class CustomerbaseinfoVo implements Serializable {
      */
     private Integer cbiValid;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime cbiCreatetime;
 
     private LocalDateTime cbiUpdatetime;
@@ -94,6 +97,8 @@ public class CustomerbaseinfoVo implements Serializable {
      * 库存数量
      */
     private Integer cbiGoodsnum;
+
+    private String cbiShareurl;
 
 
 }

@@ -4,6 +4,7 @@ package com.akfly.hzz.conroller;
 import com.akfly.hzz.annotation.LoggedIn;
 import com.akfly.hzz.annotation.VerifyToken;
 import com.akfly.hzz.constant.CommonConstant;
+import com.akfly.hzz.interceptor.AuthInterceptor;
 import com.akfly.hzz.util.JsonUtils;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
 import io.swagger.annotations.ApiOperation;
@@ -25,10 +26,11 @@ public class TestLoginController {
 
 	@RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.POST})
 	@VerifyToken
-	public String login(@LoggedIn CustomerbaseinfoVo vo, HttpServletRequest request, String phoneNum, String psw) {
+	public String login(HttpServletRequest request, String phoneNum, String psw) {
 
-		log.info("login测试拦截器 uerId={}", JsonUtils.toJson(request.getAttribute(CommonConstant.USER_INFO)));
-		log.info("login测试拦截器 vo={}", JsonUtils.toJson(vo));
+		CustomerbaseinfoVo vo = AuthInterceptor.getUserInfo();
+		log.info("login测试拦截器ThreadLocal userInfo={}", JsonUtils.toJson(AuthInterceptor.getUserInfo()));
+		log.info("login测试拦截器request uerId={}", JsonUtils.toJson(request.getAttribute(CommonConstant.USER_INFO)));
 		if ("123".equals(phoneNum) && "456".equals(psw)) {
 			request.getSession().setAttribute("phoneNum", phoneNum);
 			log.info("phoneNum={}, sessionId={}, port={}", phoneNum, request.getSession().getId(), request.getServerPort());

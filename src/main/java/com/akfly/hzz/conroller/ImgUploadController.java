@@ -5,6 +5,7 @@ import com.akfly.hzz.annotation.VerifyToken;
 import com.akfly.hzz.dto.BaseRspDto;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
+import com.akfly.hzz.interceptor.AuthInterceptor;
 import com.akfly.hzz.service.CustomercardinfoService;
 import com.akfly.hzz.service.CustomeridcardinfoService;
 import com.akfly.hzz.util.JsonUtils;
@@ -46,11 +47,12 @@ public class ImgUploadController {
     @PostMapping(value = "/imgUp")
     @ResponseBody
     @VerifyToken
-    public String imgUp(@LoggedIn CustomerbaseinfoVo vo, @RequestParam MultipartFile file, HttpServletResponse response) {
+    public String imgUp(@RequestParam MultipartFile file, HttpServletResponse response) {
 
         BaseRspDto rsp = new BaseRspDto();
         ServletOutputStream outputStream = null;
-        String userId = String.valueOf(vo.getCbiId());
+        CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+        String userId = String.valueOf(userInfo.getCbiId());
         try {
             String fileName = file.getOriginalFilename();
             checkImgSuffixAndSize(file, fileName);
@@ -125,13 +127,13 @@ public class ImgUploadController {
     @GetMapping(value = "/showImage")
     @ResponseBody
     //@VerifyToken
-    public String showImage(@LoggedIn CustomerbaseinfoVo vo, String fileName, HttpServletResponse response) {
+    public String showImage(String fileName, HttpServletResponse response) {
         log.info("图片展示前端请求参数fileName:{}", fileName);
         BaseRspDto rsp = new BaseRspDto();
         ServletOutputStream outputStream = null;
         InputStream inputStream = null;
-        //String userId = String.valueOf(vo.getCbiId());
-        String userId = "10011";
+        CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+        String userId = String.valueOf(userInfo.getCbiId());
         try {
             if (StringUtils.isBlank(fileName)) {
                 log.info("图片名称为空");

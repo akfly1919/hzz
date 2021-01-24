@@ -1,15 +1,12 @@
 package com.akfly.hzz.conroller;
 
 
-import com.akfly.hzz.annotation.LoggedIn;
 import com.akfly.hzz.annotation.VerifyToken;
 import com.akfly.hzz.constant.CommonConstant;
-import com.akfly.hzz.dto.BaseRspDto;
-import com.akfly.hzz.dto.MessageCodeDto;
-import com.akfly.hzz.dto.RealNameReqDto;
-import com.akfly.hzz.dto.RealNameRspDto;
+import com.akfly.hzz.dto.*;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
+import com.akfly.hzz.interceptor.AuthInterceptor;
 import com.akfly.hzz.service.CustomerbaseinfoService;
 import com.akfly.hzz.service.CustomeridcardinfoService;
 import com.akfly.hzz.util.*;
@@ -19,15 +16,10 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.text.SimpleDateFormat;
 
 
 @Slf4j
@@ -91,22 +83,29 @@ public class UserController {
 	@ApiImplicitParams({
 			@ApiImplicitParam(name="phoneNum",value="手机号",required=true),
 			@ApiImplicitParam(name="psw",value="密码",required=true),
-			@ApiImplicitParam(name="repeatPsw",value="确认密码",required=true)
+			@ApiImplicitParam(name="msgCode",value="短信验证码",required=true)
 	})
 	@RequestMapping(value = "/register", method = {RequestMethod.GET, RequestMethod.POST})
-	public BaseRspDto register(HttpServletResponse response, String phoneNum, String psw, String repeatPsw) {
+	public BaseRspDto register(HttpServletResponse response, String phoneNum, String psw, String msgCode, String invitationCode) {
 
 		BaseRspDto<CustomerbaseinfoVo> rsp = new BaseRspDto<CustomerbaseinfoVo>();
 		try {
-			if (StringUtils.isBlank(phoneNum) || StringUtils.isBlank(psw) || StringUtils.isBlank(repeatPsw)) {
+			if (StringUtils.isBlank(phoneNum) || StringUtils.isBlank(psw) || StringUtils.isBlank(msgCode)) {
 				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
 			}
-			if (!repeatPsw.equals(psw)) {
-				throw new HzzBizException(HzzExceptionEnum.PSW_NOT_SAME);
+			//if (!repeatPsw.equals(psw)) {
+			//	throw new HzzBizException(HzzExceptionEnum.PSW_NOT_SAME);
+			//}
+			String key = CommonConstant.MSG_CODE_PREFIX + phoneNum;
+			String redisCode = String.valueOf(redisUtils.get(key));
+			if (!msgCode.equals(redisCode)) {
+				throw new HzzBizException(HzzExceptionEnum.MSG_CODE_INVALID);
+			} else {
+				redisUtils.del(key); // 使用过之后就删除
 			}
 			CustomerbaseinfoVo existUser = customerbaseinfoService.getUserInfo(phoneNum);
 			if (existUser == null) {
-				customerbaseinfoService.userRegister(phoneNum, psw);
+				customerbaseinfoService.userRegister(phoneNum, psw, invitationCode);
 				CustomerbaseinfoVo customerbaseinfoVo = customerbaseinfoService.getUserInfo(phoneNum);
 				response.setHeader("token", TokenUtils.getToken(customerbaseinfoVo.getCbiId().toString(), customerbaseinfoVo.getCbiPassword()));
 				customerbaseinfoVo.setCbiPassword(null);  // 去掉密码
@@ -132,14 +131,15 @@ public class UserController {
 	@ApiOperation(value="退出登录",notes="用户退出登录")
 	@PostMapping(value = "/logout")
 	@VerifyToken
-	public BaseRspDto logout(HttpServletResponse response, @LoggedIn CustomerbaseinfoVo vo) {
+	public BaseRspDto logout(HttpServletResponse response) {
 
 		BaseRspDto<CustomerbaseinfoVo> rsp = new BaseRspDto<CustomerbaseinfoVo>();
 		try {
-			if (vo.getCbiId() == null) {
+			CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+			if (userInfo.getCbiId() == null) {
 				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
 			}
-			redisUtils.del("token"); // 清除缓存
+			redisUtils.del(CommonConstant.USER_PREFIX + userInfo.getCbiId());
 		} catch (HzzBizException e) {
 			log.error("用户登录业务错误 msg={}", e.getErrorMsg(), e);
 			rsp.setCode(e.getErrorCode());
@@ -186,7 +186,7 @@ public class UserController {
 	@PostMapping(value = "/realName")
 	@ResponseBody
 	@VerifyToken
-	public BaseRspDto realName(RealNameReqDto realNameReqDto, @LoggedIn CustomerbaseinfoVo userInfo) {
+	public BaseRspDto realName(RealNameReqDto realNameReqDto) {
 
 		log.info("realName realNameReqDto:{}", JsonUtils.toJson(realNameReqDto));
 		BaseRspDto rsp = new BaseRspDto();
@@ -195,6 +195,7 @@ public class UserController {
 					StringUtils.isBlank(realNameReqDto.getPhoneNum())) {
 				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
 			}
+			CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
 			CustomerbaseinfoVo vo = new CustomerbaseinfoVo();
 			vo.setCbiId(userInfo.getCbiId());
 			vo.setCbiName(realNameReqDto.getName());
@@ -217,16 +218,79 @@ public class UserController {
 	@ApiOperation(value="用户实名认证查询",notes="要求登录就可以")
 	@PostMapping(value = "/getRealName")
 	@ResponseBody
+	@VerifyToken
 	public BaseRspDto getRealName() {
 
 		BaseRspDto<RealNameRspDto> rsp = new BaseRspDto<RealNameRspDto>();
 		try {
-			CustomerbaseinfoVo vo = customerbaseinfoService.getUserInfoById("");
+			CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
 			RealNameRspDto rnDto = new RealNameRspDto();
-			rnDto.setName(vo.getCbiName());
-			rnDto.setIdentityCode(vo.getCbiIdcard());
-			rnDto.setPhoneNum(vo.getCbiPhonenum());
+			rnDto.setName(userInfo.getCbiName());
+			rnDto.setIdentityCode(userInfo.getCbiIdcard());
+			rnDto.setPhoneNum(userInfo.getCbiPhonenum());
 			rsp.setData(rnDto);
+		} catch (Exception e) {
+			log.error("用户实名认证系统异常", e);
+			rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+			rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+		}
+		return rsp;
+	}
+
+
+	@ApiOperation(value="获取邀请码",notes="要求登录就可以")
+	@PostMapping(value = "/getInvitationCode")
+	@ResponseBody
+	@VerifyToken
+	public BaseRspDto getInvitationCode() {
+
+		BaseRspDto<InvitationCode> rsp = new BaseRspDto<InvitationCode>();
+		try {
+			CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+			long userId = userInfo.getCbiId();
+			long code = (userId << 1) + 1;
+			log.info("获取邀请码userId={}, code={}", userId, code);
+			InvitationCode invitationCode = new InvitationCode();
+			invitationCode.setCode(code);
+			rsp.setData(invitationCode);
+		} catch (Exception e) {
+			log.error("获取邀请码系统异常", e);
+			rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+			rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+		}
+		return rsp;
+	}
+
+
+	@ApiOperation(value="用户修改登录密码",notes="要求登录")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name="oldPsw",value="原始密码",required=true),
+			@ApiImplicitParam(name="newPsw",value="新密码",required=true),
+			@ApiImplicitParam(name="repeatNewPsw",value="重复新密码",required=true)
+	})
+	@PostMapping(value = "/modifyPsw")
+	@ResponseBody
+	@VerifyToken
+	public BaseRspDto modifyPsw(ModifyPswReqDto modifyPswReqDto) {
+
+		log.info("modifyPsw modifyPswReqDto:{}", JsonUtils.toJson(modifyPswReqDto));
+		BaseRspDto rsp = new BaseRspDto();
+		try {
+			if (StringUtils.isBlank(modifyPswReqDto.getOldPsw()) || StringUtils.isBlank(modifyPswReqDto.getNewPsw()) ||
+					StringUtils.isBlank(modifyPswReqDto.getRepeatNewPsw()) || !modifyPswReqDto.getNewPsw().equals(modifyPswReqDto.getRepeatNewPsw())) {
+				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
+			}
+			CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+			if (StringUtils.isBlank(userInfo.getCbiPassword())) {
+				throw new HzzBizException(HzzExceptionEnum.USER_NOT_SET);
+			}
+			if (!userInfo.getCbiPassword().equals(modifyPswReqDto.getOldPsw())) {
+				throw new HzzBizException(HzzExceptionEnum.USER_OLDPSW_ERROR);
+			}
+			CustomerbaseinfoVo vo = new CustomerbaseinfoVo();
+			vo.setCbiId(userInfo.getCbiId());
+			vo.setCbiPassword(modifyPswReqDto.getNewPsw()); // TODO 密码后端需要加密
+			customerbaseinfoService.updateUserInfo(vo);
 		} catch (HzzBizException e) {
 			log.error("用户实名认证业务错误 msg={}", e.getErrorMsg(), e);
 			rsp.setCode(e.getErrorCode());
@@ -238,6 +302,7 @@ public class UserController {
 		}
 		return rsp;
 	}
+
 
 
 	private String generateUserToken(String phoneNum) {

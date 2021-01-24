@@ -4,15 +4,23 @@ import com.akfly.hzz.constant.CommonConstant;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.util.EncryDecryUtils;
+import com.akfly.hzz.util.JsonUtils;
 import com.akfly.hzz.util.RedisUtils;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
 import com.akfly.hzz.mapper.CustomerbaseinfoMapper;
 import com.akfly.hzz.service.CustomerbaseinfoService;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,6 +32,7 @@ import java.util.List;
  * @since 2021-01-18
  */
 @Service
+@Slf4j
 public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMapper, CustomerbaseinfoVo> implements CustomerbaseinfoService {
 
     @Autowired
@@ -54,7 +63,7 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
         List<CustomerbaseinfoVo> users = lambdaQuery()
                 .eq(CustomerbaseinfoVo::getCbiPhonenum, phoneNum).list();
         if (CollectionUtils.isEmpty(users)) {
-            userRegister(phoneNum, null);
+            userRegister(phoneNum, null, null);
             return getUserInfo(phoneNum);
         } else {
             return users.get(0);
@@ -72,7 +81,7 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
     }
 
     @Override
-    public void userRegister(String phoneNum, String psw) throws HzzBizException {
+    public void userRegister(String phoneNum, String psw, String invitationCode) throws HzzBizException {
 
         CustomerbaseinfoVo vo = new CustomerbaseinfoVo();
         vo.setCbiPhonenum(phoneNum);
@@ -80,6 +89,10 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
         vo.setCbiType(2);
         vo.setCbiName(phoneNum);
         vo.setCbiUsername(phoneNum);
+        CustomerbaseinfoVo parentVo = getUserInfoByInvitationCode(invitationCode);
+        if (parentVo != null) {
+            vo.setCbiParentid(parentVo.getCbiId());
+        }
         if (!save(vo)) {
             throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
         }
@@ -109,10 +122,45 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
     @Override
     public CustomerbaseinfoVo getUserInfoById(String cbiId) throws HzzBizException {
 
+        String key = CommonConstant.USER_PREFIX + cbiId;
+        Object o = redisUtils.get(key);
+
+        if (o == null) {
+            List<CustomerbaseinfoVo> users = lambdaQuery()
+                    .eq(CustomerbaseinfoVo::getCbiId, cbiId).list();
+            if (CollectionUtils.isEmpty(users)) {
+                throw new HzzBizException(HzzExceptionEnum.USER_NOTEXIST_ERROR);
+            }
+
+            CustomerbaseinfoVo vo = users.get(0);
+            redisUtils.set(key, JsonUtils.toJson(users.get(0)), 2 * 60 *60);
+            return users.get(0);
+        } else {
+            log.warn("从redis获取用户信息vo={}", JsonUtils.toJson(o));
+            CustomerbaseinfoVo vo = JsonUtils.toBean(o.toString(), CustomerbaseinfoVo.class);
+            //CustomerbaseinfoVo vo = JSONObject.parse().decode(o.toString(), CustomerbaseinfoVo.class);
+            //CustomerbaseinfoVo vo = JSONObject.parseObject(o.toString(), CustomerbaseinfoVo.class);
+            return vo;
+        }
+    }
+
+    @Override
+    public Long getInvitationCode(long cbiId) throws HzzBizException {
+
+
+        return null;
+    }
+
+
+    private CustomerbaseinfoVo getUserInfoByInvitationCode(String invitationCode) {
+
+        if (StringUtils.isBlank(invitationCode)) {
+            return null;
+        }
         List<CustomerbaseinfoVo> users = lambdaQuery()
-                .eq(CustomerbaseinfoVo::getCbiId, cbiId).list();
+                .eq(CustomerbaseinfoVo::getCbiShareurl, invitationCode).list();
         if (CollectionUtils.isEmpty(users)) {
-            throw new HzzBizException(HzzExceptionEnum.USER_NOTEXIST_ERROR);
+            return null;
         }
         return users.get(0);
     }
