@@ -12,16 +12,20 @@ import com.akfly.hzz.service.CustomercashoutinfoService;
 import com.akfly.hzz.service.CustomerpayinfoService;
 import com.akfly.hzz.service.TradeorderinfoService;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
+import com.akfly.hzz.vo.CustomercashoutinfoVo;
 import com.akfly.hzz.vo.CustomerpayinfoVo;
 import com.akfly.hzz.vo.TradeorderinfoVo;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.C;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -72,18 +76,19 @@ public class AccountInfoController {
 
 
     @ApiOperation(value="用户提现",notes="用户登录就可以")
-    @PostMapping(value = "/withdraw")
+    @PutMapping(value = "/withdraw")
     @VerifyToken
-    public BaseRspDto<List<TradeorderinfoVo>> withdraw(int pageNum, int pageSize, Date beginTime, Date endTime){
-        BaseRspDto<List<TradeorderinfoVo>> rsp = new BaseRspDto<List<TradeorderinfoVo>>();
+    public BaseRspDto<String> withdraw(@Validated CustomercashoutinfoVo customercashoutinfoVo){
+        BaseRspDto<String> rsp = new BaseRspDto<String>();
         try {
             CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
-        //    List<TradeorderinfoVo> list = tradeorderinfoService.getTradeorderinfoVo(pageNum, pageSize, userInfo.getCbiId(), beginTime, endTime);
-        //    rsp.setData(list);
-        //} catch (HzzBizException e) {
-        //    log.error("用户提现业务错误 msg={}", e.getErrorMsg(), e);
-        //    rsp.setCode(e.getErrorCode());
-        //    rsp.setMsg(e.getErrorMsg());
+             customercashoutinfoVo.setCbiId(userInfo.getCbiId());
+             customercashoutinfoVo.setCcoiUpdatetime(LocalDateTime.now());
+             customercashoutinfoService.createcustomercashoutinfo(customercashoutinfoVo);
+        } catch (HzzBizException e) {
+            log.error("用户提现业务错误 msg={}", e.getErrorMsg(), e);
+            rsp.setCode(e.getErrorCode());
+            rsp.setMsg(e.getErrorMsg());
         } catch (Exception e) {
             log.error("用户提现系统异常", e);
             rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());

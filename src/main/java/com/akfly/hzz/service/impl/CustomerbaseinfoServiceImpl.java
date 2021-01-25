@@ -9,7 +9,6 @@ import com.akfly.hzz.util.RedisUtils;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
 import com.akfly.hzz.mapper.CustomerbaseinfoMapper;
 import com.akfly.hzz.service.CustomerbaseinfoService;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
