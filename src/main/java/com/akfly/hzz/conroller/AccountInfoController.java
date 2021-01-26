@@ -14,14 +14,21 @@ import com.akfly.hzz.service.TradeorderinfoService;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
 import com.akfly.hzz.vo.CustomerpayinfoVo;
 import com.akfly.hzz.vo.TradeorderinfoVo;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.C;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.Digits;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -38,21 +45,30 @@ public class AccountInfoController {
 
 
     @ApiOperation(value="用户充值",notes="用户登录就可以")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="amount",value="充值金额(整数不带小数)",required=true),
+            @ApiImplicitParam(name="payChannel",value="支付渠道(1：微信 2：支付宝)",required=true)
+    })
     @PostMapping(value = "/recharge")
     @VerifyToken
-    public BaseRspDto<List<CustomerpayinfoVo>> recharge(int pageNum, int pageSize, Date beginTime, Date endTime){
+    public BaseRspDto<List<CustomerpayinfoVo>> recharge(@RequestParam @Digits(integer = 10, fraction = 0) Integer amount,
+                                                        @RequestParam Integer payChannel){
 
         BaseRspDto<List<CustomerpayinfoVo>> rsp = new BaseRspDto<List<CustomerpayinfoVo>>();
         try {
             CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
             CustomerpayinfoVo vo = new CustomerpayinfoVo();
-            //vo.setCaiAmount(copy.getCaiAmount());
+            vo.setCaiAmount(amount);
             vo.setCbiId(String.valueOf(userInfo.getCbiId()));
-            //vo.setCpiPaytime(new Date());
+
+            Date date = new Date();
+            Instant instant = date.toInstant();
+            ZoneId zoneId = ZoneId.systemDefault();
+            vo.setCpiPaytime(instant.atZone(zoneId).toLocalDateTime());
             //vo.setCpiFinishtime(copy.getCpiFinishtime());
             vo.setCpiPaystatus(PayStatus.UN_PAY.getStatus());
             vo.setCpiValid(ValidEnum.VALID.getStatus());
-            //vo.setCpiChannel(PayChannelEnum.);
+            vo.setCpiChannel(payChannel);
             //vo.setCpiChannelorderid(copy.getCpiChannelorderid());
             //vo.setCpiOperator(copy.getCpiOperator());
 

@@ -155,6 +155,31 @@ public class UserController {
 		return rsp;
 	}
 
+	@ApiOperation(value="获取用户信息",notes="要求用户登录")
+	@PostMapping(value = "/getUserInfo")
+	@VerifyToken
+	public BaseRspDto getUserInfo(HttpServletResponse response) {
+
+		BaseRspDto<CustomerbaseinfoVo> rsp = new BaseRspDto<CustomerbaseinfoVo>();
+		try {
+			CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+			if (userInfo.getCbiId() == null) {
+				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
+			}
+			CustomerbaseinfoVo customerbaseinfoVo = customerbaseinfoService.getUserInfoById(String.valueOf(userInfo.getCbiId()));
+			rsp.setData(customerbaseinfoVo);
+		} catch (HzzBizException e) {
+			log.error("获取用户信息业务错误 msg={}", e.getErrorMsg(), e);
+			rsp.setCode(e.getErrorCode());
+			rsp.setMsg(e.getErrorMsg());
+		} catch (Exception e) {
+			log.error("获取用户信息系统异常", e);
+			rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+			rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+		}
+		return rsp;
+	}
+
 
 	@ApiOperation(value="发送验证码",notes="目前没有真实发送，将验证码直接返回给前端")
 	@ApiImplicitParams({

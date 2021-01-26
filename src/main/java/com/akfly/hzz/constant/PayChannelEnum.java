@@ -9,8 +9,8 @@ package com.akfly.hzz.constant;  /**
 
 public enum PayChannelEnum {
 
-    WECHAT(0, "微信支付"),
-    ALIPAY(1, "支付宝支付");
+    WECHAT(1, "微信支付"),
+    ALIPAY(2, "支付宝支付");
 
     private int status;
 
