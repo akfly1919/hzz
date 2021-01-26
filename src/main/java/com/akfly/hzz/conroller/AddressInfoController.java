@@ -26,7 +26,7 @@ public class AddressInfoController {
     CustomeraddressinfoService customeraddressinfoService;
 
     @ApiOperation(value="获取收货地址",notes="用户登录就可以")
-    @GetMapping
+    @PostMapping(value = "getAddress")
     @VerifyToken
     public BaseRspDto<List<CustomeraddressinfoVo>> getCustomerAddressInfo(){
         BaseRspDto<List<CustomeraddressinfoVo>> rsp = new BaseRspDto<List<CustomeraddressinfoVo>>();
@@ -45,7 +45,7 @@ public class AddressInfoController {
         }
         return rsp;
     }
-    @PutMapping
+    @PutMapping(value = "addAddress")
     @VerifyToken
     public  BaseRspDto<String> createCustomerAddressInfo(@Validated CustomeraddressinfoVo customeraddressinfoVo){
         BaseRspDto<String> rsp = new BaseRspDto<String>();
@@ -67,7 +67,7 @@ public class AddressInfoController {
         }
         return rsp;
     }
-    @PostMapping
+    @PostMapping(value = "updateAddress")
     @VerifyToken
     public  BaseRspDto<String> updateCustomerAddressInfo(@Validated CustomeraddressinfoVo customeraddressinfoVo){
         BaseRspDto<String> rsp = new BaseRspDto<String>();
@@ -79,11 +79,11 @@ public class AddressInfoController {
             customeraddressinfoVo.setCaiSort(1);
             customeraddressinfoService.updateAddressInfo(customeraddressinfoVo);
         } catch (HzzBizException e) {
-            log.error("创建地址列表业务错误 msg={}", e.getErrorMsg(), e);
+            log.error("更新地址列表业务错误 msg={}", e.getErrorMsg(), e);
             rsp.setCode(e.getErrorCode());
             rsp.setMsg(e.getErrorMsg());
         } catch (Exception e) {
-            log.error("创建地址列表系统异常", e);
+            log.error("更新地址列表系统异常", e);
             rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
             rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
         }

@@ -46,9 +46,9 @@ public class UserController {
 			@ApiImplicitParam(name="pswType",value="密码类型(0: 代表密码登录 1: 代表手机验证码登录)",required=true)
 	})
 	@RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.POST})
-	public BaseRspDto login(HttpServletResponse response, String phoneNum, String psw, String pswType) {
+	public LoginRspDto login(HttpServletResponse response, String phoneNum, String psw, String pswType) {
 
-		BaseRspDto<CustomerbaseinfoVo> rsp = new BaseRspDto<CustomerbaseinfoVo>();
+		LoginRspDto<CustomerbaseinfoVo> rsp = new LoginRspDto<CustomerbaseinfoVo>();
 		try {
 			if (StringUtils.isBlank(phoneNum) || StringUtils.isBlank(psw) || StringUtils.isBlank(pswType)) {
 				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
@@ -62,8 +62,9 @@ public class UserController {
 			} else {
 				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
 			}
-			response.setHeader("token", TokenUtils.getToken(customerbaseinfoVo.getCbiId().toString(), customerbaseinfoVo.getCbiPassword()));
-			customerbaseinfoVo.setCbiPassword("");  // 去掉密码
+			//response.setHeader("token", TokenUtils.getToken(customerbaseinfoVo.getCbiId().toString(), customerbaseinfoVo.getCbiPassword()));
+			rsp.setToken(TokenUtils.getToken(customerbaseinfoVo.getCbiId().toString(), customerbaseinfoVo.getCbiPassword()));
+			customerbaseinfoVo.setCbiPassword(null);  // 去掉密码
 			rsp.setData(customerbaseinfoVo);
 		} catch (HzzBizException e) {
 			log.error("用户登录业务错误 msg={}", e.getErrorMsg(), e);
