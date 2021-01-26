@@ -16,7 +16,8 @@ public enum HzzExceptionEnum {
     USER_NOT_LOGIN("1007", "用户未登录"),
     USER_NOT_SET("1008", "用户未设置过登录密码"),
     USER_OLDPSW_ERROR("1009", "原始密码错误"),
-
+    ID_OCR_ERROR("1010", "OCR失败"),
+    ID_REAL_AUTH("1011", "实名认证失败"),
     /* 业务异常定义以2-8开头，顺序往下排号 */
     PARAM_INVALID("2000", "参数不合法"),
     PSW_NOT_SAME("2000", "密码不一致"),
