@@ -33,7 +33,7 @@ spring:
 #        flush-mode: on_save
 
 #支付宝APP
-alipayappsdk:
+alipayapp:
   sdk:
     unifiedorder: https://openapi.alipay.com/gateway.do
     notify_url: https://192.144.230.48/aliPayNotify
