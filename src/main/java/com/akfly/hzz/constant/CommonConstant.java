@@ -16,4 +16,6 @@ public  class CommonConstant {
 
 
     public static final String USER_INFO = "user_info";
+
+    public static final String CHARSET_UTF8 = "UTF-8";
 }

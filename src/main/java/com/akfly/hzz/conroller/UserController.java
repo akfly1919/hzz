@@ -157,7 +157,7 @@ public class UserController {
 	}
 
 	@ApiOperation(value="获取用户信息",notes="要求用户登录")
-	@PostMapping(value = "/getUserInfo")
+	@RequestMapping(value = "/getUserInfo", method = {RequestMethod.GET, RequestMethod.POST})
 	@VerifyToken
 	public BaseRspDto getUserInfo(HttpServletResponse response) {
 

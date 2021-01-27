@@ -61,7 +61,7 @@ public class AuthInterceptor implements HandlerInterceptor {
                     BaseRspDto rsp = new BaseRspDto();
                     rsp.setCode(HzzExceptionEnum.USER_NOT_LOGIN.getErrorCode());
                     rsp.setMsg(HzzExceptionEnum.USER_NOT_LOGIN.getErrorMsg());
-                    response.setCharacterEncoding("UTF-8");
+                    //response.setCharacterEncoding("UTF-8");
                     response.getWriter().write(JsonUtils.toJson(rsp));
                     return false;
                 }

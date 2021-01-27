@@ -28,7 +28,7 @@ public class CrossFilter implements Filter {
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
         response.setHeader("Access-Control-Max-Age", "3600");
-        response.setHeader("Access-Control-Allow-Headers", "content-type,Authorization");
+        response.setHeader("Access-Control-Allow-Headers", "content-type,Authorization,token");
         // response.setHeader("Access-Control-Allow-Credentials", "true");
         filterChain.doFilter(servletRequest, servletResponse);
     }

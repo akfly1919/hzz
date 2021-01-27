@@ -18,9 +18,10 @@ public enum HzzExceptionEnum {
     USER_OLDPSW_ERROR("1009", "原始密码错误"),
     ID_OCR_ERROR("1010", "OCR失败"),
     ID_REAL_AUTH("1011", "实名认证失败"),
-    /* 业务异常定义以2-8开头，顺序往下排号 */
+    ORDER_ALREADY_EXPIRED("1012", "订单超时")
+    /* 业务异常定义以2-8开头，顺序往下排号 */,
     PARAM_INVALID("2000", "参数不合法"),
-    PSW_NOT_SAME("2000", "密码不一致"),
+    PSW_NOT_SAME("2001", "密码不一致"),
 
     /* 未知异常定义以9开头 */
     SYSTEM_ERROR("9000", "系统异常"),
