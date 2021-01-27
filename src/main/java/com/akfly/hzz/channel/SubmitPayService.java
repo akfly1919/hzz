@@ -4,9 +4,7 @@ import com.akfly.hzz.exception.HzzBizException;
 
 import java.util.Map;
 
-/**
- * @author hai 16/8/4
- */
+
 public abstract class SubmitPayService<T> {
 
     /**

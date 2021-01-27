@@ -56,7 +56,7 @@ public class AliPayAppSubmitPayServiceImpl extends SubmitPayService<SubmitPayMod
 
         // 业务扩展参数,系统商编号
         JSONObject extendJsonObj = new JSONObject();
-        extendJsonObj.put("sys_service_provider_id", model.getChPid());
+        //extendJsonObj.put("sys_service_provider_id", model.getChPid());
         jsonObject.put("extend_params", extendJsonObj.toJSONString());
 
         // 将请求参数转换为JSON格式
@@ -83,14 +83,14 @@ public class AliPayAppSubmitPayServiceImpl extends SubmitPayService<SubmitPayMod
 
         log.info("AliPayAppSubmitPayServiceImpl.generateReqParam()|请求支付宝参数 = " + bizContent);
         keyValues.clear();
-        keyValues.put("tn", orderInfo);
+        keyValues.put("orderInfo", orderInfo);
         //keyValues.put("respOutputType", String.valueOf(OutputTypeEnum.ALIPAY.getCode()));
         return keyValues;
     }
 
     /**
      * 支付宝APP不用请求支付地址
-     * 
+     *
      * @param param
      * @return
      * @throws HzzBizException
@@ -109,18 +109,14 @@ public class AliPayAppSubmitPayServiceImpl extends SubmitPayService<SubmitPayMod
         return submitPayResultModel;
     }
 
+    /**
+     * 返回移动端调起支付宝app的串
+     * @param model
+     * @param param
+     * @return
+     */
     public String getJSONString(SubmitPayModel model, Map param) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("funcode", "SK001");
-        jsonObject.put("appId", model.getAppId());
-        //jsonObject.put("responseCode", PolyStatusMappingEnum.SUCCESS.getPolyStatus());
-        //jsonObject.put("responseMsg", PolyStatusMappingEnum.SUCCESS.getDesc());
-        jsonObject.put("responseTime", DateUtil.getStringFromDate(new Date(), DateUtil.FORMAT_TRADETIME));
-        jsonObject.put("tradeStatus", HzzExceptionEnum.SUCCESS.getErrorCode());
-        //jsonObject.put("mhtOrderNo", model.getMchOrderId());
-        jsonObject.put("nowPayOrderNo", model.getTransId());
-        jsonObject.put("tn", param.get("tn"));
-        jsonObject.put("signType", "RSA(sha-256)");
-        return jsonObject.toString();
+
+        return String.valueOf(param.get("orderInfo"));
     }
 }

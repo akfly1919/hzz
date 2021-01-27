@@ -10,13 +10,6 @@ import java.util.Date;
 @Data
 public class SubmitPayModel extends BaseChAppParamModel {
 
-    // 渠道应用编号
-    private String              appId;
-
-    private String              appKey;
-
-    private String              version;
-
     // 交易订单号
     private String              transId;
 
@@ -36,7 +29,7 @@ public class SubmitPayModel extends BaseChAppParamModel {
     private String              mchOrderDetail;
 
     // 下单IP地址
-    private String              remoteIp;
+    //private String              remoteIp;
 
     private CreditCardLimitEnum limit_pay;
 
@@ -47,10 +40,6 @@ public class SubmitPayModel extends BaseChAppParamModel {
     private Date                mchOrderExpDate;
 
     private String              mhtReserved;
-
-    private Date                createdTime;
-
-    private String              consumerId;
 
     // 用于区分不同应用场景，生成Detail发往支付宝
     private CliDeviceTypeEnum cliDeviceType;

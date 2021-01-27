@@ -6,6 +6,7 @@ import com.akfly.hzz.constant.CommonConstant;
 import com.akfly.hzz.dto.*;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
+import com.akfly.hzz.facade.IDFacade;
 import com.akfly.hzz.interceptor.AuthInterceptor;
 import com.akfly.hzz.service.CustomerbaseinfoService;
 import com.akfly.hzz.service.CustomeridcardinfoService;
@@ -37,7 +38,8 @@ public class UserController {
 
 	@Resource
 	private CustomeridcardinfoService customeridcardinfoService;
-
+	@Resource
+	private IDFacade idFacade;
 
 	@ApiOperation(value="用户登录",notes="同时支持手机验证码或者密码登录")
 	@ApiImplicitParams({
@@ -228,6 +230,7 @@ public class UserController {
 			vo.setCbiName(realNameReqDto.getName());
 			vo.setCbiIdcard(realNameReqDto.getIdentityCode());
 			// TODO 需要放到一个事务
+			idFacade.idRealAuth(realNameReqDto.getIdentityCode(),realNameReqDto.getName());
 			customerbaseinfoService.updateUserInfo(vo);
 			customeridcardinfoService.saveCardInfo(userInfo.getCbiId(), realNameReqDto.getIdFrontImgName(), realNameReqDto.getIdBackImgName());
 		} catch (HzzBizException e) {

@@ -1,7 +1,9 @@
 package com.akfly.hzz.conroller;
 
 import com.akfly.hzz.annotation.VerifyToken;
-import com.akfly.hzz.constant.PayChannelEnum;
+import com.akfly.hzz.channel.AliPayAppSubmitPayServiceImpl;
+import com.akfly.hzz.channel.SubmitPayModel;
+import com.akfly.hzz.channel.SubmitPayService;
 import com.akfly.hzz.constant.PayStatus;
 import com.akfly.hzz.constant.ValidEnum;
 import com.akfly.hzz.dto.BaseRspDto;
@@ -11,15 +13,12 @@ import com.akfly.hzz.interceptor.AuthInterceptor;
 import com.akfly.hzz.service.CustomerbillrelatedService;
 import com.akfly.hzz.service.CustomercashoutinfoService;
 import com.akfly.hzz.service.CustomerpayinfoService;
-import com.akfly.hzz.service.TradeorderinfoService;
 import com.akfly.hzz.vo.*;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.util.Assert;
-import org.springframework.validation.BindException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,6 +43,10 @@ public class AccountInfoController {
 
     @Resource
     private CustomerbillrelatedService customerbillrelatedService;
+
+    @Resource
+    private AliPayAppSubmitPayServiceImpl aliPayAppSubmitPayService;
+
 
     @ApiOperation(value="用户充值",notes="用户登录就可以")
     @ApiImplicitParams({
@@ -74,6 +77,25 @@ public class AccountInfoController {
             //vo.setCpiOperator(copy.getCpiOperator());
 
             customerpayinfoService.insertCustomerPayInfo(vo);
+            //SubmitPayModel submitPayModel = new SubmitPayModel();
+            //submitPayModel.setTransId(copy.getTransId());
+            //submitPayModel.setPayAmount(copy.getPayAmount());
+            //submitPayModel.setChId(copy.getChId());
+            //submitPayModel.setMchOrderName(copy.getMchOrderName());
+            //submitPayModel.setMchOrderDetail(copy.getMchOrderDetail());
+            //submitPayModel.setLimit_pay(copy.getLimit_pay());
+            //submitPayModel.setMchOrderStartTime(copy.getMchOrderStartTime());
+            //submitPayModel.setMchOrderExpDate(copy.getMchOrderExpDate());
+            //submitPayModel.setMhtReserved(copy.getMhtReserved());
+            //submitPayModel.setCliDeviceType(copy.getCliDeviceType());
+            //submitPayModel.setChAppId(copy.getChAppId());
+            //submitPayModel.setChMchId(copy.getChMchId());
+            //submitPayModel.setChAppKey(copy.getChAppKey());
+            //submitPayModel.setChMchKey(copy.getChMchKey());
+            //submitPayModel.setPrivateKey(copy.getPrivateKey());
+            //submitPayModel.setPublicKey(copy.getPublicKey());
+            //
+            //aliPayAppSubmitPayService.submitPay();
         //    rsp.setData(list);
         } catch (HzzBizException e) {
             log.error("用户充值业务错误 msg={}", e.getErrorMsg(), e);

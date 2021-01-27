@@ -48,7 +48,7 @@ public class CustomercashoutinfoServiceImpl extends ServiceImpl<Customercashouti
             BigDecimal fronzeB=new BigDecimal(fronze!=null?fronze:new Double(0.0));
             BigDecimal amountB=new BigDecimal(amount!=null?amount:new Double(0.0));
             if(balanceB.compareTo(amountB)<0){
-                throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
+                throw new HzzBizException(HzzExceptionEnum.ACCOUNT_BALACE_ERROR);
             }
             customerbaseinfoVo.setCbiFrozen(fronzeB.add(amountB).doubleValue());
             customerbaseinfoVo.setCbiBalance(balanceB.subtract(amountB).doubleValue());

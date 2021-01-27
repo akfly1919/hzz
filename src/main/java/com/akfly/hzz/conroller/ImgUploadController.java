@@ -5,11 +5,13 @@ import com.akfly.hzz.annotation.VerifyToken;
 import com.akfly.hzz.dto.BaseRspDto;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
+import com.akfly.hzz.facade.IDFacade;
 import com.akfly.hzz.interceptor.AuthInterceptor;
 import com.akfly.hzz.service.CustomercardinfoService;
 import com.akfly.hzz.service.CustomeridcardinfoService;
 import com.akfly.hzz.util.JsonUtils;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +24,8 @@ import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.validation.constraints.AssertFalse;
+import javax.validation.constraints.AssertTrue;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -38,6 +42,9 @@ public class ImgUploadController {
 
     @Resource
     private CustomeridcardinfoService customeridcardinfoService;
+
+    @Resource
+    private IDFacade idFacade;
     /**
      * 图片上传
      *
@@ -47,7 +54,7 @@ public class ImgUploadController {
     @PostMapping(value = "/imgUp")
     @ResponseBody
     @VerifyToken
-    public String imgUp(@RequestParam MultipartFile file, HttpServletResponse response) {
+    public BaseRspDto<JSONObject> imgUp(@RequestParam MultipartFile file, @AssertFalse @RequestParam Boolean isFront, HttpServletResponse response) {
 
         BaseRspDto rsp = new BaseRspDto();
         ServletOutputStream outputStream = null;
@@ -55,23 +62,35 @@ public class ImgUploadController {
         String userId = String.valueOf(userInfo.getCbiId());
         try {
             String fileName = file.getOriginalFilename();
-            checkImgSuffixAndSize(file, fileName);
+            String type=checkImgSuffixAndSize(file, fileName);
             InputStream imageStream = file.getInputStream();
-            threadPool.submit(() -> {
+           // threadPool.submit(() -> {
                 OutputStream outputStream1 = null;
                 try {
+                    // TODO 此种方式需要数据库能存储文件名称
                     //SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
                     //String dateStr = sdf.format(new Date());
-                    //File image = new File(path + userId2 + File.separator + userId2 +"_" + dateStr +  fileName);
+                    //fileName=dateStr+"."+type;
                     File dir = new File(path + userId);
                     if (!dir.isDirectory()) {
                         dir.mkdir();
                     }
-                    File image = new File(path + userId + File.separator + fileName);
+                    File image = new File(path + userId + File.separator + fileName +"."+type);
                     byte[] data = new byte[imageStream.available()];
                     imageStream.read(data);
                     outputStream1 = new FileOutputStream(image);
                     outputStream1.write(data);
+                    JSONObject object=null;
+                    if(isFront){
+                         object=idFacade.idImageProcess(image,IDFacade.IDSIDE_FRONT);
+
+                    }else{
+                         object=new JSONObject();
+                    }
+                    //TODO
+                    //object.put("fileName",fileName);
+                    rsp.setData(object);
+                    return rsp;
                 } catch (Exception e) {
                     log.error("上传原图异常,userId={}" + userId, e);
                 } finally {
@@ -84,17 +103,9 @@ public class ImgUploadController {
                         }
                     }
                 }
-            });
+           // });
 
-            response.reset();
-            response.setHeader("Content-Type", "image/jpeg");
-            outputStream = response.getOutputStream();
-            byte[] buffer = new byte[2048];
-            int i = -1;
-            while ((i = imageStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, i);
-            }
-            log.info("图片上传接口成功");
+
 
         } catch (HzzBizException e) {
             rsp.setCode(e.getErrorCode());
@@ -104,17 +115,9 @@ public class ImgUploadController {
             rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
             rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
         } finally {
-            try {
-                if (outputStream != null)
-                    outputStream.flush();
-                if (outputStream != null)
-                    outputStream.close();
 
-            } catch (IOException e) {
-                log.error("读写文件异常,userId=" + userId, e);
-            }
         }
-        return JsonUtils.toJson(rsp);
+        return rsp;
     }
 
     /**
@@ -126,7 +129,7 @@ public class ImgUploadController {
      */
     @GetMapping(value = "/showImage")
     @ResponseBody
-    //@VerifyToken
+    @VerifyToken
     public String showImage(String fileName, HttpServletResponse response) {
         log.info("图片展示前端请求参数fileName:{}", fileName);
         BaseRspDto rsp = new BaseRspDto();
@@ -222,11 +225,11 @@ public class ImgUploadController {
      * @param fileName
      * @throws HzzBizException
      */
-    private void checkImgSuffixAndSize(@RequestParam MultipartFile image, String fileName) throws HzzBizException {
-        if ((!fileName.toLowerCase().endsWith("pdf")
-                && !fileName.toLowerCase().endsWith("jpg")
-                && !fileName.toLowerCase().endsWith("jpeg")
-                && !fileName.toLowerCase().endsWith("png"))) {
+    private String checkImgSuffixAndSize(@RequestParam MultipartFile image, String fileName) throws HzzBizException {
+        String[] contentTypes=image.getContentType().split("/");
+        if(contentTypes.length!=2&&!contentTypes[1].toLowerCase().endsWith("jpg")
+                &&!contentTypes[1].toLowerCase().endsWith("jpeg")
+                &&!contentTypes[1].toLowerCase().endsWith("png")) {
             log.info("文件格式错误");
             throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
         }
@@ -241,6 +244,7 @@ public class ImgUploadController {
             throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
 
         }
+        return contentTypes[1];
     }
 
 
