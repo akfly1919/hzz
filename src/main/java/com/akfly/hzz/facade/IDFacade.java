@@ -74,6 +74,6 @@ public class IDFacade {
     public static void main(String[] args) throws HzzBizException {
         IDFacade f=new IDFacade();
         //f.idImageProcess("E:\\浏览器下载\\d085520c3b8c9484bc53ef155f00a3c5.jpeg",IDFacade.IDSIDE_FRONT);
-        f.idRealAuth("210403198808092363","徐华");
+        f.idRealAuth("","");
     }
 }

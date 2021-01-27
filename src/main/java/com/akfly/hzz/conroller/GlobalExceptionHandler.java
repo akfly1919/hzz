@@ -1,4 +1,4 @@
-package com.akfly.hzz.config;
+package com.akfly.hzz.conroller;
 
 import com.akfly.hzz.dto.BaseRspDto;
 import com.akfly.hzz.exception.HzzExceptionEnum;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(value= {MethodArgumentNotValidException.class, BindException.class})
+    @ExceptionHandler(value= {MethodArgumentNotValidException.class, BindException.class,IllegalArgumentException.class})
     @ResponseBody
     public BaseRspDto<String> errorHandler(Exception e){
         BaseRspDto<String> rsp = new BaseRspDto<String>();

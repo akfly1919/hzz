@@ -2,6 +2,9 @@ package com.akfly.hzz.mapper;
 
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Select;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -13,4 +16,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface CustomerbaseinfoMapper extends BaseMapper<CustomerbaseinfoVo> {
 
+    @Select("select * from `customerbaseinfo` where cbi_id=#{id} for update")
+    CustomerbaseinfoVo selectByIdForUpdate(Serializable id);
 }

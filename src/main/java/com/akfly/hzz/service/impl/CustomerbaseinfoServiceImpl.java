@@ -36,7 +36,8 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
 
     @Autowired
     private RedisUtils redisUtils;
-
+    @Autowired
+    private CustomerbaseinfoMapper customerbaseinfoMapper;
     @Override
     public CustomerbaseinfoVo userLoginByPsw(String phoneNum, String psw) throws HzzBizException {
 
@@ -148,6 +149,11 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
 
 
         return null;
+    }
+
+    @Override
+    public CustomerbaseinfoVo getUserInfoByIdForUpdate(String cbiId) throws HzzBizException {
+        return customerbaseinfoMapper.selectByIdForUpdate(cbiId);
     }
 
 

@@ -1,5 +1,7 @@
 package com.akfly.hzz.vo;
 
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -7,6 +9,7 @@ import java.time.LocalDateTime;
 import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
@@ -42,7 +45,7 @@ public class CustomercashoutinfoVo implements Serializable {
     /**
      * 提现账户信息
      */
-    @NotBlank
+    /*@NotBlank*/
     private String ccoiAccount;
 
     /**
@@ -80,5 +83,51 @@ public class CustomercashoutinfoVo implements Serializable {
      */
     private String ccoiOperator;
 
+    @TableField(exist = false)
+    private String alipayAccountNo;
 
+    @TableField(exist = false)
+    private String alipayAccountName;
+
+    @TableField(exist = false)
+    private String bankName;
+
+    @TableField(exist = false)
+    private String bankAccountName;
+
+    @TableField(exist = false)
+    private String bankAccountNo;
+
+    public String getCcoiAccount() {
+        if(ccoiType!=null){
+            JSONObject ob=new JSONObject();
+            if("1".equalsIgnoreCase(ccoiType.toString())){
+                if(StringUtils.hasText(this.alipayAccountNo)&&StringUtils.hasText(this.alipayAccountName)){
+                    ob.put("alipayAccountNo",this.alipayAccountNo);
+                    ob.put("alipayAccountName",this.alipayAccountName);
+                }else{
+                    return null;
+                }
+
+            }else if("3".equalsIgnoreCase(ccoiType.toString())){
+                if(StringUtils.hasText(this.bankName)&&StringUtils.hasText(this.bankAccountName)&&StringUtils.hasText(this.bankAccountNo)){
+                    ob.put("bankName",this.bankName);
+                    ob.put("bankAccountName",this.bankAccountName);
+                    ob.put("bankAccountNo",this.bankAccountNo);
+                }else{
+                    return null;
+                }
+
+            }else{
+                return null;
+            }
+            return ob.toString();
+        }else{
+            return null;
+        }
+    }
+
+    public void setCcoiAccount(String ccoiAccount) {
+        this.ccoiAccount = ccoiAccount;
+    }
 }
