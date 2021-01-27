@@ -8,24 +8,20 @@ import com.akfly.hzz.dto.BaseRspDto;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.interceptor.AuthInterceptor;
+import com.akfly.hzz.service.CustomerbillrelatedService;
 import com.akfly.hzz.service.CustomercashoutinfoService;
 import com.akfly.hzz.service.CustomerpayinfoService;
 import com.akfly.hzz.service.TradeorderinfoService;
-import com.akfly.hzz.vo.CustomerbaseinfoVo;
-import com.akfly.hzz.vo.CustomercashoutinfoVo;
-import com.akfly.hzz.vo.CustomerpayinfoVo;
-import com.akfly.hzz.vo.TradeorderinfoVo;
+import com.akfly.hzz.vo.*;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.C;
+import org.springframework.util.Assert;
+import org.springframework.validation.BindException;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.Digits;
@@ -46,6 +42,8 @@ public class AccountInfoController {
     @Resource
     private CustomercashoutinfoService customercashoutinfoService;
 
+    @Resource
+    private CustomerbillrelatedService customerbillrelatedService;
 
     @ApiOperation(value="用户充值",notes="用户登录就可以")
     @ApiImplicitParams({
@@ -95,6 +93,7 @@ public class AccountInfoController {
     @VerifyToken
     public BaseRspDto<String> withdraw(@Validated CustomercashoutinfoVo customercashoutinfoVo){
         BaseRspDto<String> rsp = new BaseRspDto<String>();
+        Assert.notNull(customercashoutinfoVo.getCcoiAccount(), "提现账户信息不完整");
         try {
             CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
              customercashoutinfoVo.setCbiId(userInfo.getCbiId());
@@ -111,5 +110,22 @@ public class AccountInfoController {
         }
         return rsp;
     }
+    @ApiOperation(value="用户流水",notes="用户登录就可以")
+    @GetMapping(value = "/customerBill")
+    @VerifyToken
+    public BaseRspDto<List<CustomerbillrelatedVo>> getCustomerBill(){
+        BaseRspDto<List<CustomerbillrelatedVo>> rsp = new BaseRspDto<List<CustomerbillrelatedVo>>();
+        try {
+            CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+            List<CustomerbillrelatedVo> list = customerbillrelatedService.getCustomerbillrelatedById(userInfo.getCbiId());
+            rsp.setData(list);
+        }  catch (Exception e) {
+            log.error("用户提现系统异常", e);
+            rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+            rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+        }
+        return rsp;
+    }
+
 
 }
