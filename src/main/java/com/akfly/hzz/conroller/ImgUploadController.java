@@ -48,22 +48,23 @@ public class ImgUploadController {
     /**
      * 图片上传
      *
-     * @param file
+     * @param imageFile
      * @return
      */
     @PostMapping(value = "/imgUp")
     @ResponseBody
     @VerifyToken
-    public BaseRspDto<JSONObject> imgUp(@RequestParam MultipartFile file, @AssertFalse @RequestParam Boolean isFront, HttpServletResponse response) {
+    public BaseRspDto<JSONObject> imgUp(@RequestParam("file") MultipartFile imageFile, HttpServletResponse response) {
 
         BaseRspDto rsp = new BaseRspDto();
         ServletOutputStream outputStream = null;
         CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
         String userId = String.valueOf(userInfo.getCbiId());
         try {
-            String fileName = file.getOriginalFilename();
-            String type=checkImgSuffixAndSize(file, fileName);
-            InputStream imageStream = file.getInputStream();
+            String fileName = imageFile.getOriginalFilename();
+            log.info("imgUp ------- fileName={}", fileName);
+            String type=checkImgSuffixAndSize(imageFile, fileName);
+            InputStream imageStream = imageFile.getInputStream();
            // threadPool.submit(() -> {
                 OutputStream outputStream1 = null;
                 try {
@@ -75,18 +76,12 @@ public class ImgUploadController {
                     if (!dir.isDirectory()) {
                         dir.mkdir();
                     }
-                    File image = new File(path + userId + File.separator + fileName +"."+type);
+                    File image = new File(path + userId + File.separator + fileName);
                     byte[] data = new byte[imageStream.available()];
                     imageStream.read(data);
                     outputStream1 = new FileOutputStream(image);
                     outputStream1.write(data);
-                    JSONObject object=null;
-                    if(isFront){
-                         object=idFacade.idImageProcess(image,IDFacade.IDSIDE_FRONT);
-
-                    }else{
-                         object=new JSONObject();
-                    }
+                    JSONObject object =idFacade.idImageProcess(image,IDFacade.IDSIDE_FRONT);
                     //TODO
                     //object.put("fileName",fileName);
                     rsp.setData(object);
@@ -221,12 +216,12 @@ public class ImgUploadController {
     /**
      * 校验图片后缀及大小
      *
-     * @param image
+     * @param imageFile
      * @param fileName
      * @throws HzzBizException
      */
-    private String checkImgSuffixAndSize(@RequestParam MultipartFile image, String fileName) throws HzzBizException {
-        String[] contentTypes=image.getContentType().split("/");
+    private String checkImgSuffixAndSize(@RequestParam("file") MultipartFile imageFile, String fileName) throws HzzBizException {
+        String[] contentTypes=imageFile.getContentType().split("/");
         if(contentTypes.length!=2&&!contentTypes[1].toLowerCase().endsWith("jpg")
                 &&!contentTypes[1].toLowerCase().endsWith("jpeg")
                 &&!contentTypes[1].toLowerCase().endsWith("png")) {
@@ -234,7 +229,7 @@ public class ImgUploadController {
             throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
         }
 
-        long fileSize = image.getSize();
+        long fileSize = imageFile.getSize();
         log.info("fileInfo:fileName=" + fileName + "&fileSize=" + fileSize);
         if (fileSize <= 0) {
             log.info("文件为空");
