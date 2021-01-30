@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akfly.hzz.mapper.ReporttradedateMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.ReporttradedateVo">
+        <result column="rti_year" property="rtiYear" />
+        <result column="rti_month" property="rtiMonth" />
+        <result column="rti_week" property="rtiWeek" />
+        <result column="rti_date" property="rtiDate" />
+        <result column="rti_gbid" property="rtiGbid" />
+        <result column="rit_gbiname" property="ritGbiname" />
+        <result column="rti_num" property="rtiNum" />
+        <result column="rti_money" property="rtiMoney" />
+        <result column="rti_createtime" property="rtiCreatetime" />
+        <result column="rti_updatetime" property="rtiUpdatetime" />
+    </resultMap>
+
+</mapper>
