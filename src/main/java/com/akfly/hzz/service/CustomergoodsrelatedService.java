@@ -13,4 +13,14 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface CustomergoodsrelatedService extends IService<CustomergoodsrelatedVo> {
 
+    /**
+     * @Description
+     * @param  gbiId 商品id
+     * @rerurn
+     * @throws
+     * @author
+     * @date 2021/1/30 15:17
+     */
+    int getStock(long gbiId);
+
 }

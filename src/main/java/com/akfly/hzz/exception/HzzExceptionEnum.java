@@ -18,13 +18,15 @@ public enum HzzExceptionEnum {
     USER_OLDPSW_ERROR("1009", "原始密码错误"),
     ID_OCR_ERROR("1010", "OCR失败"),
     ID_REAL_AUTH("1011", "实名认证失败"),
-    ORDER_ALREADY_EXPIRED("1012", "订单超时")
+    ORDER_ALREADY_EXPIRED("1012", "订单超时"),
+    PHONE_NOT_SAME("1013", "与注册的手机号不一致"),
+    MESSAGE_CODE_FAILED("1014", "发送验证码失败"),
 
-    /* 业务异常定义以2-8开头，顺序往下排号 */,
+    /* 业务异常定义以2-8开头，顺序往下排号 */
     PARAM_INVALID("2000","参数不合法"),
     ACCOUNT_BALACE_ERROR("3000","余额不足"),
     /* 未知异常定义以9开头 */
-    SYSTEM_ERROR("9000", "系统异常"),
+    SYSTEM_ERROR("9000", "系统繁忙"),
     DB_ERROR("9001", "数据库异常"),
     UNKNOWN_ERROR("9999", "其他异常"),
 

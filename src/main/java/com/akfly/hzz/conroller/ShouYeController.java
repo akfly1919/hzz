@@ -6,9 +6,7 @@ import com.akfly.hzz.dto.BaseRspDto;
 import com.akfly.hzz.dto.ShouYeDto;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
-import com.akfly.hzz.service.BroadcastnoteinfoService;
-import com.akfly.hzz.service.GoodsbaseinfoService;
-import com.akfly.hzz.service.PictureinfoService;
+import com.akfly.hzz.service.*;
 import com.akfly.hzz.util.CacheUtils;
 import com.akfly.hzz.util.JsonUtils;
 import com.akfly.hzz.vo.BroadcastnoteinfoVo;
@@ -25,6 +23,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -44,6 +43,12 @@ public class ShouYeController {
     PictureinfoService pictureinfoService;
     @Autowired
     private RedisTemplate<String,Object> redisTemplate;
+
+    @Resource
+    private CustomergoodsrelatedService customergoodsrelatedService;
+
+    @Resource
+    private ReporttradedateService reporttradedateService;
 
     @GetMapping(value = "/hello")
     public String hello(){

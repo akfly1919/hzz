@@ -17,4 +17,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomergoodsrelatedServiceImpl extends ServiceImpl<CustomergoodsrelatedMapper, CustomergoodsrelatedVo> implements CustomergoodsrelatedService {
 
+    @Override
+    public int getStock(long gbiId) {
+
+        int stock = lambdaQuery().eq(CustomergoodsrelatedVo::getGbiId, gbiId).eq(CustomergoodsrelatedVo::getCgrIsown, 1).count();
+        return stock;
+    }
 }

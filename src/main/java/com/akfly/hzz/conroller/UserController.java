@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import sun.applet.resources.MsgAppletViewer_zh_TW;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -100,7 +101,7 @@ public class UserController {
 			//if (!repeatPsw.equals(psw)) {
 			//	throw new HzzBizException(HzzExceptionEnum.PSW_NOT_SAME);
 			//}
-			String key = CommonConstant.MSG_CODE_PREFIX + phoneNum;
+			String key = CommonConstant.MSG_CODE_LOGIN + phoneNum;
 			String redisCode = String.valueOf(redisUtils.get(key));
 			if (!msgCode.equals(redisCode)) {
 				throw new HzzBizException(HzzExceptionEnum.MSG_CODE_INVALID);
@@ -186,20 +187,50 @@ public class UserController {
 
 	@ApiOperation(value="发送验证码",notes="目前没有真实发送，将验证码直接返回给前端")
 	@ApiImplicitParams({
-			@ApiImplicitParam(name="phoneNum",value="手机号",required=true)
+			@ApiImplicitParam(name="phoneNum",value="手机号",required=true),
+			@ApiImplicitParam(name="msgType",value="短信码类型(0:登录 1:注册 2:找回密码)",required=true)
 	})
 	@RequestMapping(value = "/sendMsgCode", method = {RequestMethod.GET, RequestMethod.POST})
-	public BaseRspDto sendMsgCode(String phoneNum) {
+	public BaseRspDto sendMsgCode(String phoneNum, String msgType) {
 
-		String code = RandomGenUtils.getRandomNumberInRange(100000, 999999)+"";
-		log.info("sendMsgCode phoneName:{},code:{}", phoneNum, code);
-		redisUtils.set(CommonConstant.MSG_CODE_PREFIX + phoneNum, code, 300); // 有效期5分钟
-		//return ""+SmsUtils.smsSend(phoneName,code);
 		BaseRspDto<MessageCodeDto> rsp = new BaseRspDto<MessageCodeDto>();
-		MessageCodeDto messageCodeDto = new MessageCodeDto();
-		messageCodeDto.setPhoneNum(phoneNum);
-		messageCodeDto.setMsgCode(code);
-		rsp.setData(messageCodeDto);
+		try {
+			if (StringUtils.isBlank(phoneNum) || StringUtils.isBlank(msgType)) {
+				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
+			}
+
+			String code = RandomGenUtils.getRandomNumberInRange(100000, 999999)+"";
+			log.info("sendMsgCode phoneNum:{},code:{}", phoneNum, code);
+			String msg_prefix = "";
+			if ("0".equals(msgType)) {
+				msg_prefix = CommonConstant.MSG_CODE_LOGIN;
+			} else if ("1".equals(msgType)) {
+				msg_prefix = CommonConstant.MSG_CODE_REGISTER;
+			} else if ("2".equals(msgType)) {
+				msg_prefix = CommonConstant.MSG_CODE_FORGET_PSW;
+			} else {
+				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
+			}
+			redisUtils.set(msg_prefix + phoneNum, code, 300); // 有效期5分钟
+
+			if (SmsUtils.smsSend(phoneNum,code)) {
+				MessageCodeDto messageCodeDto = new MessageCodeDto();
+				messageCodeDto.setPhoneNum(phoneNum);
+				messageCodeDto.setMsgCode(code);
+				rsp.setData(messageCodeDto);
+			} else {
+				rsp.setCode(HzzExceptionEnum.MESSAGE_CODE_FAILED.getErrorCode());
+				rsp.setMsg(HzzExceptionEnum.MESSAGE_CODE_FAILED.getErrorMsg());
+			}
+		} catch (HzzBizException e) {
+			log.error("sendMsgCode业务错误 msg={}", e.getErrorMsg(), e);
+			rsp.setCode(e.getErrorCode());
+			rsp.setMsg(e.getErrorMsg());
+		} catch (Exception e) {
+			log.error("sendMsgCode系统异常", e);
+			rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+			rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+		}
 		return rsp;
 	}
 
@@ -320,6 +351,52 @@ public class UserController {
 			CustomerbaseinfoVo vo = new CustomerbaseinfoVo();
 			vo.setCbiId(userInfo.getCbiId());
 			vo.setCbiPassword(modifyPswReqDto.getNewPsw()); // TODO 密码后端需要加密
+			customerbaseinfoService.updateUserInfo(vo);
+		} catch (HzzBizException e) {
+			log.error("用户实名认证业务错误 msg={}", e.getErrorMsg(), e);
+			rsp.setCode(e.getErrorCode());
+			rsp.setMsg(e.getErrorMsg());
+		} catch (Exception e) {
+			log.error("用户实名认证系统异常", e);
+			rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+			rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+		}
+		return rsp;
+	}
+
+
+	@ApiOperation(value="用户修改登录密码",notes="要求登录")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name="oldPsw",value="原始密码",required=true),
+			@ApiImplicitParam(name="newPsw",value="新密码",required=true),
+			@ApiImplicitParam(name="repeatNewPsw",value="重复新密码",required=true)
+	})
+	@PostMapping(value = "/forgetPsw")
+	@ResponseBody
+	@VerifyToken
+	public BaseRspDto forgetPsw(ForgetPswReqDto forgetPswReqDto) {
+
+		log.info("forgetPsw modifyPswReqDto:{}", JsonUtils.toJson(forgetPswReqDto));
+		BaseRspDto rsp = new BaseRspDto();
+		try {
+			if (StringUtils.isBlank(forgetPswReqDto.getNewPsw()) || StringUtils.isBlank(forgetPswReqDto.getPhoneNum()) ||
+					StringUtils.isBlank(forgetPswReqDto.getMsgCode())) {
+				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
+			}
+			CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+			if (!userInfo.getCbiPhonenum().equals(forgetPswReqDto.getPhoneNum())) {
+				throw new HzzBizException(HzzExceptionEnum.PHONE_NOT_SAME);
+			}
+			String key = CommonConstant.MSG_CODE_LOGIN + forgetPswReqDto.getPhoneNum();
+			String redisCode = String.valueOf(redisUtils.get(key));
+			if (!forgetPswReqDto.getMsgCode().equals(redisCode)) {
+				throw new HzzBizException(HzzExceptionEnum.MSG_CODE_INVALID);
+			} else {
+				redisUtils.del(key); // 使用过之后就删除
+			}
+			CustomerbaseinfoVo vo = new CustomerbaseinfoVo();
+			vo.setCbiId(userInfo.getCbiId());
+			vo.setCbiPassword(forgetPswReqDto.getNewPsw()); // TODO 密码后端需要加密
 			customerbaseinfoService.updateUserInfo(vo);
 		} catch (HzzBizException e) {
 			log.error("用户实名认证业务错误 msg={}", e.getErrorMsg(), e);

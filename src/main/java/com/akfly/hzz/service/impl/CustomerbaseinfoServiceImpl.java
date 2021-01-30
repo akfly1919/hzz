@@ -3,23 +3,19 @@ package com.akfly.hzz.service.impl;
 import com.akfly.hzz.constant.CommonConstant;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
-import com.akfly.hzz.util.EncryDecryUtils;
+import com.akfly.hzz.mapper.CustomerbaseinfoMapper;
+import com.akfly.hzz.service.CustomerbaseinfoService;
 import com.akfly.hzz.util.JsonUtils;
 import com.akfly.hzz.util.RedisUtils;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
-import com.akfly.hzz.mapper.CustomerbaseinfoMapper;
-import com.akfly.hzz.service.CustomerbaseinfoService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.time.ZoneId;
-import java.util.Date;
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -36,7 +32,7 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
 
     @Autowired
     private RedisUtils redisUtils;
-    @Autowired
+    @Resource
     private CustomerbaseinfoMapper customerbaseinfoMapper;
     @Override
     public CustomerbaseinfoVo userLoginByPsw(String phoneNum, String psw) throws HzzBizException {
@@ -53,7 +49,7 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
     @Override
     public CustomerbaseinfoVo userLoginByCode(String phoneNum, String msgCode) throws HzzBizException {
 
-        String key = CommonConstant.MSG_CODE_PREFIX + phoneNum;
+        String key = CommonConstant.MSG_CODE_LOGIN + phoneNum;
         String redisCode = String.valueOf(redisUtils.get(key));
         if (!msgCode.equals(redisCode)) {
             throw new HzzBizException(HzzExceptionEnum.MSG_CODE_INVALID);
