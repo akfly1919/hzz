@@ -5,6 +5,7 @@ import com.akfly.hzz.channel.AliPayAppSubmitPayServiceImpl;
 import com.akfly.hzz.channel.SubmitPayModel;
 import com.akfly.hzz.channel.SubmitPayResultModel;
 import com.akfly.hzz.channel.SubmitPayService;
+import com.akfly.hzz.constant.CreditCardLimitEnum;
 import com.akfly.hzz.constant.PayStatus;
 import com.akfly.hzz.constant.ValidEnum;
 import com.akfly.hzz.dto.BaseRspDto;
@@ -19,6 +20,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -45,8 +47,8 @@ public class AccountInfoController {
     @Resource
     private CustomerbillrelatedService customerbillrelatedService;
 
-    @Resource
-    private AliPayAppSubmitPayServiceImpl aliPayAppSubmitPayService;
+    @Resource(name = "aliPayH5SubmitPayService")
+    private SubmitPayService aliPayH5SubmitPayService;
 
 
     @ApiOperation(value="用户充值",notes="用户登录就可以")
@@ -62,6 +64,9 @@ public class AccountInfoController {
         BaseRspDto<SubmitPayResultModel> rsp = new BaseRspDto<SubmitPayResultModel>();
         try {
             CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+            if (payChannel != 2) {
+                throw new HzzBizException(HzzExceptionEnum.NOT_SUPPORT_PAY);
+            }
             CustomerpayinfoVo vo = new CustomerpayinfoVo();
             vo.setCaiAmount(amount);
             vo.setCbiId(String.valueOf(userInfo.getCbiId()));
@@ -77,27 +82,24 @@ public class AccountInfoController {
             //vo.setCpiChannelorderid(copy.getCpiChannelorderid());
             //vo.setCpiOperator(copy.getCpiOperator());
 
-            customerpayinfoService.insertCustomerPayInfo(vo);
+            long orderId = customerpayinfoService.insertCustomerPayInfo(vo);
+            log.info("orderId={}", orderId);
             //customerpayinfoService.lambdaQuery().
             SubmitPayModel submitPayModel = new SubmitPayModel();
-            //submitPayModel.setTransId(copy.getTransId());
-            //submitPayModel.setPayAmount(copy.getPayAmount());
-            //submitPayModel.setChId(copy.getChId());
-            //submitPayModel.setMchOrderName(copy.getMchOrderName());
-            //submitPayModel.setMchOrderDetail(copy.getMchOrderDetail());
-            //submitPayModel.setLimit_pay(copy.getLimit_pay());
-            //submitPayModel.setMchOrderStartTime(copy.getMchOrderStartTime());
-            //submitPayModel.setMchOrderExpDate(copy.getMchOrderExpDate());
+            submitPayModel.setTransId(String.valueOf(orderId));
+            submitPayModel.setPayAmount(Long.valueOf(amount));
+            submitPayModel.setMchOrderName("订单");
+            submitPayModel.setMchOrderDetail("订单");
+            submitPayModel.setLimit_pay(CreditCardLimitEnum.NO_CREDIT);
+            Date startTime = new Date();
+            submitPayModel.setMchOrderStartTime(startTime);
+            submitPayModel.setMchOrderExpDate(DateUtils.addHours(startTime, 2));
+            submitPayModel.setSignType("RSA2");
             //submitPayModel.setMhtReserved(copy.getMhtReserved());
             //submitPayModel.setCliDeviceType(copy.getCliDeviceType());
-            //submitPayModel.setChAppId(copy.getChAppId());
-            //submitPayModel.setChMchId(copy.getChMchId());
-            //submitPayModel.setChAppKey(copy.getChAppKey());
-            //submitPayModel.setChMchKey(copy.getChMchKey());
-            //submitPayModel.setPrivateKey(copy.getPrivateKey());
-            //submitPayModel.setPublicKey(copy.getPublicKey());
 
-            SubmitPayResultModel model = aliPayAppSubmitPayService.submitPay(submitPayModel);
+            SubmitPayResultModel model = aliPayH5SubmitPayService.submitPay(submitPayModel);
+            log.info("支付宝H5下单返回参数 result={}", model.getResult());
             rsp.setData(model);
         } catch (HzzBizException e) {
             log.error("用户充值业务错误 msg={}", e.getErrorMsg(), e);
@@ -113,7 +115,7 @@ public class AccountInfoController {
 
 
     @ApiOperation(value="用户提现",notes="用户登录就可以")
-    @PutMapping(value = "/withdraw")
+    @RequestMapping(value = "/withdraw", method = {RequestMethod.PUT, RequestMethod.POST})
     @VerifyToken
     public BaseRspDto<String> withdraw(@Validated CustomercashoutinfoVo customercashoutinfoVo){
         BaseRspDto<String> rsp = new BaseRspDto<String>();
@@ -135,13 +137,13 @@ public class AccountInfoController {
         return rsp;
     }
     @ApiOperation(value="用户流水",notes="用户登录就可以")
-    @GetMapping(value = "/customerBill")
+    @PostMapping(value = "/customerBill")
     @VerifyToken
-    public BaseRspDto<List<CustomerbillrelatedVo>> getCustomerBill(){
+    public BaseRspDto<List<CustomerbillrelatedVo>> getCustomerBill(@RequestParam @Digits(integer = 10,fraction = 0) Integer beg, @RequestParam @Digits(integer = 10,fraction = 0) Integer size){
         BaseRspDto<List<CustomerbillrelatedVo>> rsp = new BaseRspDto<List<CustomerbillrelatedVo>>();
         try {
             CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
-            List<CustomerbillrelatedVo> list = customerbillrelatedService.getCustomerbillrelatedById(userInfo.getCbiId());
+            List<CustomerbillrelatedVo> list = customerbillrelatedService.getCustomerbillrelatedById(userInfo.getCbiId(), size, beg);
             rsp.setData(list);
         }  catch (Exception e) {
             log.error("用户提现系统异常", e);

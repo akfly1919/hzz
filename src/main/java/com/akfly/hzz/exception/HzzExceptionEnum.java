@@ -22,9 +22,12 @@ public enum HzzExceptionEnum {
     PHONE_NOT_SAME("1013", "与注册的手机号不一致"),
     MESSAGE_CODE_FAILED("1014", "发送验证码失败"),
     PHONENUM_NOT_REGISTER("1005", "手机号未注册过"),
+    NOT_SUPPORT_PAY("1006", "不支持的支付方式"),
 
     /* 业务异常定义以2-8开头，顺序往下排号 */
     PARAM_INVALID("2000","参数不合法"),
+    REQUEST_ALIPAY_ERROR("2001", "请求支付宝失败"),
+
     ACCOUNT_BALACE_ERROR("3000","余额不足"),
     /* 未知异常定义以9开头 */
     SYSTEM_ERROR("9000", "系统繁忙"),

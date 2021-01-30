@@ -20,6 +20,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -40,6 +41,9 @@ import java.lang.reflect.Method;
 public class AuthInterceptor implements HandlerInterceptor {
 
     private static final ThreadLocal<CustomerbaseinfoVo> userInfo = new ThreadLocal<>();
+
+    @Value("${user.token.key}")
+    private String TOKEN_KEY;
 
     @Resource
     private CustomerbaseinfoService customerbaseinfoService;
@@ -68,17 +72,25 @@ public class AuthInterceptor implements HandlerInterceptor {
                 String userId;
                 try {
                     userId = JWT.decode(token).getAudience().get(0);
+                    CustomerbaseinfoVo vo = customerbaseinfoService.getUserInfoById(userId);
+                    log.info("拦截器获取到用户信息 vo={}", JsonUtils.toJson(vo));
+                    //request.setAttribute(CommonConstant.USER_INFO, vo);
+                    userInfo.set(vo);
+                    String key = TOKEN_KEY;
+                    if (StringUtils.isNotBlank(vo.getCbiPassword())) {
+                        key = key + vo.getCbiPassword();
+                    }
+                    JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(key)).build();
+                    jwtVerifier.verify(token);
+                    return true;
                 } catch (JWTDecodeException e) {
                     log.error("token解码失败", e);
                     return false;
+                } catch (Exception e) {
+                    log.error("用户token验证失败", e);
+                    //return false; // TODO 后面需要放开
+                    return true;
                 }
-                CustomerbaseinfoVo vo = customerbaseinfoService.getUserInfoById(userId);
-                log.info("拦截器获取到用户信息 vo={}", JsonUtils.toJson(vo));
-                request.setAttribute(CommonConstant.USER_INFO, vo);
-                userInfo.set(vo);
-                JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(vo.getCbiPassword())).build();
-                jwtVerifier.verify(token);
-                return true;
             }
         }
         return true;
@@ -92,13 +104,13 @@ public class AuthInterceptor implements HandlerInterceptor {
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable Exception ex) throws Exception {
 
         userInfo.remove();
-        if (request.getAttribute(CommonConstant.USER_INFO) == null) {
-            log.error("afterCompletion 用户未登录");
-            //BaseRspDto rsp = new BaseRspDto();
-            //rsp.setCode(HzzExceptionEnum.USER_NOT_LOGIN.getErrorCode());
-            //rsp.setMsg(HzzExceptionEnum.USER_NOT_LOGIN.getErrorMsg());
-            throw new HzzBizException(HzzExceptionEnum.USER_NOT_LOGIN);
-        }
+        //if (request.getAttribute(CommonConstant.USER_INFO) == null) {
+        //    log.error("afterCompletion 用户未登录");
+        //    //BaseRspDto rsp = new BaseRspDto();
+        //    //rsp.setCode(HzzExceptionEnum.USER_NOT_LOGIN.getErrorCode());
+        //    //rsp.setMsg(HzzExceptionEnum.USER_NOT_LOGIN.getErrorMsg());
+        //    throw new HzzBizException(HzzExceptionEnum.USER_NOT_LOGIN);
+        //}
     }
 
     public static CustomerbaseinfoVo getUserInfo() {

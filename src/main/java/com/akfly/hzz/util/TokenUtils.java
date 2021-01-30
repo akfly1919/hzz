@@ -2,6 +2,7 @@ package com.akfly.hzz.util;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
@@ -17,10 +18,13 @@ import java.util.Date;
 
 public class TokenUtils {
 
-    public static String getToken(String userId, String sec) throws UnsupportedEncodingException {
+    public static String getToken(String userId, String key, String psw) throws UnsupportedEncodingException {
 
+        if (StringUtils.isNotBlank(psw)) {
+            key = key + psw;
+        }
         // TODO 正式测试时候需要加上过期时间
-        //return JWT.create().withAudience(userId).withExpiresAt(new Date(System.currentTimeMillis() + 2 * 24 * 3600 * 1000)).sign(Algorithm.HMAC256(sec));
-        return JWT.create().withAudience(userId).sign(Algorithm.HMAC256(sec));
+        //return JWT.create().withAudience(userId).withExpiresAt(new Date(System.currentTimeMillis() + 2 * 24 * 3600 * 1000)).sign(Algorithm.HMAC256(key));
+        return JWT.create().withAudience(userId).sign(Algorithm.HMAC256(key));
     }
 }

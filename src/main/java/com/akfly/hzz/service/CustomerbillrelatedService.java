@@ -15,5 +15,5 @@ import java.util.List;
  * @since 2021-01-24
  */
 public interface CustomerbillrelatedService extends IService<CustomerbillrelatedVo> {
-    public List<CustomerbillrelatedVo> getCustomerbillrelatedById(Long id);
+    public List<CustomerbillrelatedVo> getCustomerbillrelatedById(Long id, int pageSize, int pageNum);
 }

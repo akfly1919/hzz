@@ -21,12 +21,21 @@ import java.util.Map;
 public class AliPayAppSubmitPayServiceImpl extends SubmitPayService<SubmitPayModel> {
 
     // 异步通知地址
-    @Value("${alipayapp.sdk.notify_url}")
+    @Value("${alipay.sdk.notify_url}")
     private String NOTIFY_URL;
 
     // 支付结束回显url
-    @Value("${alipayapp.sdk.method}")
+    @Value("${alipay.sdk.method}")
     private String METHOD;
+
+    @Value("${alipay.wap.privateKey}")
+    private String privateKey;
+
+    @Value("${alipay.wap.publicKey}")
+    private String publicKey;
+
+    @Value("${alipay.wap.appid}")
+    private String appId;
 
 
     @Override
@@ -63,7 +72,7 @@ public class AliPayAppSubmitPayServiceImpl extends SubmitPayService<SubmitPayMod
         String bizContent = jsonObject.toJSONString();
 
         Map<String, String> keyValues = new HashMap<String, String>();
-        keyValues.put("app_id", model.getChAppId());
+        keyValues.put("app_id", appId);
         keyValues.put("method", METHOD);
         keyValues.put("format", "JSON");
         keyValues.put("charset", CommonConstant.CHARSET_UTF8);
@@ -76,7 +85,7 @@ public class AliPayAppSubmitPayServiceImpl extends SubmitPayService<SubmitPayMod
         String orderParam = SignUtil.buildOrderParam(keyValues);
 
         // 使用私钥生成sign
-        String sign = SignUtil.getSign(keyValues, model.getChAppKey());
+        String sign = SignUtil.getSign(keyValues, privateKey);
 
         // 生成支付串
         String orderInfo = orderParam + "&" + sign;

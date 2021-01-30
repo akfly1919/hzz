@@ -17,8 +17,8 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
-import sun.applet.resources.MsgAppletViewer_zh_TW;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -29,7 +29,8 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping(value = "/hzz/user")
 public class UserController {
 
-	private static final String MD5_KEY = "Jg7ZjmnxE8c7RCXy";
+	@Value("${user.token.key}")
+	private String TOKEN_KEY;
 
 	@Resource
 	private RedisUtils redisUtils;
@@ -66,7 +67,7 @@ public class UserController {
 				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
 			}
 			//response.setHeader("token", TokenUtils.getToken(customerbaseinfoVo.getCbiId().toString(), customerbaseinfoVo.getCbiPassword()));
-			rsp.setToken(TokenUtils.getToken(customerbaseinfoVo.getCbiId().toString(), customerbaseinfoVo.getCbiPassword()));
+			rsp.setToken(TokenUtils.getToken(customerbaseinfoVo.getCbiId().toString(), TOKEN_KEY, customerbaseinfoVo.getCbiPassword()));
 			customerbaseinfoVo.setCbiPassword(null);  // 去掉密码
 			rsp.setData(customerbaseinfoVo);
 		} catch (HzzBizException e) {
@@ -112,7 +113,7 @@ public class UserController {
 			if (existUser == null) {
 				customerbaseinfoService.userRegister(phoneNum, psw, invitationCode);
 				CustomerbaseinfoVo customerbaseinfoVo = customerbaseinfoService.getUserInfo(phoneNum);
-				response.setHeader("token", TokenUtils.getToken(customerbaseinfoVo.getCbiId().toString(), customerbaseinfoVo.getCbiPassword()));
+				//response.setHeader("token", TokenUtils.getToken(customerbaseinfoVo.getCbiId().toString(), customerbaseinfoVo.getCbiPassword()));
 				customerbaseinfoVo.setCbiPassword(null);  // 去掉密码
 				//customerbaseinfoVo.setCbiCreatetime(DateHandlerUtil.getDateTimeFromDate(customerbaseinfoVo.getCbiCreatetime(), "yyyy-MM-dd HH:mm:ss"));
 				rsp.setData(customerbaseinfoVo);
@@ -412,10 +413,5 @@ public class UserController {
 	}
 
 
-
-	private String generateUserToken(String phoneNum) {
-
-		return EncryDecryUtils.md5(phoneNum + MD5_KEY);
-	}
 
 }

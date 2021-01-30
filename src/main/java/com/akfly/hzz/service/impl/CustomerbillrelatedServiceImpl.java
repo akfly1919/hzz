@@ -20,9 +20,9 @@ import java.util.List;
 @Service
 public class CustomerbillrelatedServiceImpl extends ServiceImpl<CustomerbillrelatedMapper, CustomerbillrelatedVo> implements CustomerbillrelatedService {
 
-    public List<CustomerbillrelatedVo> getCustomerbillrelatedById(Long id){
+    public List<CustomerbillrelatedVo> getCustomerbillrelatedById(Long id, int pageSize, int pageNum){
         List<CustomerbillrelatedVo> list=lambdaQuery()
-                .eq(CustomerbillrelatedVo::getCbiId, id).list();
+                .eq(CustomerbillrelatedVo::getCbiId, id).last("limit " + pageNum + "," + pageSize + " ").list();
         return list;
     }
 }

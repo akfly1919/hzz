@@ -40,7 +40,7 @@ public class HzzApplication {
 		//添加header参数
 		ParameterBuilder ticketPar = new ParameterBuilder();
 		List<Parameter> pars = new ArrayList<>();
-		ticketPar.name("token").description("user token").defaultValue("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxMDAxMSJ9.zjbbon8q1sHoyHgArNplO0quW8Rwnp7NUxHXQov4DLU")
+		ticketPar.name("token").description("user token").defaultValue("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxMDAwOSJ9.e2d2AYEGpDMz6DQKr1GUVCPuQmR-z0MBSii3OewpNcY")
 				.modelRef(new ModelRef("string")).parameterType("header")
 				.required(true).build(); //header中的ticket参数非必填，传空也可以
 		pars.add(ticketPar.build());    //根据每个方法名也知道当前方法在设置什么参数

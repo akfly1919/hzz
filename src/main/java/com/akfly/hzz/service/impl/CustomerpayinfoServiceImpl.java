@@ -8,6 +8,8 @@ import com.akfly.hzz.service.CustomerpayinfoService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+
 /**
  * <p>
  * 用户充值信息 服务实现类
@@ -19,10 +21,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomerpayinfoServiceImpl extends ServiceImpl<CustomerpayinfoMapper, CustomerpayinfoVo> implements CustomerpayinfoService {
 
-    @Override
-    public void insertCustomerPayInfo(CustomerpayinfoVo vo) throws HzzBizException {
+    @Resource
+    private CustomerpayinfoMapper customerpayinfoMapper;
 
-        if (!save(vo)) {
+    @Override
+    public long insertCustomerPayInfo(CustomerpayinfoVo vo) throws HzzBizException {
+
+        try {
+            int id = customerpayinfoMapper.insert(vo);
+            return vo.getCpiOrderid();
+        } catch (Exception e) {
             throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
         }
 

@@ -15,6 +15,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface CustomerpayinfoService extends IService<CustomerpayinfoVo> {
 
 
-    void insertCustomerPayInfo(CustomerpayinfoVo vo) throws HzzBizException;
+    long insertCustomerPayInfo(CustomerpayinfoVo vo) throws HzzBizException;
 
 }

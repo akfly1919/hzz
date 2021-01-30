@@ -8,7 +8,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class SubmitPayModel extends BaseChAppParamModel {
+public class SubmitPayModel {
 
     // 交易订单号
     private String              transId;
@@ -18,9 +18,6 @@ public class SubmitPayModel extends BaseChAppParamModel {
 
     // 输出类型
     //private OutputTypeEnum      outputType;
-
-    // 渠道编号
-    private String              chId;
 
     // 商品名称
     private String              mchOrderName;
@@ -41,7 +38,6 @@ public class SubmitPayModel extends BaseChAppParamModel {
 
     private String              mhtReserved;
 
-    // 用于区分不同应用场景，生成Detail发往支付宝
-    private CliDeviceTypeEnum cliDeviceType;
+    private String signType;
 
 }
