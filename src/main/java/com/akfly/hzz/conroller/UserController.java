@@ -373,7 +373,6 @@ public class UserController {
 	})
 	@PostMapping(value = "/forgetPsw")
 	@ResponseBody
-	@VerifyToken
 	public BaseRspDto forgetPsw(ForgetPswReqDto forgetPswReqDto) {
 
 		log.info("forgetPsw modifyPswReqDto:{}", JsonUtils.toJson(forgetPswReqDto));
@@ -383,9 +382,11 @@ public class UserController {
 					StringUtils.isBlank(forgetPswReqDto.getMsgCode())) {
 				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
 			}
-			CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
-			if (!userInfo.getCbiPhonenum().equals(forgetPswReqDto.getPhoneNum())) {
-				throw new HzzBizException(HzzExceptionEnum.PHONE_NOT_SAME);
+
+			CustomerbaseinfoVo existUser = customerbaseinfoService.getUserInfo(forgetPswReqDto.getPhoneNum());
+
+			if (existUser == null) {
+				throw new HzzBizException(HzzExceptionEnum.PHONENUM_NOT_REGISTER);
 			}
 			String key = CommonConstant.MSG_CODE_LOGIN + forgetPswReqDto.getPhoneNum();
 			String redisCode = String.valueOf(redisUtils.get(key));
@@ -395,7 +396,7 @@ public class UserController {
 				redisUtils.del(key); // 使用过之后就删除
 			}
 			CustomerbaseinfoVo vo = new CustomerbaseinfoVo();
-			vo.setCbiId(userInfo.getCbiId());
+			vo.setCbiId(existUser.getCbiId());
 			vo.setCbiPassword(forgetPswReqDto.getNewPsw()); // TODO 密码后端需要加密
 			customerbaseinfoService.updateUserInfo(vo);
 		} catch (HzzBizException e) {

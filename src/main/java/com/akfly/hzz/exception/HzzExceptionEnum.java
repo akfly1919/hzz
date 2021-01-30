@@ -21,6 +21,7 @@ public enum HzzExceptionEnum {
     ORDER_ALREADY_EXPIRED("1012", "订单超时"),
     PHONE_NOT_SAME("1013", "与注册的手机号不一致"),
     MESSAGE_CODE_FAILED("1014", "发送验证码失败"),
+    PHONENUM_NOT_REGISTER("1005", "手机号未注册过"),
 
     /* 业务异常定义以2-8开头，顺序往下排号 */
     PARAM_INVALID("2000","参数不合法"),

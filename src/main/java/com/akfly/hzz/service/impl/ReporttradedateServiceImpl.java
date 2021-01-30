@@ -22,7 +22,7 @@ public class ReporttradedateServiceImpl extends ServiceImpl<ReporttradedateMappe
 
 
     @Override
-    public int getRtiNum(long gbiId) throws HzzBizException {
+    public int getRtiNum(long gbiId) {
 
         int rtiNum = lambdaQuery().eq(ReporttradedateVo::getRtiGbid, gbiId).count();
         return rtiNum;

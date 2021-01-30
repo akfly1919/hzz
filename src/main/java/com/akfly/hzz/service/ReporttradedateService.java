@@ -20,6 +20,6 @@ public interface ReporttradedateService extends IService<ReporttradedateVo> {
      * @return
      * @throws HzzBizException
      */
-    int getRtiNum(long gbiId) throws HzzBizException;
+    int getRtiNum(long gbiId);
 
 }

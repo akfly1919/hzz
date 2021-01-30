@@ -1,7 +1,7 @@
 package com.akfly.hzz.dto;
 
-import com.akfly.hzz.vo.BroadcastnoteinfoVo;
 import com.akfly.hzz.vo.GoodsbaseinfoVo;
+import com.akfly.hzz.vo.PictureinfoVo;
 import lombok.Data;
 
 import java.util.List;
@@ -15,16 +15,14 @@ import java.util.List;
 @Data
 public class GoodInfoDto {
 
-    private List<GoodsbaseinfoVo> zcgoods;
+    private GoodsbaseinfoVo gbi;
 
-    private List<GoodsbaseinfoVo> xsgoods;
+    private List<PictureinfoVo> pivs;
 
-    private List<BroadcastnoteinfoVo> sys;
+    // 库存量
+    private int stock;
 
-    private List<BroadcastnoteinfoVo> tzs;
-
-    private List<BroadcastnoteinfoVo> hds;
-
-
+    // 销售量
+    private int salesVolume;
 
 }

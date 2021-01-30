@@ -45,7 +45,7 @@ public class AddressInfoController {
         }
         return rsp;
     }
-    @PutMapping(value = "addAddress")
+    @PostMapping(value = "addAddress")
     @VerifyToken
     public  BaseRspDto<String> createCustomerAddressInfo(@Validated CustomeraddressinfoVo customeraddressinfoVo){
         BaseRspDto<String> rsp = new BaseRspDto<String>();

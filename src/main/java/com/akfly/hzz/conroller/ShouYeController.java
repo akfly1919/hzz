@@ -3,6 +3,7 @@ package com.akfly.hzz.conroller;
 
 import com.akfly.hzz.constant.CommonConstant;
 import com.akfly.hzz.dto.BaseRspDto;
+import com.akfly.hzz.dto.GoodInfoDto;
 import com.akfly.hzz.dto.ShouYeDto;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
@@ -97,23 +98,34 @@ public class ShouYeController {
             @ApiImplicitParam(name="goodId",value="商品id",required=true)
     })
     @RequestMapping(value = "/goodInfo", method = {RequestMethod.GET, RequestMethod.POST})
-    public String goodInfo(@RequestParam @NotEmpty String goodId) {
-        Map<String, Object> map = Maps.newHashMap();
+    public BaseRspDto goodInfo(@RequestParam @NotEmpty String goodId) {
 
-        BaseRspDto rsp = new BaseRspDto();
-        GoodsbaseinfoVo goodsbaseinfoVo = goodsbaseinfoService.lambdaQuery()
-                .eq(GoodsbaseinfoVo::getGbiId, goodId).one();
-        map.put("gbi", goodsbaseinfoVo);
-        rsp.setData(map);
-        if (goodsbaseinfoVo == null) {
-            return JsonUtils.toJson(rsp);
+        BaseRspDto<GoodInfoDto> rsp = new BaseRspDto<GoodInfoDto>();
+        try {
+            GoodsbaseinfoVo goodsbaseinfoVo = goodsbaseinfoService.lambdaQuery()
+                    .eq(GoodsbaseinfoVo::getGbiId, goodId).one();
+            GoodInfoDto goodInfoDto = new GoodInfoDto();
+            goodInfoDto.setGbi(goodsbaseinfoVo);
+            if (goodsbaseinfoVo == null) {
+                return rsp;
+            }
+            List<PictureinfoVo> pictureinfoVos = pictureinfoService.lambdaQuery()
+                    .eq(PictureinfoVo::getGbiId, goodsbaseinfoVo.getGbiId())
+                    .eq(PictureinfoVo::getPiValid, 1).list();
+            goodInfoDto.setPivs(pictureinfoVos);
+
+            int stock = customergoodsrelatedService.getStock(goodsbaseinfoVo.getGbiId());
+            goodInfoDto.setStock(stock);
+
+            int salesVolume = reporttradedateService.getRtiNum(goodsbaseinfoVo.getGbiId());
+            goodInfoDto.setSalesVolume(salesVolume);
+            rsp.setData(goodInfoDto);
+        } catch (Exception e) {
+            log.error("获取商品详情系统异常", e);
+            rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+            rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
         }
-        List<PictureinfoVo> pictureinfoVos = pictureinfoService.lambdaQuery()
-                .eq(PictureinfoVo::getGbiId, goodsbaseinfoVo.getGbiId()).list();
-        map.put("pivs", pictureinfoVos);
-        rsp.setData(map);
-
-        return JsonUtils.toJson(rsp);
+        return rsp;
 
     }
 
@@ -169,7 +181,7 @@ public class ShouYeController {
 
             rsp.setData(shouYeDto);
         } catch (Exception e) {
-            log.error("获取用户信息系统异常", e);
+            log.error("获取首页数据系统异常", e);
             rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
             rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
         }
