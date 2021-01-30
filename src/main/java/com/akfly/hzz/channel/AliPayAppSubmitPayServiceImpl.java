@@ -22,11 +22,11 @@ public class AliPayAppSubmitPayServiceImpl extends SubmitPayService<SubmitPayMod
 
     // 异步通知地址
     @Value("${alipayapp.sdk.notify_url}")
-    private String NOTIFY_URL = "";
+    private String NOTIFY_URL;
 
     // 支付结束回显url
     @Value("${alipayapp.sdk.method}")
-    private String METHOD = "";
+    private String METHOD;
 
 
     @Override

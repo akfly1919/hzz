@@ -13,7 +13,7 @@ import java.util.List;
  * @create: 2021-01-18 19:58
  **/
 @Data
-public class ShouYeDto {
+public class GoodInfoDto {
 
     private List<GoodsbaseinfoVo> zcgoods;
 
