@@ -19,21 +19,14 @@ public class SubmitPayResultModel {
     //private OutputTypeEnum      outputType;
 
     /**
-     * 资源地址
+     * 返回结果串
      */
-    private String              resource;
+    private String              result;
 
     /**
      * 返回内容
      */
-    private Map<String, String> retContent;
+    //private Map<String, String> retContent;
 
-    //public OutputTypeEnum getOutputType() {
-    //    return outputType;
-    //}
-    //
-    //public void setOutputType(OutputTypeEnum outputType) {
-    //    this.outputType = outputType;
-    //}
 
 }

@@ -104,8 +104,9 @@ public class AliPayAppSubmitPayServiceImpl extends SubmitPayService<SubmitPayMod
     protected SubmitPayResultModel getResult(SubmitPayModel model, Map param) throws HzzBizException {
         SubmitPayResultModel submitPayResultModel = new SubmitPayResultModel();
         //submitPayResultModel.setOutputType(OutputTypeEnum.ALIPAY);
-         String info = getJSONString(model,param);
-        submitPayResultModel.setRetContent(param);
+         String result = getJSONString(model,param);
+        submitPayResultModel.setResult(result);
+        //submitPayResultModel.setRetContent(param);
         return submitPayResultModel;
     }
 

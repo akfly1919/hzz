@@ -3,6 +3,7 @@ package com.akfly.hzz.conroller;
 import com.akfly.hzz.annotation.VerifyToken;
 import com.akfly.hzz.channel.AliPayAppSubmitPayServiceImpl;
 import com.akfly.hzz.channel.SubmitPayModel;
+import com.akfly.hzz.channel.SubmitPayResultModel;
 import com.akfly.hzz.channel.SubmitPayService;
 import com.akfly.hzz.constant.PayStatus;
 import com.akfly.hzz.constant.ValidEnum;
@@ -55,10 +56,10 @@ public class AccountInfoController {
     })
     @PostMapping(value = "/recharge")
     @VerifyToken
-    public BaseRspDto<List<CustomerpayinfoVo>> recharge(@RequestParam @Digits(integer = 10, fraction = 0) Integer amount,
+    public BaseRspDto<SubmitPayResultModel> recharge(@RequestParam @Digits(integer = 10, fraction = 0) Integer amount,
                                                         @RequestParam Integer payChannel){
 
-        BaseRspDto<List<CustomerpayinfoVo>> rsp = new BaseRspDto<List<CustomerpayinfoVo>>();
+        BaseRspDto<SubmitPayResultModel> rsp = new BaseRspDto<SubmitPayResultModel>();
         try {
             CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
             CustomerpayinfoVo vo = new CustomerpayinfoVo();
@@ -77,7 +78,8 @@ public class AccountInfoController {
             //vo.setCpiOperator(copy.getCpiOperator());
 
             customerpayinfoService.insertCustomerPayInfo(vo);
-            //SubmitPayModel submitPayModel = new SubmitPayModel();
+            //customerpayinfoService.lambdaQuery().
+            SubmitPayModel submitPayModel = new SubmitPayModel();
             //submitPayModel.setTransId(copy.getTransId());
             //submitPayModel.setPayAmount(copy.getPayAmount());
             //submitPayModel.setChId(copy.getChId());
@@ -94,9 +96,9 @@ public class AccountInfoController {
             //submitPayModel.setChMchKey(copy.getChMchKey());
             //submitPayModel.setPrivateKey(copy.getPrivateKey());
             //submitPayModel.setPublicKey(copy.getPublicKey());
-            //
-            //aliPayAppSubmitPayService.submitPay();
-        //    rsp.setData(list);
+
+            SubmitPayResultModel model = aliPayAppSubmitPayService.submitPay(submitPayModel);
+            rsp.setData(model);
         } catch (HzzBizException e) {
             log.error("用户充值业务错误 msg={}", e.getErrorMsg(), e);
             rsp.setCode(e.getErrorCode());
