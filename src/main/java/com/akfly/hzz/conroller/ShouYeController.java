@@ -84,7 +84,7 @@ public class ShouYeController {
     public String goodList(@RequestParam @Digits(integer = 10,fraction = 0) Integer beg, @RequestParam @Digits(integer = 10,fraction = 0) Integer size, @RequestParam @Digits(integer = 2,fraction = 0)Integer gbiType) {
 
         List<GoodsbaseinfoVo> zcgoods = goodsbaseinfoService.lambdaQuery()
-                .eq(GoodsbaseinfoVo::getGbiType, gbiType)
+                .eq(GoodsbaseinfoVo::getGbiType, gbiType).eq(GoodsbaseinfoVo::getGbiValid, 1)
                 .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit " + beg + "," + size + " ").list();
 
         BaseRspDto<List<GoodsbaseinfoVo>> rsp = new BaseRspDto<List<GoodsbaseinfoVo>>();
@@ -114,7 +114,7 @@ public class ShouYeController {
                     .eq(PictureinfoVo::getPiValid, 1).list();
             goodInfoDto.setPivs(pictureinfoVos);
 
-            int stock = customergoodsrelatedService.getStock(goodsbaseinfoVo.getGbiId());
+            int stock = customergoodsrelatedService.getStock(goodsbaseinfoVo.getGbiId()); // TODO 需要加上状态，只获取未锁定的单子
             goodInfoDto.setStock(stock);
 
             int salesVolume = reporttradedateService.getRtiNum(goodsbaseinfoVo.getGbiId());
@@ -135,7 +135,7 @@ public class ShouYeController {
 
         BaseRspDto<List<BroadcastnoteinfoVo>> rsp = new BaseRspDto<List<BroadcastnoteinfoVo>>();
         List<BroadcastnoteinfoVo> tzs = broadcastnoteinfoService.lambdaQuery()
-                .eq(BroadcastnoteinfoVo::getBniPostion, CommonConstant.LUNBO_TZ)
+                .eq(BroadcastnoteinfoVo::getBniPostion, CommonConstant.LUNBO_TZ).eq(BroadcastnoteinfoVo::getBniValid, 1)
                 .orderByDesc(BroadcastnoteinfoVo::getBniSort).last("limit 10").list();
 
         rsp.setData(tzs);
@@ -150,23 +150,23 @@ public class ShouYeController {
         try {
             //正常商品
             List<GoodsbaseinfoVo> zcgoods = goodsbaseinfoService.lambdaQuery()
-                    .eq(GoodsbaseinfoVo::getGbiType, CommonConstant.GOODSTYPE_ZC)
+                    .eq(GoodsbaseinfoVo::getGbiType, CommonConstant.GOODSTYPE_ZC).eq(GoodsbaseinfoVo::getGbiValid, 1)
                     .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit 3").list();
             //新手商品
             List<GoodsbaseinfoVo> xsgoods = goodsbaseinfoService.lambdaQuery()
-                    .eq(GoodsbaseinfoVo::getGbiType, CommonConstant.GOODSTYPE_XS)
+                    .eq(GoodsbaseinfoVo::getGbiType, CommonConstant.GOODSTYPE_XS).eq(GoodsbaseinfoVo::getGbiValid, 1)
                     .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit 3").list();
             //首页轮播图
             List<BroadcastnoteinfoVo> sys = broadcastnoteinfoService.lambdaQuery()
-                    .eq(BroadcastnoteinfoVo::getBniPostion, CommonConstant.LUNBO_SY)
+                    .eq(BroadcastnoteinfoVo::getBniPostion, CommonConstant.LUNBO_SY).eq(BroadcastnoteinfoVo::getBniValid, 1)
                     .orderByDesc(BroadcastnoteinfoVo::getBniSort).last("limit 3").list();
             //消息通知
             List<BroadcastnoteinfoVo> tzs = broadcastnoteinfoService.lambdaQuery()
-                    .eq(BroadcastnoteinfoVo::getBniPostion, CommonConstant.LUNBO_TZ)
+                    .eq(BroadcastnoteinfoVo::getBniPostion, CommonConstant.LUNBO_TZ).eq(BroadcastnoteinfoVo::getBniValid, 1)
                     .orderByDesc(BroadcastnoteinfoVo::getBniSort).last("limit 5").list();
             //活动图
             List<BroadcastnoteinfoVo> hds = broadcastnoteinfoService.lambdaQuery()
-                    .eq(BroadcastnoteinfoVo::getBniPostion, CommonConstant.LUNBO_HD)
+                    .eq(BroadcastnoteinfoVo::getBniPostion, CommonConstant.LUNBO_HD).eq(BroadcastnoteinfoVo::getBniValid, 1)
                     .orderByDesc(BroadcastnoteinfoVo::getBniSort).last("limit 1").list();
             Map<String, Object> map = Maps.newHashMap();
             map.put("code", HzzExceptionEnum.SUCCESS.getErrorCode());

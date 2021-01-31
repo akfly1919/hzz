@@ -4,6 +4,7 @@ package com.akfly.hzz.service;
 import com.akfly.hzz.vo.CustomerbillrelatedVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -15,5 +16,13 @@ import java.util.List;
  * @since 2021-01-24
  */
 public interface CustomerbillrelatedService extends IService<CustomerbillrelatedVo> {
-    public List<CustomerbillrelatedVo> getCustomerbillrelatedById(Long id, int pageSize, int pageNum);
+    /**
+     *
+     * @param id
+     * @param pageSize
+     * @param pageNum
+     * @param flag 0 表示当天  1 表示历史
+     * @return
+     */
+    public List<CustomerbillrelatedVo> getCustomerbillrelatedById(Long id, int pageSize, int pageNum, int flag);
 }

@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * <p>
@@ -61,5 +62,13 @@ public class CustomercashoutinfoServiceImpl extends ServiceImpl<Customercashouti
             distributedLocker.unlock(locakKey,threadId,timeStart);
         }*/
 
+    }
+
+    @Override
+    public List<CustomercashoutinfoVo> getWithdraw(Long userId, int pageSize, int pageNum) throws HzzBizException {
+
+        List<CustomercashoutinfoVo> list = lambdaQuery().eq(CustomercashoutinfoVo::getCbiId, userId)
+                .last("limit " + pageNum + "," + pageSize + " ").list();
+        return list;
     }
 }

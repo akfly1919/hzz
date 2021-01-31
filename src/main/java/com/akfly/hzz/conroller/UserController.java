@@ -102,7 +102,7 @@ public class UserController {
 			//if (!repeatPsw.equals(psw)) {
 			//	throw new HzzBizException(HzzExceptionEnum.PSW_NOT_SAME);
 			//}
-			String key = CommonConstant.MSG_CODE_LOGIN + phoneNum;
+			String key = CommonConstant.MSG_CODE_REGISTER + phoneNum;
 			String redisCode = String.valueOf(redisUtils.get(key));
 			if (!msgCode.equals(redisCode)) {
 				throw new HzzBizException(HzzExceptionEnum.MSG_CODE_INVALID);
@@ -217,7 +217,7 @@ public class UserController {
 			if (SmsUtils.smsSend(phoneNum,code)) {
 				MessageCodeDto messageCodeDto = new MessageCodeDto();
 				messageCodeDto.setPhoneNum(phoneNum);
-				messageCodeDto.setMsgCode(code);
+				//messageCodeDto.setMsgCode(code);
 				rsp.setData(messageCodeDto);
 			} else {
 				rsp.setCode(HzzExceptionEnum.MESSAGE_CODE_FAILED.getErrorCode());
@@ -366,7 +366,7 @@ public class UserController {
 	}
 
 
-	@ApiOperation(value="用户修改登录密码",notes="要求登录")
+	@ApiOperation(value="用户找回登录密码",notes="要求登录")
 	@ApiImplicitParams({
 			@ApiImplicitParam(name="oldPsw",value="原始密码",required=true),
 			@ApiImplicitParam(name="newPsw",value="新密码",required=true),
@@ -389,7 +389,7 @@ public class UserController {
 			if (existUser == null) {
 				throw new HzzBizException(HzzExceptionEnum.PHONENUM_NOT_REGISTER);
 			}
-			String key = CommonConstant.MSG_CODE_LOGIN + forgetPswReqDto.getPhoneNum();
+			String key = CommonConstant.MSG_CODE_FORGET_PSW + forgetPswReqDto.getPhoneNum();
 			String redisCode = String.valueOf(redisUtils.get(key));
 			if (!forgetPswReqDto.getMsgCode().equals(redisCode)) {
 				throw new HzzBizException(HzzExceptionEnum.MSG_CODE_INVALID);
@@ -401,11 +401,11 @@ public class UserController {
 			vo.setCbiPassword(forgetPswReqDto.getNewPsw()); // TODO 密码后端需要加密
 			customerbaseinfoService.updateUserInfo(vo);
 		} catch (HzzBizException e) {
-			log.error("用户实名认证业务错误 msg={}", e.getErrorMsg(), e);
+			log.error("用户找回登录密码业务错误 msg={}", e.getErrorMsg(), e);
 			rsp.setCode(e.getErrorCode());
 			rsp.setMsg(e.getErrorMsg());
 		} catch (Exception e) {
-			log.error("用户实名认证系统异常", e);
+			log.error("用户找回登录密码系统异常", e);
 			rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
 			rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
 		}

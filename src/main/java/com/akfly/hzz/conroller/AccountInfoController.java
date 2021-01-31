@@ -136,17 +136,42 @@ public class AccountInfoController {
         }
         return rsp;
     }
+
+    @ApiOperation(value="查询用户提现进度",notes="用户登录就可以")
+    @PostMapping(value = "/getWithdraw")
+    @VerifyToken
+    public BaseRspDto<List<CustomercashoutinfoVo>> getWithdraw(@RequestParam @Digits(integer = 10,fraction = 0) Integer beg,
+                                          @RequestParam @Digits(integer = 10,fraction = 0) Integer size){
+        BaseRspDto<List<CustomercashoutinfoVo>> rsp = new BaseRspDto<List<CustomercashoutinfoVo>>();
+        try {
+            CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+            List<CustomercashoutinfoVo> list = customercashoutinfoService.getWithdraw(userInfo.getCbiId(), size, beg);
+            rsp.setData(list);
+        } catch (HzzBizException e) {
+            log.error("查询用户提现进度业务异常 msg={}", e.getErrorMsg(), e);
+            rsp.setCode(e.getErrorCode());
+            rsp.setMsg(e.getErrorMsg());
+        } catch (Exception e) {
+            log.error("查询用户提现进度系统异常", e);
+            rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+            rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+        }
+        return rsp;
+    }
+
     @ApiOperation(value="用户流水",notes="用户登录就可以")
     @PostMapping(value = "/customerBill")
     @VerifyToken
-    public BaseRspDto<List<CustomerbillrelatedVo>> getCustomerBill(@RequestParam @Digits(integer = 10,fraction = 0) Integer beg, @RequestParam @Digits(integer = 10,fraction = 0) Integer size){
+    public BaseRspDto<List<CustomerbillrelatedVo>> getCustomerBill(@RequestParam @Digits(integer = 10,fraction = 0) Integer beg,
+                                                                   @RequestParam @Digits(integer = 10,fraction = 0) Integer size,
+                                                                    @RequestParam String flag){
         BaseRspDto<List<CustomerbillrelatedVo>> rsp = new BaseRspDto<List<CustomerbillrelatedVo>>();
         try {
             CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
-            List<CustomerbillrelatedVo> list = customerbillrelatedService.getCustomerbillrelatedById(userInfo.getCbiId(), size, beg);
+            List<CustomerbillrelatedVo> list = customerbillrelatedService.getCustomerbillrelatedById(userInfo.getCbiId(), size, beg, Integer.parseInt(flag));
             rsp.setData(list);
         }  catch (Exception e) {
-            log.error("用户提现系统异常", e);
+            log.error("获取用户资金流水系统异常", e);
             rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
             rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
         }
