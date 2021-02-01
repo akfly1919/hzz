@@ -65,11 +65,11 @@ public class ShouYeController {
     @ApiOperation(value="首页所有内容查询接口",notes="不需要登录")
     @RequestMapping(value = "/index", method = {RequestMethod.GET, RequestMethod.POST})
     public String index() {
-        try {
-            return CacheUtils.graphs.get(CacheUtils.CACHEUTILS_SY, () -> shouye());
-        } catch (Exception e) {
-            log.error("ShouYeController index error", e);
-        }
+        //try {
+        //    return CacheUtils.graphs.get(CacheUtils.CACHEUTILS_SY, () -> shouye());
+        //} catch (Exception e) {
+        //    log.error("ShouYeController index error", e);
+        //}
         return shouye();
 
     }

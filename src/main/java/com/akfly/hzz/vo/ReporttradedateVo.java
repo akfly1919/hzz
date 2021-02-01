@@ -1,10 +1,11 @@
 package com.akfly.hzz.vo;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
-import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -12,7 +13,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author wangfei
- * @since 2021-01-30
+ * @since 2021-02-01
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -40,6 +41,11 @@ public class ReporttradedateVo implements Serializable {
      * 日期
      */
     private Integer rtiDate;
+
+    /**
+     * 0-24
+     */
+    private Integer rtiHour;
 
     /**
      * 物品id

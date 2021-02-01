@@ -3,7 +3,7 @@
 <mapper namespace="com.akfly.hzz.mapper.TradeorderinfoMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.qianxian.api.vo.TradeorderinfoVo">
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.TradeorderinfoVo">
         <id column="id" property="id" />
         <result column="toi_orderid" property="toiOrderid" />
         <result column="tgs_id" property="tgsId" />

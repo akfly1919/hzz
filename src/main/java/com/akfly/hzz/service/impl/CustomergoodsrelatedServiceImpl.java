@@ -20,7 +20,8 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
     @Override
     public int getStock(long gbiId) {
 
-        int stock = lambdaQuery().eq(CustomergoodsrelatedVo::getGbiId, gbiId).eq(CustomergoodsrelatedVo::getCgrIsown, 1).count();
+        int stock = lambdaQuery().eq(CustomergoodsrelatedVo::getGbiId, gbiId)
+                .eq(CustomergoodsrelatedVo::getCgrIsown, 1).eq(CustomergoodsrelatedVo::getCgrIslock, 0).count();
         return stock;
     }
 }

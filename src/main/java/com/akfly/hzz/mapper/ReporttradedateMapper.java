@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author wangfei
- * @since 2021-01-30
+ * @since 2021-02-01
  */
 public interface ReporttradedateMapper extends BaseMapper<ReporttradedateVo> {
 

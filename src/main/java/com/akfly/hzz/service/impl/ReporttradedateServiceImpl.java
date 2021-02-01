@@ -1,13 +1,10 @@
 package com.akfly.hzz.service.impl;
 
-import com.akfly.hzz.exception.HzzBizException;
-import com.akfly.hzz.vo.ReporttradedateVo;
 import com.akfly.hzz.mapper.ReporttradedateMapper;
 import com.akfly.hzz.service.ReporttradedateService;
+import com.akfly.hzz.vo.ReporttradedateVo;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 
 /**
  * <p>
@@ -15,7 +12,7 @@ import javax.annotation.Resource;
  * </p>
  *
  * @author wangfei
- * @since 2021-01-30
+ * @since 2021-02-01
  */
 @Service
 public class ReporttradedateServiceImpl extends ServiceImpl<ReporttradedateMapper, ReporttradedateVo> implements ReporttradedateService {

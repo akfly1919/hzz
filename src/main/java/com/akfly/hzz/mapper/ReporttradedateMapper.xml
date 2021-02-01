@@ -8,6 +8,7 @@
         <result column="rti_month" property="rtiMonth" />
         <result column="rti_week" property="rtiWeek" />
         <result column="rti_date" property="rtiDate" />
+        <result column="rti_hour" property="rtiHour" />
         <result column="rti_gbid" property="rtiGbid" />
         <result column="rit_gbiname" property="ritGbiname" />
         <result column="rti_num" property="rtiNum" />

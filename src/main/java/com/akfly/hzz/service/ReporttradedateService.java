@@ -1,6 +1,5 @@
 package com.akfly.hzz.service;
 
-import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.vo.ReporttradedateVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -10,7 +9,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * </p>
  *
  * @author wangfei
- * @since 2021-01-30
+ * @since 2021-02-01
  */
 public interface ReporttradedateService extends IService<ReporttradedateVo> {
 
