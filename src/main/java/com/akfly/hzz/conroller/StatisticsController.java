@@ -32,13 +32,8 @@ public class StatisticsController {
     ReporttradedateService seporttradedateService;
 
     @ApiOperation(value="交易行情",notes="交易行情查询")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name="gbid",value="货物id",required=true,paramType="form"),
-            @ApiImplicitParam(name="queryType",value="查询类别",required=true,paramType="form"),
-    })
     @PostMapping
-    //@VerifyToken
-    BaseRspDto<List<ReporttradedateVo>> listReporttradedateStatistics( @RequestParam @NotNull Long gbid, @RequestParam @Pattern(regexp = "YEAR|MONTH|DAY|WEEK|HOUR") String queryType){
+    BaseRspDto<List<ReporttradedateVo>> listReporttradedateStatistics(@RequestParam @NotNull Long gbid, @RequestParam @Pattern(regexp = "YEAR|MONTH|DAY|WEEK|HOUR") String queryType){
         BaseRspDto<List<ReporttradedateVo>> rsp = new BaseRspDto<List<ReporttradedateVo>>();
         try {
             List<ReporttradedateVo> list = seporttradedateService.listReporttradedateStatistics(gbid.longValue(), queryType);

@@ -37,7 +37,8 @@ public class AuthConfig implements WebMvcConfigurer {
                 "/hzz/user/forgetPsw",
                 "/swagger-ui.html",
                 "/swagger-resources/**",
-                "/hzz/sy/**"
+                "/hzz/sy/**",
+                "/hzz/statistics"
         );
     }
 
