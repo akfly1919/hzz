@@ -2,6 +2,7 @@ package com.akfly.hzz.mapper;
 
 import com.akfly.hzz.vo.ReporttradedateVo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * <p>
