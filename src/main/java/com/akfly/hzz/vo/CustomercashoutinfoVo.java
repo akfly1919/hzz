@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.util.StringUtils;
@@ -35,17 +37,21 @@ public class CustomercashoutinfoVo implements Serializable {
      * 提货单号
      */
       @TableId(value = "ccoi_id", type = IdType.AUTO)
+      @ApiModelProperty(hidden = true)
     private Long ccoiId;
 
     /**
      * 用户ID
      */
+
+    @ApiModelProperty(hidden = true)
     private Long cbiId;
 
     /**
      * 提现账户信息
      */
     /*@NotBlank*/
+    @ApiModelProperty(hidden = true)
     private String ccoiAccount;
 
     /**
@@ -69,18 +75,19 @@ public class CustomercashoutinfoVo implements Serializable {
     /**
      * 1待审核2已审核3已拒绝4审核通过5已打款 6打款失败
      */
-
+    @ApiModelProperty(hidden = true)
     private Integer ccoiStatus;
-
+    @ApiModelProperty(hidden = true)
     private LocalDateTime ccoiCreatetime;
-
+    @ApiModelProperty(hidden = true)
     private LocalDateTime ccoiUpdatetime;
-
+    @ApiModelProperty(hidden = true)
     private LocalDateTime ccoiFinishtime;
 
     /**
      * 审核人
      */
+    @ApiModelProperty(hidden = true)
     private String ccoiOperator;
 
     @TableField(exist = false)

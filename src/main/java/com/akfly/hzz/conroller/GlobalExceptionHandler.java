@@ -8,9 +8,11 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.validation.ConstraintViolationException;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(value= {MethodArgumentNotValidException.class, BindException.class,IllegalArgumentException.class})
+    @ExceptionHandler(value= {MethodArgumentNotValidException.class, BindException.class,IllegalArgumentException.class, ConstraintViolationException.class})
     @ResponseBody
     public BaseRspDto<String> errorHandler(Exception e){
         BaseRspDto<String> rsp = new BaseRspDto<String>();

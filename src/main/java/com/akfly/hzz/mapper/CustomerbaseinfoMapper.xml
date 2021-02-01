@@ -24,5 +24,7 @@
         <result column="cbi_goodsnum" property="cbiGoodsnum" />
         <result column="cbi_shareurl" property="cbiShareurl" />
     </resultMap>
+    <select id="selectByIdForUpdate">
 
+    </select>
 </mapper>
