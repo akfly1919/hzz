@@ -5,6 +5,7 @@ import com.akfly.hzz.channel.AliPayAppSubmitPayServiceImpl;
 import com.akfly.hzz.channel.SubmitPayModel;
 import com.akfly.hzz.channel.SubmitPayResultModel;
 import com.akfly.hzz.channel.SubmitPayService;
+import com.akfly.hzz.constant.CommonConstant;
 import com.akfly.hzz.constant.CreditCardLimitEnum;
 import com.akfly.hzz.constant.PayStatus;
 import com.akfly.hzz.constant.ValidEnum;
@@ -27,6 +28,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.Digits;
+import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -53,12 +56,12 @@ public class AccountInfoController {
 
     @ApiOperation(value="用户充值",notes="用户登录就可以")
     @ApiImplicitParams({
-            @ApiImplicitParam(name="amount",value="充值金额(整数不带小数)",required=true),
+            @ApiImplicitParam(name="amount",value="充值金额(单位元，精度到分)",required=true),
             @ApiImplicitParam(name="payChannel",value="支付渠道(1：微信 2：支付宝)",required=true)
     })
     @PostMapping(value = "/recharge")
     @VerifyToken
-    public BaseRspDto<SubmitPayResultModel> recharge(@RequestParam @Digits(integer = 10, fraction = 0) Integer amount,
+    public BaseRspDto<SubmitPayResultModel> recharge(@RequestParam String amount,
                                                         @RequestParam Integer payChannel){
 
         BaseRspDto<SubmitPayResultModel> rsp = new BaseRspDto<SubmitPayResultModel>();
@@ -68,7 +71,9 @@ public class AccountInfoController {
                 throw new HzzBizException(HzzExceptionEnum.NOT_SUPPORT_PAY);
             }
             CustomerpayinfoVo vo = new CustomerpayinfoVo();
-            vo.setCaiAmount(amount);
+            BigDecimal bAmount = new BigDecimal(amount);
+            int rechargeAmount = bAmount.multiply(new BigDecimal(100)).intValue();
+            vo.setCaiAmount(rechargeAmount);
             vo.setCbiId(String.valueOf(userInfo.getCbiId()));
 
             Date date = new Date();
@@ -87,7 +92,7 @@ public class AccountInfoController {
             //customerpayinfoService.lambdaQuery().
             SubmitPayModel submitPayModel = new SubmitPayModel();
             submitPayModel.setTransId(String.valueOf(orderId));
-            submitPayModel.setPayAmount(Long.valueOf(amount));
+            submitPayModel.setPayAmount((long) rechargeAmount);
             submitPayModel.setMchOrderName("订单");
             submitPayModel.setMchOrderDetail("订单");
             submitPayModel.setLimit_pay(CreditCardLimitEnum.NO_CREDIT);

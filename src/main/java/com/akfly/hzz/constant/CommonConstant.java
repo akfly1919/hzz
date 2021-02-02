@@ -20,4 +20,24 @@ public  class CommonConstant {
     public static final String USER_INFO = "user_info";
 
     public static final String CHARSET_UTF8 = "UTF-8";
+
+    /**
+     * 支付宝支付成功标识码
+     */
+    public static final String ALIPAY_SUCCESS_RESP_CODE ="success";
+
+    /**
+     * 返回给第三方的失败标识
+     */
+    public static final String RESPTO_BANK_FAIL_MSG ="fail";
+
+    /**
+     * 支付宝成功标识码
+     */
+    public static final String ALI_SUCCESS_RESP_CODE ="TRADE_SUCCESS";
+
+    /**
+     * 返回给第三方的成功标识
+     */
+    public static final String RESPTO_BANK_SUCCESS_MSG ="success";
 }

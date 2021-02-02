@@ -14,7 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.security.PublicKey;
 import java.util.Date;
 import java.util.HashMap;
@@ -145,7 +147,13 @@ public class AliPayH5SubmitPayServiceImpl extends SubmitPayService<SubmitPayMode
         //submitPayResultModel.setRetContent(param);
         //return submitPayResultModel;
         //}
-        submitPayResultModel.setResult(String.valueOf(param.get("form")));
+        try {
+            String result = String.valueOf(param.get("form"));
+            log.info("支付宝H5下单返回参数 result={}", result);
+            submitPayResultModel.setResult(URLEncoder.encode(result, CommonConstant.CHARSET_UTF8));
+        } catch (UnsupportedEncodingException e) {
+            log.error("支付宝返回页面form异常-encode", e);
+        }
         return submitPayResultModel;
     }
 }

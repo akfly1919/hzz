@@ -129,8 +129,8 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
             }
 
             CustomerbaseinfoVo vo = users.get(0);
-            redisUtils.set(key, JsonUtils.toJson(users.get(0)), 2 * 60 *60);
-            return users.get(0);
+            redisUtils.set(key, JsonUtils.toJson(vo), 2 * 60 *60);
+            return vo;
         } else {
             log.warn("从redis获取用户信息vo={}", JsonUtils.toJson(o));
             CustomerbaseinfoVo vo = JsonUtils.toBean(o.toString(), CustomerbaseinfoVo.class);
