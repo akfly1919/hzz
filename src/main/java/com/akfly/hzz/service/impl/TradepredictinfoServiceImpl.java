@@ -1,5 +1,7 @@
 package com.akfly.hzz.service.impl;
 
+import com.akfly.hzz.exception.HzzBizException;
+import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.vo.TradepredictinfoVo;
 import com.akfly.hzz.mapper.TradepredictinfoMapper;
 import com.akfly.hzz.service.TradepredictinfoService;
@@ -17,4 +19,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class TradepredictinfoServiceImpl extends ServiceImpl<TradepredictinfoMapper, TradepredictinfoVo> implements TradepredictinfoService {
 
+    public void saveTradepredictinfoVo(TradepredictinfoVo tradepredictinfoVo) throws HzzBizException {
+       if(!saveOrUpdate(tradepredictinfoVo)) {
+           throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
+       }
+    }
 }

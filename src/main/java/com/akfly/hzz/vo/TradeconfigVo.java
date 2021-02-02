@@ -23,6 +23,10 @@ public class TradeconfigVo implements Serializable {
 
     private static final long serialVersionUID=1L;
 
+    public static int TCTYPE_BUY=5;
+
+    public static int TCTYPE_SELL=6;
+
     /**
      * ID
      */

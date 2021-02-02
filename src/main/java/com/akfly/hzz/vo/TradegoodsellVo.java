@@ -23,6 +23,7 @@ public class TradegoodsellVo implements Serializable {
 
     private static final long serialVersionUID=1L;
 
+    public static int STATUS_SUCCESS=2;
     /**
      * ID
      */

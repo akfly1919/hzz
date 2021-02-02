@@ -29,6 +29,7 @@ public enum HzzExceptionEnum {
     REQUEST_ALIPAY_ERROR("2001", "请求支付宝失败"),
 
     ACCOUNT_BALACE_ERROR("3000","余额不足"),
+    STOCK_ERROR("3001","库存不足"),
     /* 未知异常定义以9开头 */
     SYSTEM_ERROR("9000", "系统繁忙"),
     DB_ERROR("9001", "数据库异常"),

@@ -12,5 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2021-01-18
  */
 public interface GoodsbaseinfoService extends IService<GoodsbaseinfoVo> {
-
+    public GoodsbaseinfoVo getGoodsbaseinfoVo(long gbiId);
 }
