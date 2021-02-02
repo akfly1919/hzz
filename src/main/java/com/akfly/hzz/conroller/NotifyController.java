@@ -78,7 +78,6 @@ public class NotifyController {
                 ZoneId zoneId = ZoneId.systemDefault();
                 vo.setCpiFinishtime(instant.atZone(zoneId).toLocalDateTime());
                 vo.setCpiPaystatus(PayStatus.PAYED.getStatus());
-                vo.setCpiValid(ValidEnum.VALID.getStatus());
                 vo.setCpiChannelorderid(channelTransId);
                 customerpayinfoService.rechargeSuccess(vo);
                 return CommonConstant.RESPTO_BANK_SUCCESS_MSG;

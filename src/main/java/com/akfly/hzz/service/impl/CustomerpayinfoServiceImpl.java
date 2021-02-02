@@ -78,6 +78,7 @@ public class CustomerpayinfoServiceImpl extends ServiceImpl<CustomerpayinfoMappe
             customerbillrelatedService.save(bill);
             customerbaseinfoService.updateById(userInfo);
         } catch (Exception e) {
+            log.error("充值成功操作数据库异常", e);
             throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
         }
     }
