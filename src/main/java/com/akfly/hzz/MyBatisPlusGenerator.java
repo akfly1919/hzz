@@ -53,12 +53,12 @@ public class MyBatisPlusGenerator {
         gc.setSwagger2(false);
 
         // 自定义文件命名，注意 %s 会自动填充表实体属性！
-        gc.setControllerName("%sController");
-        gc.setServiceName("%sService");
-        gc.setServiceImplName("%sServiceImpl");
+        gc.setControllerName("%sController1");
+        gc.setServiceName("%sService1");
+        gc.setServiceImplName("%sServiceImpl1");
         gc.setMapperName("%sMapper");
         gc.setXmlName("%sMapper");
-        gc.setEntityName("%sVo");
+        gc.setEntityName("%sVo1");
         autoGenerator.setGlobalConfig(gc);
 
         // 数据源配置
@@ -66,10 +66,10 @@ public class MyBatisPlusGenerator {
 
         //设置数据库类型
         dsc.setDbType(DbType.MYSQL);
-        dsc.setUrl("jdbc:mysql://192.144.230.48:3306/hzzdev?useUnicode=true&useSSL=false&characterEncoding=utf8");
+        dsc.setUrl("jdbc:mysql://localhost:3306/hzz?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC");
         dsc.setDriverName("com.mysql.jdbc.Driver");
         dsc.setUsername("root");
-        dsc.setPassword("3eufds983d");
+        dsc.setPassword("1qaz2wsxE");
         autoGenerator.setDataSource(dsc);
 
         // 策略配置
@@ -79,7 +79,7 @@ public class MyBatisPlusGenerator {
         strategy.setNaming(NamingStrategy.underline_to_camel);
 
         // 需要生成的表
-        //strategy.setInclude(new String[]{"reporttradedate"});
+        strategy.setInclude(new String[]{"tradeconfig"});
         //strategy.setSuperServiceClass(null);
         //strategy.setSuperServiceImplClass(null);
         //strategy.setSuperMapperClass(null);
@@ -94,10 +94,10 @@ public class MyBatisPlusGenerator {
         // 包配置
         PackageConfig pc = new PackageConfig();
         //父包路径
-        pc.setParent("com.qianxian.api");
-        pc.setController("controller");
-        pc.setService("service");
-        pc.setServiceImpl("service.impl");
+        pc.setParent("com.akfly.hzz");
+        pc.setController("conroller1");
+        pc.setService("service1");
+        pc.setServiceImpl("service1.impl");
         pc.setMapper("mapper");
         pc.setEntity("vo");
         pc.setXml("mapper");
