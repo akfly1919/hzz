@@ -85,6 +85,9 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
         vo.setCbiType(2);
         vo.setCbiName(phoneNum);
         vo.setCbiUsername(phoneNum);
+        vo.setCbiTotal(0d);
+        vo.setCbiBalance(0d);
+        vo.setCbiFrozen(0d);
         CustomerbaseinfoVo parentVo = getUserInfoByInvitationCode(invitationCode);
         if (parentVo != null) {
             vo.setCbiParentid(parentVo.getCbiId());

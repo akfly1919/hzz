@@ -62,13 +62,14 @@ public class CustomerpayinfoServiceImpl extends ServiceImpl<CustomerpayinfoMappe
             CustomerpayinfoVo payInfo = lambdaQuery().eq(CustomerpayinfoVo::getCpiOrderid, vo.getCpiOrderid()).one();
             customerpayinfoMapper.updateById(vo);
             CustomerbaseinfoVo userInfo = customerbaseinfoService.lambdaQuery().eq(CustomerbaseinfoVo::getCbiId, Long.valueOf(payInfo.getCbiId())).one();
-            long largeMoney = vo.getCaiAmount() * 1000000;
-            userInfo.setCbiBalance(userInfo.getCbiBalance() + largeMoney); // TODO 金额乘以10000
+            double largeMoney = vo.getCaiAmount() * 1000000;
+            userInfo.setCbiBalance(userInfo.getCbiBalance() + largeMoney); // TODO 金额乘以1000000，后续需要去掉
+            userInfo.setCbiTotal(userInfo.getCbiBalance() + largeMoney);
 
             CustomerbillrelatedVo bill = new CustomerbillrelatedVo();
             bill.setCbiId(Long.valueOf(payInfo.getCbiId()));
             bill.setCbrorderid(String.valueOf(vo.getCpiOrderid()));
-            bill.setCbrMoney((double) (largeMoney / 100));
+            bill.setCbrMoney(largeMoney);
             bill.setCbrType(1); // 1收入  2支出
             Date date = new Date();
             Instant instant = date.toInstant();

@@ -66,12 +66,11 @@ public class NotifyController {
             if (CommonConstant.ALI_SUCCESS_RESP_CODE.equals(resultCode)) {
                 String transId = notifyMap.get("out_trade_no");
                 String channelTransId = notifyMap.get("trade_no");
-                BigDecimal amount = new BigDecimal(notifyMap.get("total_amount"));
-                String transAmount = String.valueOf(amount.multiply(new BigDecimal(100)).longValue());
+                String amount = notifyMap.get("total_amount");
 
                 CustomerpayinfoVo vo = new CustomerpayinfoVo();
                 vo.setCpiOrderid(Long.valueOf(transId));
-                vo.setCaiAmount(Integer.parseInt(transAmount));
+                vo.setCaiAmount(Integer.parseInt(amount));
                 String payTime = notifyMap.get("gmt_payment");
                 Date date = DateUtils.parseDate(payTime, "yyyy-MM-dd HH:mm:ss");
                 Instant instant = date.toInstant();
