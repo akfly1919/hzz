@@ -42,7 +42,7 @@ public class HzzApplication {
 		List<Parameter> pars = new ArrayList<>();
 		ticketPar.name("token").description("user token").defaultValue("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxMDAwOSJ9.1U97a14qqsZdQT7zjI7anOk6SwZSlAoJEv8UjHVq1yk")
 				.modelRef(new ModelRef("string")).parameterType("header")
-				.required(true).build(); //header中的ticket参数非必填，传空也可以
+				.required(true).build(); //header中的token参数非必填，传空也可以
 		pars.add(ticketPar.build());    //根据每个方法名也知道当前方法在设置什么参数
 
 

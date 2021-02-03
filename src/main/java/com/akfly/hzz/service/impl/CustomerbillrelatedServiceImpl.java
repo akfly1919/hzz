@@ -34,13 +34,14 @@ public class CustomerbillrelatedServiceImpl extends ServiceImpl<Customerbillrela
         if (flag == 1) {
             Date end = DateUtil.getDateBegin(new Date());
             list = lambdaQuery()
-                    .eq(CustomerbillrelatedVo::getCbiId, id).lt(CustomerbillrelatedVo::getCbrCreatetime, end).last("limit " + pageNum + "," + pageSize + " ").list();
+                    .eq(CustomerbillrelatedVo::getCbiId, id).lt(CustomerbillrelatedVo::getCbrCreatetime, end).last("limit " + pageNum * pageSize + "," + pageSize + " ").list();
         } else if (flag == 0) {
             Date begin = DateUtil.getDateBegin(new Date());
             Date end = DateUtils.addDays(begin, 1);
             log.info("begin={}, end={}", begin, end);
             list = lambdaQuery()
-                    .eq(CustomerbillrelatedVo::getCbiId, id).between(CustomerbillrelatedVo::getCbrCreatetime, begin, end).last("limit " + pageNum + "," + pageSize + " ").list();
+                    .eq(CustomerbillrelatedVo::getCbiId, id).between(CustomerbillrelatedVo::getCbrCreatetime, begin, end)
+                    .last("limit " + pageNum * pageSize + "," + pageSize + " ").list();
         }
         return list;
     }

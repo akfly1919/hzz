@@ -15,6 +15,7 @@ public  class CommonConstant {
     public static final String MSG_CODE_REGISTER = "msg_code:register:";
     public static final String MSG_CODE_FORGET_PSW = "msg_code:forget_psw:";
     public static final String USER_PREFIX = "user:";
+    public static final String GOODS_PREFIX = "goods:";
 
 
     public static final String USER_INFO = "user_info";

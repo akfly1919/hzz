@@ -54,7 +54,7 @@ public class GoodsListController {
     public String goodList(@Validated int beg, int size) {
         List<GoodsbaseinfoVo> zcgoods = goodsbaseinfoService.lambdaQuery()
                 .eq(GoodsbaseinfoVo::getGbiType, CommonConstant.GOODSTYPE_ZC)
-                .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit " + beg + "," + size + " ").list();
+                .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit " + beg * size + "," + size + " ").list();
         return JsonUtils.toJson(zcgoods);
 
     }

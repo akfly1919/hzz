@@ -6,6 +6,7 @@ import com.akfly.hzz.mapper.CustomerpayinfoMapper;
 import com.akfly.hzz.service.CustomerbaseinfoService;
 import com.akfly.hzz.service.CustomerbillrelatedService;
 import com.akfly.hzz.service.CustomerpayinfoService;
+import com.akfly.hzz.util.DateUtil;
 import com.akfly.hzz.util.JsonUtils;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
 import com.akfly.hzz.vo.CustomerbillrelatedVo;
@@ -64,16 +65,14 @@ public class CustomerpayinfoServiceImpl extends ServiceImpl<CustomerpayinfoMappe
             CustomerbaseinfoVo userInfo = customerbaseinfoService.lambdaQuery().eq(CustomerbaseinfoVo::getCbiId, Long.valueOf(payInfo.getCbiId())).one();
             long largeMoney = vo.getCaiAmount() * 1000000;
             userInfo.setCbiBalance(userInfo.getCbiBalance() + largeMoney); // TODO 金额乘以10000
+            userInfo.setCbiUpdatetime(DateUtil.getLocalDateTime(new Date()));
 
             CustomerbillrelatedVo bill = new CustomerbillrelatedVo();
             bill.setCbiId(Long.valueOf(payInfo.getCbiId()));
             bill.setCbrorderid(String.valueOf(vo.getCpiOrderid()));
             bill.setCbrMoney((double) (largeMoney / 100));
             bill.setCbrType(1); // 1收入  2支出
-            Date date = new Date();
-            Instant instant = date.toInstant();
-            ZoneId zoneId = ZoneId.systemDefault();
-            bill.setCbrCreatetime(instant.atZone(zoneId).toLocalDateTime());
+            bill.setCbrCreatetime(DateUtil.getLocalDateTime(new Date()));
             //bill.setCbrUpdatetime(copy.getCbrUpdatetime());
             customerbillrelatedService.save(bill);
             customerbaseinfoService.updateById(userInfo);

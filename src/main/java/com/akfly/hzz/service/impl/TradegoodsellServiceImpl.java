@@ -71,6 +71,17 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
             dealSold(cbiid,gbid,num,price);
         }
     }
+
+    @Override
+    public List<TradegoodsellVo> getSellTrade(long userId, int pageSize, int pageNum) throws HzzBizException {
+
+        List<TradegoodsellVo> list = lambdaQuery().eq(TradegoodsellVo::getTgsSellerid, userId)
+                .orderByDesc(TradegoodsellVo::getTgsCreatetime)
+                .last("limit " + pageNum * pageSize + "," + pageSize + " ").list();
+        return list;
+
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public void dealSold(long cbiid,long gbid,int num,double price) throws HzzBizException {
         QueryWrapper wrapper_c=new QueryWrapper();
