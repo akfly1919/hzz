@@ -55,6 +55,11 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
 
     @Resource
     private  CustomerbaseinfoService customerbaseinfoService;
+
+    @Resource
+    private CustomergoodsrelatedService customergoodsrelatedService;
+    @Resource
+    private CustomergoodsrelatedMapper customergoodsrelatedMapper;
     @Override
     public List<TradeorderinfoVo> getTradeorderinfoVo(int pageNum, int pageSize, long cbiid, Date beginTime, Date endTime) throws HzzBizException {
         List<TradeorderinfoVo> tradeorderinfoVos = lambdaQuery()
@@ -84,7 +89,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         BigDecimal feeB=priceB.multiply(new BigDecimal(tc.getTcRate()));
         BigDecimal totalB=priceB.multiply(BigDecimal.valueOf(num)).add(feeB.multiply(BigDecimal.valueOf(num)));
         //冻账
-        frozenAccount(cbiid,totalB.doubleValue());
+        customerbaseinfoService.frozenAccount(cbiid,totalB.doubleValue());
         //创建一条预购记录
         TradepredictinfoVo tp=new TradepredictinfoVo();
         tp.setTpiId(RandomGenUtils.genFlowNo("TPI"));
@@ -105,30 +110,19 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         tp.setTpiStatus(TradepredictinfoVo.STATUS_ENTRUST);
 
         //判断是否在交易时间
-        TradetimeVo tt = tradetimeService.getTradeTime();
         String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm:ss"));
-        if(DateUtil.isEffectiveTime(nowTime,tt.getTtTimeAmStart(),tt.getTtTimeAmEnd())||DateUtil.isEffectiveTime(nowTime,tt.getTtTimePmStart(),tt.getTtTimePmEnd())){
+        if(tradetimeService.isInTradeTime(nowTime)){
             dealSold(tp,tc);
         }else{
             tradepredictinfoService.saveTradepredictinfoVo(tp);
         }
     }
-    @Transactional(rollbackFor = Exception.class)
-    public void frozenAccount(long cbiid,Double total) throws HzzBizException {
-        CustomerbaseinfoVo customerbaseinfoVo = customerbaseinfoMapper.selectByIdForUpdate(cbiid);
-        Double balance=customerbaseinfoVo.getCbiBalance();
-        Double fronze=customerbaseinfoVo.getCbiFrozen();
-        BigDecimal balanceB=BigDecimal.valueOf(balance!=null?balance:0);
-        BigDecimal fronzeB=BigDecimal.valueOf(fronze!=null?fronze:0);
-        BigDecimal totalB=BigDecimal.valueOf(total);
-        balanceB.subtract(totalB);
-        fronzeB.add(totalB);
-        if(balanceB.compareTo(new BigDecimal("0.0"))<0){
-            throw new HzzBizException(HzzExceptionEnum.ACCOUNT_BALACE_ERROR);
-        }
-    }
+
     @Transactional(rollbackFor = Exception.class)
     public void dealSold(TradepredictinfoVo tp,TradeconfigVo tc) throws HzzBizException {
+        if(tc==null){
+            tc=tradeconfigService.getTradeconfig(TradeconfigVo.TCTYPE_BUY);
+        }
         int need=tp.getTpiNum()-tp.getTpiSucessnum();
         QueryWrapper<TradegoodsellVo> wrapper = new QueryWrapper<TradegoodsellVo>();
         wrapper.eq("gbi_id",tp.getGbiId());
@@ -151,6 +145,33 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
                 tg.setTgsStatus(TradegoodsellVo.STATUS_SUCCESS);
                 tg.setTgsTradetime(LocalDateTime.now());
                 tradegoodsellService.saveTradegoodsell(tg);
+            }
+            {
+                //更新物料关系
+                Map<String,Object> map=new HashMap<>();
+                map.put("cbi_id",tg.getTgsSellerid());
+                map.put("gii_id",tg.getGiiId());
+                map.put("cgr_isown",1);
+                QueryWrapper wrapper_c=new QueryWrapper();
+                wrapper_c.allEq(map);
+                wrapper_c.last("for update");
+                CustomergoodsrelatedVo cgr = customergoodsrelatedMapper.selectOne(wrapper_c);
+                cgr.setCgrIslock(0);
+                cgr.setCgrSelltime(LocalDateTime.now());
+                cgr.setCgrIsown(0);
+                customergoodsrelatedService.saveCustomergoodsrelated(cgr);
+                CustomergoodsrelatedVo cgrnew=new CustomergoodsrelatedVo();
+                cgrnew.setCbiId(tp.getTpiBuyerid());
+                cgrnew.setGiiId(cgr.getGiiId());
+                cgrnew.setGbiId(cgr.getGbiId());
+                cgrnew.setCgrIsown(1);
+                cgrnew.setCgrIslock(1);
+                cgrnew.setCgrIspickup(0);
+                cgrnew.setCgrBuytime(LocalDateTime.now());
+                cgrnew.setCgrSelltime(LocalDateTime.now());
+                cgrnew.setCgrUpdatetime(LocalDateTime.now());
+                customergoodsrelatedService.saveCustomergoodsrelated(cgrnew);
+
             }
             {
                 //生成买单

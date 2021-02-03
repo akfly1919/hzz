@@ -14,4 +14,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface TradegoodsellService extends IService<TradegoodsellVo> {
     public void saveTradegoodsell(TradegoodsellVo tradegoodsellVo) throws HzzBizException;
+
+    public void sell(long cbiid,long gbid,int num,double price) throws HzzBizException;
 }

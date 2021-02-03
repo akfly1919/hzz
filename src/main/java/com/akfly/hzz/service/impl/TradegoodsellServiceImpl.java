@@ -1,12 +1,27 @@
 package com.akfly.hzz.service.impl;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
-import com.akfly.hzz.vo.TradegoodsellVo;
+import com.akfly.hzz.mapper.CustomergoodsrelatedMapper;
+import com.akfly.hzz.mapper.TradepredictinfoMapper;
+import com.akfly.hzz.service.*;
+import com.akfly.hzz.util.DateUtil;
+import com.akfly.hzz.util.RandomGenUtils;
+import com.akfly.hzz.vo.*;
 import com.akfly.hzz.mapper.TradegoodsellMapper;
-import com.akfly.hzz.service.TradegoodsellService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -19,9 +34,103 @@ import org.springframework.stereotype.Service;
 @Service
 public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, TradegoodsellVo> implements TradegoodsellService {
 
+    @Resource
+    private CustomergoodsrelatedMapper customergoodsrelatedMapper;
+    @Resource
+    private CustomergoodsrelatedService customergoodsrelatedService;
+    @Resource
+    private TradeconfigService tradeconfigService;
+    @Resource
+    GoodsbaseinfoService goodsbaseinfoService;
+    @Resource
+    private TradetimeService tradetimeService;
+    @Resource
+    private TradepredictinfoMapper tradepredictinfoMapper;
+    @Resource
+    private TradeorderinfoService tradeorderinfoService;
+
     public void saveTradegoodsell(TradegoodsellVo tradegoodsellVo) throws HzzBizException {
         if(!saveOrUpdate(tradegoodsellVo)) {
             throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
         }
     }
+
+    public void sell(long cbiid,long gbid,int num,double price) throws HzzBizException {
+        GoodsbaseinfoVo gi = goodsbaseinfoService.getGoodsbaseinfoVo(gbid);
+        if (gi.getGbiPrice().doubleValue()!=price){
+            //TODO 价格不正确
+            price=gi.getGbiPrice().doubleValue();
+        }
+        TradeconfigVo tc = tradeconfigService.getTradeconfig(TradeconfigVo.TCTYPE_SELL);
+        BigDecimal priceB=new BigDecimal(price);
+        BigDecimal feeB=priceB.multiply(new BigDecimal(tc.getTcRate()));
+        lockStock(cbiid,gbid,num,price,feeB.doubleValue());
+
+        String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm:ss"));
+        if(tradetimeService.isInTradeTime(nowTime)){
+            dealSold(cbiid,gbid,num,price);
+        }
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public void dealSold(long cbiid,long gbid,int num,double price) throws HzzBizException {
+        QueryWrapper wrapper_c=new QueryWrapper();
+        wrapper_c.eq("gbi_id",gbid);
+        wrapper_c.in("tpi_status",1,3);
+        wrapper_c.ge("tpi_price",price);
+        wrapper_c.orderByAsc("tpi_createtime");
+        wrapper_c.last("for update");
+        List<TradepredictinfoVo> list = tradepredictinfoMapper.selectList(wrapper_c);
+        if(list==null||list.size()==0){
+            return;
+        }
+        for(TradepredictinfoVo tp:list){
+            tradeorderinfoService.dealSold(tp,null);
+        }
+
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public void lockStock(long cbiid,long gbid,int num,double price,double feeB) throws HzzBizException {
+        Map<String,Object> map=new HashMap<>();
+        map.put("cbi_id",cbiid);
+        map.put("gbi_id",gbid);
+        map.put("cgr_isown",1);
+        map.put("cgr_islock",0);
+        QueryWrapper wrapper_c=new QueryWrapper();
+        wrapper_c.allEq(map);
+        //wrapper_c.lt("cgr_buytime", LocalDate.now());
+        wrapper_c.last("for update");
+        List<CustomergoodsrelatedVo> cgrlist = customergoodsrelatedMapper.selectList(wrapper_c);
+        if(cgrlist==null||cgrlist.size()<num){
+            throw new HzzBizException(HzzExceptionEnum.STOCK_ERROR);
+        }
+        for(CustomergoodsrelatedVo cgr:cgrlist){
+            cgr.setCgrIslock(2);
+            customergoodsrelatedService.saveCustomergoodsrelated(cgr);
+            TradegoodsellVo tgs=new TradegoodsellVo();
+            tgs.setTgsId(RandomGenUtils.genFlowNo("TGS"));
+            tgs.setGiiId(cgr.getGiiId());
+            tgs.setGbiId(cgr.getGbiId());
+            tgs.setTgsSellerid(cgr.getCbiId());
+            tgs.setTgsPrice(price);
+            tgs.setTgsStatus(0);
+            tgs.setTgsSaleable(1);
+            tgs.setTgsCreatetime(LocalDateTime.now());
+            tgs.setTgsPublishtime(LocalDateTime.now());
+            tgs.setTgsUpdatetime(LocalDateTime.now());
+            tgs.setTgsFinshitime(LocalDateTime.now());
+            tgs.setTgsType(1);
+            tgs.setTgsOwntype(2);
+            tgs.setTgsServicefee(feeB);
+            tgs.setTgsTradetime(LocalDateTime.now());
+            tgs.setTgsSelltype(2);
+            saveTradeorderinfo(tgs);
+
+        }
+    }
+    public void saveTradeorderinfo(TradegoodsellVo tradegoodsellVo) throws HzzBizException {
+        if(!saveOrUpdate(tradegoodsellVo)) {
+            throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
+        }
+    }
+
 }

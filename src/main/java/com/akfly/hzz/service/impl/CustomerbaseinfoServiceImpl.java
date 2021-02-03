@@ -13,9 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -165,5 +167,18 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
         }
         return users.get(0);
     }
-
+    @Transactional(rollbackFor = Exception.class)
+    public void frozenAccount(long cbiid,Double total) throws HzzBizException {
+        CustomerbaseinfoVo customerbaseinfoVo = customerbaseinfoMapper.selectByIdForUpdate(cbiid);
+        Double balance=customerbaseinfoVo.getCbiBalance();
+        Double fronze=customerbaseinfoVo.getCbiFrozen();
+        BigDecimal balanceB=BigDecimal.valueOf(balance!=null?balance:0);
+        BigDecimal fronzeB=BigDecimal.valueOf(fronze!=null?fronze:0);
+        BigDecimal totalB=BigDecimal.valueOf(total);
+        balanceB.subtract(totalB);
+        fronzeB.add(totalB);
+        if(balanceB.compareTo(new BigDecimal("0.0"))<0){
+            throw new HzzBizException(HzzExceptionEnum.ACCOUNT_BALACE_ERROR);
+        }
+    }
 }
