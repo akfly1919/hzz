@@ -38,7 +38,8 @@ public class AuthConfig implements WebMvcConfigurer {
                 "/swagger-ui.html",
                 "/swagger-resources/**",
                 "/hzz/sy/**",
-                "/hzz/statistics"
+                "/hzz/statistics",
+                "/hzz/notify/aliPayNotify"
         );
     }
 

@@ -17,4 +17,6 @@ public interface CustomerpayinfoService extends IService<CustomerpayinfoVo> {
 
     long insertCustomerPayInfo(CustomerpayinfoVo vo) throws HzzBizException;
 
+    void rechargeSuccess(CustomerpayinfoVo vo) throws HzzBizException;
+
 }

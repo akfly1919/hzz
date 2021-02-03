@@ -41,11 +41,11 @@ spring:
 alipay:
   sdk:
     unifiedorder: https://openapi.alipay.com/gateway.do
-    notify_url: https://192.144.230.48/aliPayNotify
+    notify_url: http://192.144.230.48/hzz/notify/aliPayNotify
     method: alipay.trade.app.pay
   wap:
     unifiedorder: https://openapi.alipay.com/gateway.do
-    notify_url: https://192.144.230.48/aliPayNotify
+    notify_url: http://192.144.230.48/hzz/notify/aliPayNotify
     url_return: https://192.144.230.48/alipayFrontNotify
     # 自己的私钥
     privateKey: MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCb5+Nf+s5VW10aBqDUCX/aQBn2WBsOz4yJYJw9lD91JnKgUfq36KCgbEgTuYP4keqS9WG5yf7biO6FyggVx6bn8AtUJbk+vSzTcG3Dhg8TmwQP0Z36OJXdaFXEfXm2Hb9q+arwvE8X5g/zVUo/8OBW/hoYquoDgHfszb6V+y9frUYikFeiCs1cyNEO4+VnhDHRjN0NKCkiY/dsDmxgs60MW9aeZjGVXwVPP83Sr59W4uE9gZptHXnpBrC2AJflCVIvEWTzl+IWy1sqWEQdy6vC6VgIrfsSwWK070p/cJm7EYXnfKUwDk73rhBwXunXFP5H7RfD2CwFs4mWFpJGIUPdAgMBAAECggEAG+7aIDIxkb2C2szhN9xT2eiuPiLfBjJNfbefhrDvBbBTzUGi6Bx32wZLi60rZffOzXHFhqIYVYEdKz9dX3mb/+ZUQUlY/VKrm16DbAqy3NJjUeo+obxNrZOp+kB49BY0W5hL9kHm8eM4bGKVoQspRqzURCMrNmFoGzdptDmC7WM4kf015tJwQU75TBudzSx/zQG5esFmGW4CZ5tTgK+S6LD/e4eQhVMvTDdpPxHAuJ7VUqdrLKvyF9lQhTzt9pioIvHzW5ns7aBMCC7/+Ep2E0CEcVpf4Q/KFyiT3m1vGuV+mOX2tAUR1ce+n3tP3etJvVTfhdGiwXQ9uTVLbSLFiQKBgQDO1PURQVvl02vrzJ29Y6x4iF3f0NiNNdjquZMUydGkt22k/TAARTE2rY0nn8w017ONxasportC+LzamHQGHX1HakR4CDsvL7rExfB1Xk73ZUReKsmYYHQF4+yDirQbY7Cf4DyhIM/Zif6+P4qRBo3PUaGuOlCtk6lmUkZt8w0OTwKBgQDA98E2gUqtuRUnS6wxJ5duFFh9YLOH+pTSDtddx+oFXGOHYzoz/0y1fC7NTR3DT3KyGa4cSKMJjRoU790q1yTQpzD9itaPl88wTe1GzkJxAO3YYbCOkxa+uxA6fC+eYheRQNbDnOs4toNQz/FFS/I9NQcQ3/iXMFmaOqJM0sqMEwKBgGQAtUkVh+BUW97TvQTgF3jjvjfEG6ATBAFhnoqzleiFQ789J6NJ0SS1vwUEj1CRZmBKzZpA8zfLWkx638ZBJdyMtfQvTqZe9nfDmKK26YlWbjr1hylkoVRjwmxLeQ+xIKn8WnQxkC2HOiM0R8QdHh26Q2khCvcR6Rru9tycYpijAoGBAInduQ5fC2LY9DMSDqFD3x4HrT1OpJYHQuJdNiPLm/hejMGC9GeIBF85rRqC+Tu8fH6geFO+1bUSOcsxoHtmIOhuO0M6OZd359BkLJ1E6hVgi43oJcOHdV2puqt+ZGstPBdMEuTJLQlk5KcNGhzfaN+wDi9RRYOHSM03DRQEGjA/AoGBAMeDo2dsLYuZ+SLNJwPhj2HLi75RI/eKYbJXjyYmzAHhQQCVxDFutHGmYm64CYglKrOG3IYA/1puUHZv3r3C/GiuGkOVBlLV71Opnd1GDxBLB5NecvkX+5bNjY+l0Md/l29phFRKyuh+ljM5GKJedREg4wp6FWzMyVqLD12P2RMj

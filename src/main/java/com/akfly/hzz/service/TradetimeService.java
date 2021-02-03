@@ -1,5 +1,6 @@
 package com.akfly.hzz.service;
 
+import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.vo.TradetimeVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -12,5 +13,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2021-01-18
  */
 public interface TradetimeService extends IService<TradetimeVo> {
-
+    public TradetimeVo getTradeTime() throws HzzBizException;
 }
