@@ -18,6 +18,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -25,6 +27,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(value = "/hzz/trade")
+@Validated
 public class TradeInfoController {
 
     @Resource
@@ -45,6 +48,25 @@ public class TradeInfoController {
             rsp.setMsg(e.getErrorMsg());
         } catch (Exception e) {
             log.error("获取购买订单系统异常", e);
+            rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+            rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+        }
+        return rsp;
+    }
+    @ApiOperation(value="购买",notes="用户登录就可以")
+    @PostMapping(value = "/buy")
+    @VerifyToken
+    public BaseRspDto<String> buy(@RequestParam @NotNull @Digits(integer = 6,fraction = 2) Double price,@RequestParam @NotNull Long gbid,@RequestParam @NotNull Integer num){
+        BaseRspDto<String> rsp = new BaseRspDto<String>();
+        try {
+            CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+            tradeorderinfoService.nomalBuy(userInfo.getCbiId(),gbid.longValue(),num,price.doubleValue());
+        } catch (HzzBizException e) {
+            log.error("购买业务错误 msg={}", e.getErrorMsg(), e);
+            rsp.setCode(e.getErrorCode());
+            rsp.setMsg(e.getErrorMsg());
+        } catch (Exception e) {
+            log.error("购买系统异常", e);
             rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
             rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
         }

@@ -3,21 +3,22 @@
 <mapper namespace="com.akfly.hzz.mapper.TradepredictinfoMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.TradepredictinfoVo">
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.TradepredictinfoVo1">
         <id column="id" property="id" />
         <result column="tpi_id" property="tpiId" />
-        <result column="tgs_id" property="tgsId" />
-        <result column="gii_id" property="giiId" />
         <result column="gbi_id" property="gbiId" />
         <result column="tpi_buyerid" property="tpiBuyerid" />
-        <result column="tpi_sellerid" property="tpiSellerid" />
         <result column="tpi_price" property="tpiPrice" />
+        <result column="tpi_num" property="tpiNum" />
+        <result column="tpi_sucessnum" property="tpiSucessnum" />
         <result column="tpi_type" property="tpiType" />
         <result column="tpi_status" property="tpiStatus" />
         <result column="tpi_createtime" property="tpiCreatetime" />
         <result column="tpi_buytime" property="tpiBuytime" />
-        <result column="tpi_updatetime" property="tpiUpdatetime" />
         <result column="tpi_finishtime" property="tpiFinishtime" />
+        <result column="tpi_tradetime" property="tpiTradetime" />
+        <result column="tpi_updatetime" property="tpiUpdatetime" />
+        <result column="tpi_servicefee" property="tpiServicefee" />
     </resultMap>
 
 </mapper>

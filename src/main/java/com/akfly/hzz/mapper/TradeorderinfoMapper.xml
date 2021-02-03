@@ -17,6 +17,7 @@
         <result column="toi_updatetime" property="toiUpdatetime" />
         <result column="toi_buyservicefee" property="toiBuyservicefee" />
         <result column="toi_sellservicefee" property="toiSellservicefee" />
+        <result column="toi_type" property="toiType" />
     </resultMap>
 
 </mapper>

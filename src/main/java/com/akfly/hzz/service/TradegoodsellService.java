@@ -1,5 +1,6 @@
 package com.akfly.hzz.service;
 
+import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.vo.TradegoodsellVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -12,5 +13,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2021-01-18
  */
 public interface TradegoodsellService extends IService<TradegoodsellVo> {
-
+    public void saveTradegoodsell(TradegoodsellVo tradegoodsellVo) throws HzzBizException;
 }

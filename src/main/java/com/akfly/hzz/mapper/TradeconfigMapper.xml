@@ -8,8 +8,6 @@
         <result column="tc_rate" property="tcRate" />
         <result column="tc_type" property="tcType" />
         <result column="tc_valid" property="tcValid" />
-        <result column="tc_startime" property="tcStartime" />
-        <result column="tc_endtime" property="tcEndtime" />
         <result column="tc_createtime" property="tcCreatetime" />
         <result column="tc_updatetime" property="tcUpdatetime" />
         <result column="tc_operator" property="tcOperator" />

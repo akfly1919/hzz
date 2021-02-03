@@ -1,5 +1,7 @@
 package com.akfly.hzz.service.impl;
 
+import com.akfly.hzz.exception.HzzBizException;
+import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.vo.TradegoodsellVo;
 import com.akfly.hzz.mapper.TradegoodsellMapper;
 import com.akfly.hzz.service.TradegoodsellService;
@@ -17,4 +19,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, TradegoodsellVo> implements TradegoodsellService {
 
+    public void saveTradegoodsell(TradegoodsellVo tradegoodsellVo) throws HzzBizException {
+        if(!saveOrUpdate(tradegoodsellVo)) {
+            throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
+        }
+    }
 }

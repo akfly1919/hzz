@@ -21,6 +21,10 @@ public class RandomGenUtils {
 		return UUID.randomUUID().toString();
 	}
 
+	public static String genFlowNo(String prefix) {
+		String dateInfo = DateUtil.getCurrentDate(DateUtil.FORMAT_FULLTIME);
+		return "TOI"+dateInfo+ getRandomNumberInRange(100000,999999);
+	}
 	public static void main(String[] args) {
 		int x = RandomGenUtils.getRandomNumberInRange(100000, 999999);
 		System.out.println(x);
