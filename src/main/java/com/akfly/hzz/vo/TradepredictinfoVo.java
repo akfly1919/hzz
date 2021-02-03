@@ -10,11 +10,11 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 交易预购买表
+ * 交易市场买方预买表
  * </p>
  *
  * @author wangfei
- * @since 2021-01-18
+ * @since 2021-02-03
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -22,6 +22,10 @@ import lombok.EqualsAndHashCode;
 public class TradepredictinfoVo implements Serializable {
 
     private static final long serialVersionUID=1L;
+    public static int TYPE_NOMAL=2;
+    public static int STATUS_PARTIAL_SUCCESS=3;
+    public static  int STATUS_SUCCESS=4;
+    public static int STATUS_ENTRUST=1;
 
     /**
      * ID
@@ -35,16 +39,6 @@ public class TradepredictinfoVo implements Serializable {
     private String tpiId;
 
     /**
-     * 交易市场卖货单id
-     */
-    private String tgsId;
-
-    /**
-     * 物料id
-     */
-    private Long giiId;
-
-    /**
      * 商品id 例如:某品牌价格红酒
      */
     private Long gbiId;
@@ -55,14 +49,19 @@ public class TradepredictinfoVo implements Serializable {
     private Long tpiBuyerid;
 
     /**
-     * 售卖人cbi_id
-     */
-    private Long tpiSellerid;
-
-    /**
-     * 售卖价格
+     * 预购价格
      */
     private Double tpiPrice;
+
+    /**
+     * 购买数量
+     */
+    private Integer tpiNum;
+
+    /**
+     * 成功购买数量
+     */
+    private Integer tpiSucessnum;
 
     /**
      * 1委托买入 2正常买入
@@ -70,12 +69,12 @@ public class TradepredictinfoVo implements Serializable {
     private Integer tpiType;
 
     /**
-     * 1已委托 2 已取消 3交易成功 4交易失败
+     * 1已委托,初始状态 2 已取消 3部分成功 4交易成功 5交易失败
      */
     private Integer tpiStatus;
 
     /**
-     * 预购买时间
+     * 创建时间
      */
     private LocalDateTime tpiCreatetime;
 
@@ -84,12 +83,25 @@ public class TradepredictinfoVo implements Serializable {
      */
     private LocalDateTime tpiBuytime;
 
+    /**
+     * 预购完成时间
+     */
+    private LocalDateTime tpiFinishtime;
+
+    /**
+     * 撮合交易完成时间
+     */
+    private LocalDateTime tpiTradetime;
+
+    /**
+     * 更新时间
+     */
     private LocalDateTime tpiUpdatetime;
 
     /**
-     * 完成交易时间
+     * 预购服务费金额
      */
-    private LocalDateTime tpiFinishtime;
+    private Double tpiServicefee;
 
 
 }

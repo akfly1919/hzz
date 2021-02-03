@@ -116,7 +116,13 @@ public class DateUtil extends Object {
             return -2;
         }
     }
+    public static boolean isEffectiveTime(String nowTime, String startTime, String endTime) {
+        if(compareOnlyByTime(nowTime,startTime)>=0&&compareOnlyByTime(nowTime,endTime)<=0){
+            return true;
+        }
+        return false;
 
+    }
     /**
      * 根据规定格式的字符串得到Calendar.<br>
      * <br>

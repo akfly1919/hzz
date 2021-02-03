@@ -10,11 +10,11 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 交易市场卖货订
+ * 交易市场卖方预卖表
  * </p>
  *
  * @author wangfei
- * @since 2021-01-18
+ * @since 2021-02-03
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -22,7 +22,6 @@ import lombok.EqualsAndHashCode;
 public class TradegoodsellVo implements Serializable {
 
     private static final long serialVersionUID=1L;
-
     public static int STATUS_SUCCESS=2;
     /**
      * ID
@@ -56,7 +55,7 @@ public class TradegoodsellVo implements Serializable {
     private Double tgsPrice;
 
     /**
-     * 0未交易 1交易中 2交易成功 3已取消
+     * 0未交易 1交易中 2交易成功 3已取消 4交易失败
      */
     private Integer tgsStatus;
 
@@ -65,6 +64,9 @@ public class TradegoodsellVo implements Serializable {
      */
     private Integer tgsSaleable;
 
+    /**
+     * 创建时间
+     */
     private LocalDateTime tgsCreatetime;
 
     /**
@@ -88,6 +90,21 @@ public class TradegoodsellVo implements Serializable {
      * 1系统2用户
      */
     private Integer tgsOwntype;
+
+    /**
+     * 卖货服务费金额
+     */
+    private Double tgsServicefee;
+
+    /**
+     * 成交时间
+     */
+    private LocalDateTime tgsTradetime;
+
+    /**
+     * 1.委托卖出2正常卖出
+     */
+    private Integer tgsSelltype;
 
 
 }

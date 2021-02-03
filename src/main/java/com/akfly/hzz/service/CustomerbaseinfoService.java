@@ -31,5 +31,5 @@ public interface CustomerbaseinfoService extends IService<CustomerbaseinfoVo> {
     Long getInvitationCode(long cbiId) throws HzzBizException;
 
     CustomerbaseinfoVo getUserInfoByIdForUpdate(String cbiId) throws HzzBizException;
-
+    public void frozenAccount(long cbiid,Double total) throws HzzBizException;
 }

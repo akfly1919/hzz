@@ -3,7 +3,6 @@ package com.akfly.hzz.vo;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
 import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,7 +13,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author wangfei
- * @since 2021-01-18
+ * @since 2021-02-03
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -30,14 +29,24 @@ public class TradetimeVo implements Serializable {
     private Integer id;
 
     /**
-     * 交易开始时间,截取此表时分秒对比
+     * 上午交易开始时间
      */
-    private LocalDateTime ttStarttime;
+    private String ttTimeAmStart;
 
     /**
-     * 交易结束时间, 截取此表时分秒对比
+     * 上午交易结束时间
      */
-    private LocalDateTime ttEndtime;
+    private String ttTimeAmEnd;
+
+    /**
+     * 下午交易开始时间
+     */
+    private String ttTimePmStart;
+
+    /**
+     * 下午交易结束时间
+     */
+    private String ttTimePmEnd;
 
     /**
      * 0不可用  1可用

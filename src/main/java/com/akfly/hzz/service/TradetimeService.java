@@ -14,4 +14,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface TradetimeService extends IService<TradetimeVo> {
     public TradetimeVo getTradeTime() throws HzzBizException;
+    public boolean isInTradeTime(String time) throws HzzBizException;
 }

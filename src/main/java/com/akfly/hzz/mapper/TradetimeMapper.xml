@@ -5,8 +5,10 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.TradetimeVo">
         <id column="id" property="id" />
-        <result column="tt_starttime" property="ttStarttime" />
-        <result column="tt_endtime" property="ttEndtime" />
+        <result column="tt_time_am_start" property="ttTimeAmStart" />
+        <result column="tt_time_am_end" property="ttTimeAmEnd" />
+        <result column="tt_time_pm_start" property="ttTimePmStart" />
+        <result column="tt_time_pm_end" property="ttTimePmEnd" />
         <result column="tt_status" property="ttStatus" />
     </resultMap>
 

@@ -7,6 +7,8 @@ import com.akfly.hzz.mapper.CustomerbaseinfoMapper;
 import com.akfly.hzz.mapper.CustomergoodsrelatedMapper;
 import com.akfly.hzz.mapper.TradegoodsellMapper;
 import com.akfly.hzz.service.*;
+import com.akfly.hzz.util.DateUtil;
+import com.akfly.hzz.util.RandomGenUtils;
 import com.akfly.hzz.vo.*;
 import com.akfly.hzz.mapper.TradeorderinfoMapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -16,6 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -44,6 +49,17 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
 
     @Resource
     private TradepredictinfoService tradepredictinfoService;
+
+    @Resource
+    private TradegoodsellService tradegoodsellService;
+
+    @Resource
+    private  CustomerbaseinfoService customerbaseinfoService;
+
+    @Resource
+    private CustomergoodsrelatedService customergoodsrelatedService;
+    @Resource
+    private CustomergoodsrelatedMapper customergoodsrelatedMapper;
     @Override
     public List<TradeorderinfoVo> getTradeorderinfoVo(int pageNum, int pageSize, long cbiid, Date beginTime, Date endTime) throws HzzBizException {
         List<TradeorderinfoVo> tradeorderinfoVos = lambdaQuery()
@@ -62,7 +78,6 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
     public void updateTradeOrder(TradeorderinfoVo vo) throws HzzBizException {
 
     }
-    @Transactional(rollbackFor = Exception.class)
     public void nomalBuy(long cbiid,long gbid,int num,double price) throws HzzBizException {
         GoodsbaseinfoVo gi = goodsbaseinfoService.getGoodsbaseinfoVo(gbid);
         if (gi.getGbiPrice().doubleValue()!=price){
@@ -70,85 +85,173 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
             price=gi.getGbiPrice().doubleValue();
         }
         TradeconfigVo tc = tradeconfigService.getTradeconfig(TradeconfigVo.TCTYPE_BUY);
-        CustomerbaseinfoVo customerbaseinfoVo = customerbaseinfoMapper.selectByIdForUpdate(cbiid);
-        Double balance=customerbaseinfoVo.getCbiBalance();
-        Double fronze=customerbaseinfoVo.getCbiFrozen();
-        Double total=customerbaseinfoVo.getCbiTotal();
-        BigDecimal balanceB=new BigDecimal(balance!=null?balance:new Double(0.0));
-        BigDecimal fronzeB=new BigDecimal(fronze!=null?fronze:new Double(0.0));
-        BigDecimal totalB=new BigDecimal(fronze!=null?total:new Double(0.0));
-        BigDecimal amountB=new BigDecimal(price);
-        amountB=amountB.multiply(new BigDecimal(num));
-        amountB=amountB.multiply(new BigDecimal(tc.getTcRate())).add(amountB);
-        if(balanceB.compareTo(amountB)<0){
-            throw new HzzBizException(HzzExceptionEnum.ACCOUNT_BALACE_ERROR);
-        }
+        BigDecimal priceB=new BigDecimal(price);
+        BigDecimal feeB=priceB.multiply(new BigDecimal(tc.getTcRate()));
+        BigDecimal totalB=priceB.multiply(BigDecimal.valueOf(num)).add(feeB.multiply(BigDecimal.valueOf(num)));
+        //冻账
+        customerbaseinfoService.frozenAccount(cbiid,totalB.doubleValue());
+        //创建一条预购记录
+        TradepredictinfoVo tp=new TradepredictinfoVo();
+        tp.setTpiId(RandomGenUtils.genFlowNo("TPI"));
+        tp.setGbiId(gbid);
+        tp.setTpiBuyerid(cbiid);
+        tp.setTpiPrice(price);
+        tp.setTpiNum(num);
+        tp.setTpiType(TradepredictinfoVo.TYPE_NOMAL);
+        tp.setTpiStatus(0);
+        tp.setTpiCreatetime(LocalDateTime.now());
+        tp.setTpiBuytime(LocalDateTime.now());
+        tp.setTpiFinishtime(LocalDateTime.now());
+        tp.setTpiTradetime(LocalDateTime.now());
+        tp.setTpiUpdatetime(LocalDateTime.now());
+        tp.setTpiServicefee(feeB.doubleValue());
+        tp.setTpiSucessnum(num);
+        tp.setTpiSucessnum(0);
+        tp.setTpiStatus(TradepredictinfoVo.STATUS_ENTRUST);
 
-        /* 写串了，这是卖出逻辑
-        QueryWrapper<CustomergoodsrelatedVo> wrapper = new QueryWrapper<CustomergoodsrelatedVo>();
-        wrapper.eq("cbi_id",cbiid);
-        wrapper.eq("gbi_id",gbid);
-        wrapper.eq("cgr_islock","0");
-        wrapper.eq("cgr_isown","1");
-        wrapper.last("limit "+num+" for update");
-        List<CustomergoodsrelatedVo> list = customergoodsrelatedMapper.selectList(wrapper);
-        if(list.size()<num){
-            throw new HzzBizException(HzzExceptionEnum.STOCK_ERROR);
-        }*/
-        TradetimeVo tt = tradetimeService.getTradeTime();
-        //TODO 这里判断交易时间在不在范围
+        //判断是否在交易时间
+        String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm:ss"));
+        if(tradetimeService.isInTradeTime(nowTime)){
+            dealSold(tp,tc);
+        }else{
+            tradepredictinfoService.saveTradepredictinfoVo(tp);
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void dealSold(TradepredictinfoVo tp,TradeconfigVo tc) throws HzzBizException {
+        if(tc==null){
+            tc=tradeconfigService.getTradeconfig(TradeconfigVo.TCTYPE_BUY);
+        }
+        int need=tp.getTpiNum()-tp.getTpiSucessnum();
         QueryWrapper<TradegoodsellVo> wrapper = new QueryWrapper<TradegoodsellVo>();
-        wrapper.eq("gbi_id",gbid);
+        wrapper.eq("gbi_id",tp.getGbiId());
         wrapper.eq("tgs_status","0");
         wrapper.eq("tgs_saleable","1");
-        wrapper.le("tgs_price",price);
+        wrapper.le("tgs_price",tp.getTpiPrice());
         wrapper.orderByAsc("tgs_price");
         wrapper.orderByAsc("tgs_owntype");//价格相同，系统用户在前
         wrapper.orderByAsc("tgs_tradetime");
-        wrapper.last("limit "+num+" for update");
+        wrapper.last("limit "+need+" for update");
         List<TradegoodsellVo> list = tradegoodsellMapper.selectList(wrapper);
-        List<TradeorderinfoVo> buylist=new ArrayList<>();
-        Map<String,BigDecimal> map=dealSold(list,tc,buylist);
-        BigDecimal totalprice = map.get("totalprice");
-        BigDecimal feeprice = map.get("feeprice");
-
-        int success=num;
-        if(list.size()<num){
-            //部分可买,还需要再插入一些数据
-            for(int i=0;i<num-list.size();i++){
-                TradeorderinfoVo toi=new TradeorderinfoVo();
-                //TODO 设置toi
-                buylist.add(toi);
-            }
-            success=list.size();
+        if(list==null||list.size()==0){
+            return;
         }
-        TradepredictinfoVo tp=new TradepredictinfoVo();
-        tp.setGbiId(gbid);
-        //TODO 设置tp参数
-        tradepredictinfoService.saveTradepredictinfoVo(tp);
-        saveBatch(buylist);
-        //TODO 买家上账
-    }
-    private Map<String,BigDecimal> dealSold(List<TradegoodsellVo> list,TradeconfigVo tc,List<TradeorderinfoVo> toilist){
         BigDecimal goodsprice=new BigDecimal("0");
         BigDecimal feeprice=new BigDecimal("0");
         for(TradegoodsellVo tg:list){
-            tg.setTgsStatus(TradegoodsellVo.STATUS_SUCCESS);
-            //TODO 设置tg参数
-            BigDecimal price=new BigDecimal(tg.getTgsPrice());
-            BigDecimal fee=price.multiply(new BigDecimal(tc.getTcRate()));
-            goodsprice=goodsprice.add(price);
-            feeprice=feeprice.add(fee);
-            TradeorderinfoVo toi=new TradeorderinfoVo();
-            //TODO 设置toi
-            toilist.add(toi);
-            //TODO 更新卖数据tg
-            //TODO 卖家上账
+            {
+                //更新卖单状态
+                tg.setTgsStatus(TradegoodsellVo.STATUS_SUCCESS);
+                tg.setTgsTradetime(LocalDateTime.now());
+                tradegoodsellService.saveTradegoodsell(tg);
+            }
+            {
+                //更新物料关系
+                Map<String,Object> map=new HashMap<>();
+                map.put("cbi_id",tg.getTgsSellerid());
+                map.put("gii_id",tg.getGiiId());
+                map.put("cgr_isown",1);
+                QueryWrapper wrapper_c=new QueryWrapper();
+                wrapper_c.allEq(map);
+                wrapper_c.last("for update");
+                CustomergoodsrelatedVo cgr = customergoodsrelatedMapper.selectOne(wrapper_c);
+                cgr.setCgrIslock(0);
+                cgr.setCgrSelltime(LocalDateTime.now());
+                cgr.setCgrIsown(0);
+                customergoodsrelatedService.saveCustomergoodsrelated(cgr);
+                CustomergoodsrelatedVo cgrnew=new CustomergoodsrelatedVo();
+                cgrnew.setCbiId(tp.getTpiBuyerid());
+                cgrnew.setGiiId(cgr.getGiiId());
+                cgrnew.setGbiId(cgr.getGbiId());
+                cgrnew.setCgrIsown(1);
+                cgrnew.setCgrIslock(1);
+                cgrnew.setCgrIspickup(0);
+                cgrnew.setCgrBuytime(LocalDateTime.now());
+                cgrnew.setCgrSelltime(LocalDateTime.now());
+                cgrnew.setCgrUpdatetime(LocalDateTime.now());
+                customergoodsrelatedService.saveCustomergoodsrelated(cgrnew);
+
+            }
+            {
+                //生成买单
+                BigDecimal price=new BigDecimal(tg.getTgsPrice());
+                BigDecimal fee=price.multiply(new BigDecimal(tc.getTcRate()));
+                goodsprice=goodsprice.add(price);
+                feeprice=feeprice.add(fee);
+                TradeorderinfoVo toi=new TradeorderinfoVo();
+                toi.setToiOrderid(RandomGenUtils.genFlowNo("TOI"));
+                toi.setTgsId(tg.getTgsId());
+                toi.setGiiId(tg.getGiiId());
+                toi.setGbiId(tg.getGbiId());
+                toi.setTgsBuyerid(tp.getTpiBuyerid());
+                toi.setToiSellerid(tg.getTgsSellerid());
+                toi.setToiPrice(tg.getTgsPrice());
+                toi.setToiStatus(TradeorderinfoVo.STATUS_SUCCESS);
+                toi.setToiTradetime(LocalDateTime.now());
+                toi.setToiUpdatetime(LocalDateTime.now());
+                toi.setToiBuyservicefee(fee.doubleValue());
+                toi.setToiSellservicefee(tg.getTgsServicefee());
+                toi.setToiType(TradeorderinfoVo.TYPE_NOMAL);
+                saveTradeorderinfo(toi);
+            }
+            {
+                //卖家上账
+                CustomerbaseinfoVo customerbaseinfoVo = customerbaseinfoMapper.selectByIdForUpdate(tg.getTgsSellerid());
+                Double balance=customerbaseinfoVo.getCbiBalance();
+                Double total=customerbaseinfoVo.getCbiTotal();
+                BigDecimal balanceB=BigDecimal.valueOf(balance!=null?balance:0);
+                BigDecimal totalB=BigDecimal.valueOf(total!=null?total:0);
+                balanceB.add(BigDecimal.valueOf(tg.getTgsPrice())).subtract(BigDecimal.valueOf(tg.getTgsServicefee()));
+                totalB.add(BigDecimal.valueOf(tg.getTgsPrice())).subtract(BigDecimal.valueOf(tg.getTgsServicefee()));
+                customerbaseinfoVo.setCbiTotal(totalB.doubleValue());
+                customerbaseinfoVo.setCbiBalance(balanceB.doubleValue());
+                customerbaseinfoService.updateUserInfo(customerbaseinfoVo);
+            }
+
         }
-        Map<String,BigDecimal> map=new HashMap<>();
-        map.put("goodsprice",goodsprice);
-        map.put("feeprice",feeprice);
-        map.put("totalprice",goodsprice.add(feeprice));
-        return map;
+        {
+            //更新预购信息
+            if(list.size()<need){
+                tp.setTpiSucessnum(tp.getTpiSucessnum()+list.size());
+                tp.setTpiStatus(TradepredictinfoVo.STATUS_PARTIAL_SUCCESS);
+            }else{
+                tp.setTpiSucessnum(tp.getTpiSucessnum()+need);
+                tp.setTpiStatus(TradepredictinfoVo.STATUS_SUCCESS);
+            }
+            tp.setTpiUpdatetime(LocalDateTime.now());
+            tradepredictinfoService.saveTradepredictinfoVo(tp);
+        }
+        {
+            //买家解冻记账
+            CustomerbaseinfoVo customerbaseinfoVo = customerbaseinfoMapper.selectByIdForUpdate(tp.getTpiBuyerid());
+            Double balance=customerbaseinfoVo.getCbiBalance();
+            Double fronze=customerbaseinfoVo.getCbiFrozen();
+            Double total=customerbaseinfoVo.getCbiTotal();
+            BigDecimal balanceB=BigDecimal.valueOf(balance!=null?balance:0);
+            BigDecimal fronzeB=BigDecimal.valueOf(fronze!=null?fronze:0);
+            BigDecimal totalB=BigDecimal.valueOf(total!=null?total:0);
+            int leftnum=list.size();
+            BigDecimal priceB=BigDecimal.valueOf(tp.getTpiPrice()).multiply(BigDecimal.valueOf(leftnum));
+            BigDecimal feeB=BigDecimal.valueOf(tp.getTpiServicefee()).multiply(BigDecimal.valueOf(leftnum));
+            balanceB.add(feeB).add(priceB);
+            fronzeB.subtract(feeB).subtract(priceB);
+            totalB.subtract(goodsprice).subtract(feeprice);
+            balanceB.subtract(goodsprice).subtract(feeprice);
+            if(balanceB.compareTo(new BigDecimal("0.0"))<0){
+                throw new HzzBizException(HzzExceptionEnum.ACCOUNT_BALACE_ERROR);
+            }
+            customerbaseinfoVo.setCbiTotal(totalB.doubleValue());
+            customerbaseinfoVo.setCbiFrozen(fronzeB.doubleValue());
+            customerbaseinfoVo.setCbiBalance(balanceB.doubleValue());
+            customerbaseinfoService.updateUserInfo(customerbaseinfoVo);
+        }
+
     }
+    public void saveTradeorderinfo(TradeorderinfoVo tradeorderinfoVo) throws HzzBizException {
+        if(!saveOrUpdate(tradeorderinfoVo)) {
+            throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
+        }
+    }
+
 }

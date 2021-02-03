@@ -2,6 +2,7 @@ package com.akfly.hzz.service.impl;
 
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
+import com.akfly.hzz.util.DateUtil;
 import com.akfly.hzz.vo.GoodsbaseinfoVo;
 import com.akfly.hzz.vo.TradetimeVo;
 import com.akfly.hzz.mapper.TradetimeMapper;
@@ -33,5 +34,12 @@ public class TradetimeServiceImpl extends ServiceImpl<TradetimeMapper, Tradetime
             throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
         }
         return tt;
+    }
+    public boolean isInTradeTime(String time) throws HzzBizException {
+        TradetimeVo tt=this.getTradeTime();
+        if(DateUtil.isEffectiveTime(time,tt.getTtTimeAmStart(),tt.getTtTimeAmEnd())||DateUtil.isEffectiveTime(time,tt.getTtTimePmStart(),tt.getTtTimePmEnd())){
+            return true;
+        }
+        return false;
     }
 }

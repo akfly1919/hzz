@@ -1,21 +1,20 @@
 package com.akfly.hzz.vo;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import java.time.LocalDateTime;
+import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
 /**
  * <p>
- * 交易市场买货订单
+ * 交易市场成交订单表
  * </p>
  *
  * @author wangfei
- * @since 2021-01-24
+ * @since 2021-02-03
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -24,6 +23,8 @@ public class TradeorderinfoVo implements Serializable {
 
     private static final long serialVersionUID=1L;
 
+    public static int STATUS_SUCCESS=3;
+    public static int TYPE_NOMAL=1;
     /**
      * ID
      */
@@ -86,6 +87,11 @@ public class TradeorderinfoVo implements Serializable {
      * 卖货服务费金额
      */
     private Double toiSellservicefee;
+
+    /**
+     * 1.正常商品2新手商品3特价
+     */
+    private Integer toiType;
 
 
 }
