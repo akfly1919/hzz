@@ -152,17 +152,16 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         Double balance=customerbaseinfoVo.getCbiBalance();
         Double fronze=customerbaseinfoVo.getCbiFrozen();
         Double total=customerbaseinfoVo.getCbiTotal();
-        BigDecimal balanceB=new BigDecimal(balance!=null?balance:new Double(0.0));
-        BigDecimal fronzeB=new BigDecimal(fronze!=null?fronze:new Double(0.0));
-        BigDecimal totalB=new BigDecimal(total!=null?total:new Double(0.0));
+        BigDecimal balanceB=BigDecimal.valueOf(balance!=null?balance:0);
+        BigDecimal fronzeB=BigDecimal.valueOf(fronze!=null?balance:0);
+        BigDecimal totalB=BigDecimal.valueOf(total!=null?balance:0);
         int leftnum=num-list.size();
         BigDecimal totalprice = map.get("totalprice");
-        BigDecimal feeprice = map.get("feeprice");
         totalB.subtract(totalprice);
         balanceB.subtract(totalprice);
-        priceB=priceB.multiply(new BigDecimal(leftnum));
+        priceB=priceB.multiply(BigDecimal.valueOf(leftnum));
         balanceB=balanceB.subtract(priceB);
-        feeB=feeB.multiply(new BigDecimal(leftnum));
+        feeB=feeB.multiply(BigDecimal.valueOf(leftnum));
         balanceB=balanceB.subtract(feeB);
         if(balanceB.compareTo(new BigDecimal("0.0"))<0){
             throw new HzzBizException(HzzExceptionEnum.ACCOUNT_BALACE_ERROR);
