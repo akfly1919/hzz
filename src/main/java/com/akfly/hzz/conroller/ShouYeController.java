@@ -78,16 +78,22 @@ public class ShouYeController {
     @ApiImplicitParams({
             @ApiImplicitParam(name="beg",value="起始位置",required=true),
             @ApiImplicitParam(name="size",value="每页展示多少条数据",required=true),
-            @ApiImplicitParam(name="gbiType",value="商品类型(1:普通商品, 2:新手商品)",required=true),
+            @ApiImplicitParam(name="gbiType",value="商品类型(0: 全部, 1:普通商品, 2:新手商品)",required=true),
     })
     @RequestMapping(value = "/goodList", method = {RequestMethod.GET, RequestMethod.POST})
     public String goodList(@RequestParam @Digits(integer = 10,fraction = 0) Integer beg, @RequestParam @Digits(integer = 10,fraction = 0) Integer size, @RequestParam @Digits(integer = 2,fraction = 0)Integer gbiType) {
 
-        List<GoodsbaseinfoVo> zcgoods = goodsbaseinfoService.lambdaQuery()
-                .eq(GoodsbaseinfoVo::getGbiType, gbiType).eq(GoodsbaseinfoVo::getGbiValid, 1)
-                .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit " + beg + "," + size + " ").list();
-
         BaseRspDto<List<GoodsbaseinfoVo>> rsp = new BaseRspDto<List<GoodsbaseinfoVo>>();
+        List<GoodsbaseinfoVo> zcgoods;
+        if (gbiType == 0) {
+            zcgoods = goodsbaseinfoService.lambdaQuery()
+                    .eq(GoodsbaseinfoVo::getGbiValid, 1)
+                    .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit " + beg + "," + size + " ").list();
+        } else {
+            zcgoods = goodsbaseinfoService.lambdaQuery()
+                    .eq(GoodsbaseinfoVo::getGbiType, gbiType).eq(GoodsbaseinfoVo::getGbiValid, 1)
+                    .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit " + beg + "," + size + " ").list();
+        }
         rsp.setData(zcgoods);
         return JsonUtils.toJson(rsp);
 

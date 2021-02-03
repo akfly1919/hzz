@@ -19,7 +19,6 @@ public interface ReporttradedateService extends IService<ReporttradedateVo> {
      * 通过商品id查询销售数量
      * @param gbiId
      * @return
-     * @throws HzzBizException
      */
     int getRtiNum(long gbiId);
 
