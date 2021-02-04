@@ -1,5 +1,6 @@
 package com.akfly.hzz.vo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -71,5 +72,7 @@ public class ReporttradedateVo implements Serializable {
 
     private LocalDateTime rtiUpdatetime;
 
+    @TableField(exist = false)
+    private int time;
 
 }
