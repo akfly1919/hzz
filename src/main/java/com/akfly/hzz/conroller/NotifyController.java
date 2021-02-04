@@ -71,14 +71,16 @@ public class NotifyController {
 
                 CustomerpayinfoVo vo = new CustomerpayinfoVo();
                 vo.setCpiOrderid(Long.valueOf(transId));
-                vo.setCaiAmount(Integer.parseInt(amount));
+                BigDecimal b_amount = new BigDecimal(amount);
+                String transAmount = String.valueOf(b_amount.multiply(new BigDecimal(100)).longValue());
+                vo.setCaiAmount(Integer.parseInt(transAmount));
                 String payTime = notifyMap.get("gmt_payment");
                 Date date = DateUtils.parseDate(payTime, "yyyy-MM-dd HH:mm:ss");
                 vo.setCpiFinishtime(DateUtil.getLocalDateTime(date));
                 vo.setCpiUpdatetime(DateUtil.getLocalDateTime(new Date()));
                 vo.setCpiPaystatus(PayStatus.PAYED.getStatus());
                 vo.setCpiChannelorderid(channelTransId);
-                customerpayinfoService.rechargeSuccess(vo);
+                customerpayinfoService.rechargeSuccess(vo, amount);
                 return CommonConstant.RESPTO_BANK_SUCCESS_MSG;
             }
         } catch (HzzBizException e) {

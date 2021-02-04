@@ -1,7 +1,6 @@
 package com.akfly.hzz.conroller;
 
 
-import com.akfly.hzz.annotation.LoggedIn;
 import com.akfly.hzz.annotation.VerifyToken;
 import com.akfly.hzz.constant.CommonConstant;
 import com.akfly.hzz.interceptor.AuthInterceptor;
