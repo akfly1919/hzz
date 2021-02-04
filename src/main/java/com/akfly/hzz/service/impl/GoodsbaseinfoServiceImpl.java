@@ -56,7 +56,7 @@ public class GoodsbaseinfoServiceImpl extends ServiceImpl<GoodsbaseinfoMapper, G
             contract_wrapper.eq("gbi_id",gbiId);
             GoodsbaseinfoVo vo = goodsbaseinfoMapper.selectOne(contract_wrapper);
             if (vo == null) throw new HzzBizException(HzzExceptionEnum.GOODS_NOTEXIST_ERROR);
-            redisUtils.set(key, JsonUtils.toJson(vo), 2 * 60 *60);
+            redisUtils.set(key, JsonUtils.toJson(vo), 60 *60);
             return vo;
         } else {
             log.warn("从redis获取商品信息vo={}", JsonUtils.toJson(o));

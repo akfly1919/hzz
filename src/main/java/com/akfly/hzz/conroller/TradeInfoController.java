@@ -1,8 +1,11 @@
 package com.akfly.hzz.conroller;
 
 import com.akfly.hzz.annotation.VerifyToken;
+import com.akfly.hzz.constant.PickUpEnum;
+import com.akfly.hzz.constant.StockEnum;
 import com.akfly.hzz.dto.BaseRspDto;
 import com.akfly.hzz.dto.TradeInfoDto;
+import com.akfly.hzz.dto.UserGoodsDto;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.interceptor.AuthInterceptor;
@@ -41,6 +44,9 @@ public class TradeInfoController {
 
     @Resource
     private GoodsbaseinfoService goodsbaseinfoService;
+
+    @Resource
+    private CustomergoodsrelatedService customergoodsrelatedService;
 
     @ApiOperation(value="获取已成交订单",notes="用户登录就可以")
     @PostMapping(value = "/getFinishedTradeOrder")
@@ -117,6 +123,28 @@ public class TradeInfoController {
     }
 
 
+    @ApiOperation(value="获取用户可以卖出的商品信息(不分页)",notes="用户登录就可以")
+    @PostMapping(value = "/getCanSellStocks")
+    @VerifyToken
+    public BaseRspDto<List<UserGoodsDto>> getCanSellStocks(){
+
+        BaseRspDto<List<UserGoodsDto>> rsp = new BaseRspDto<List<UserGoodsDto>>();
+        try {
+            CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+            List<UserGoodsDto> userGoodsDtoList = customergoodsrelatedService.getStockForUser(userInfo.getCbiId(), StockEnum.UNLOCKED, PickUpEnum.UNPICK);
+            rsp.setData(userGoodsDtoList);
+        } catch (HzzBizException e) {
+            log.error("获取用户持仓信息业务错误 msg={}", e.getErrorMsg(), e);
+            rsp.setCode(e.getErrorCode());
+            rsp.setMsg(e.getErrorMsg());
+        } catch (Exception e) {
+            log.error("获取用户持仓信息系统异常", e);
+            rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+            rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+        }
+        return rsp;
+    }
+
     @ApiOperation(value="获取用户委托订单(所有订单)",notes="用户登录就可以")
     @ApiImplicitParams({
             @ApiImplicitParam(name="tradeType",value="交易类型(1: 买入交易 2: 卖出交易)",required=true),
@@ -148,6 +176,51 @@ public class TradeInfoController {
             rsp.setMsg(e.getErrorMsg());
         } catch (Exception e) {
             log.error("获取用户委托订单系统异常", e);
+            rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+            rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+        }
+        return rsp;
+    }
+
+
+    @ApiOperation(value="获取用户冻结商品信息(不分页)",notes="用户登录就可以")
+    @PostMapping(value = "/getFrozenStocks")
+    @VerifyToken
+    public BaseRspDto<List<UserGoodsDto>> getFrozenStocks(){
+
+        BaseRspDto<List<UserGoodsDto>> rsp = new BaseRspDto<List<UserGoodsDto>>();
+        try {
+            CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+            List<UserGoodsDto> userGoodsDtoList = customergoodsrelatedService.getStockForUser(userInfo.getCbiId(), StockEnum.FROZEN, PickUpEnum.UNPICK);
+            rsp.setData(userGoodsDtoList);
+        } catch (HzzBizException e) {
+            log.error("获取用户冻结商品信息业务错误 msg={}", e.getErrorMsg(), e);
+            rsp.setCode(e.getErrorCode());
+            rsp.setMsg(e.getErrorMsg());
+        } catch (Exception e) {
+            log.error("获取用户冻结商品信息系统异常", e);
+            rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+            rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+        }
+        return rsp;
+    }
+
+    @ApiOperation(value="获取用户现货商品信息(不分页)",notes="用户登录就可以")
+    @PostMapping(value = "/getXianhuoStocks")
+    @VerifyToken
+    public BaseRspDto<List<UserGoodsDto>> getXianhuoStocks(){
+
+        BaseRspDto<List<UserGoodsDto>> rsp = new BaseRspDto<List<UserGoodsDto>>();
+        try {
+            CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+            List<UserGoodsDto> userGoodsDtoList = customergoodsrelatedService.getStockForUser(userInfo.getCbiId(), StockEnum.XIANHUO, PickUpEnum.UNPICK);
+            rsp.setData(userGoodsDtoList);
+        } catch (HzzBizException e) {
+            log.error("获取用户现货商品信息业务错误 msg={}", e.getErrorMsg(), e);
+            rsp.setCode(e.getErrorCode());
+            rsp.setMsg(e.getErrorMsg());
+        } catch (Exception e) {
+            log.error("获取用户现货商品信息系统异常", e);
             rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
             rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
         }

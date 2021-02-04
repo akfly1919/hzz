@@ -1,9 +1,13 @@
 package com.akfly.hzz.service;
 
+import com.akfly.hzz.constant.PickUpEnum;
+import com.akfly.hzz.constant.StockEnum;
+import com.akfly.hzz.dto.UserGoodsDto;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.vo.CustomergoodsrelatedVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,5 +33,7 @@ public interface CustomergoodsrelatedService extends IService<Customergoodsrelat
     public CustomergoodsrelatedVo selectCustomergoodsrelatedVoForUpdate(Map<String,Object> condition);
 
     public void saveCustomergoodsrelated(CustomergoodsrelatedVo customergoodsrelatedVo) throws HzzBizException;
+
+    List<UserGoodsDto> getStockForUser(Long userId, StockEnum stockEnum, PickUpEnum pickUpEnum) throws HzzBizException;
 
 }

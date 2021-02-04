@@ -1,14 +1,10 @@
 package com.akfly.hzz.conroller;
 
-import com.akfly.hzz.annotation.VerifyToken;
 import com.akfly.hzz.dto.BaseRspDto;
 import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.service.ReporttradedateService;
 import com.akfly.hzz.vo.ReporttradedateVo;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -17,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.List;
