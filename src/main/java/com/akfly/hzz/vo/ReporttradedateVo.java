@@ -73,6 +73,6 @@ public class ReporttradedateVo implements Serializable {
     private LocalDateTime rtiUpdatetime;
 
     @TableField(exist = false)
-    private int time;
+    private String time;
 
 }
