@@ -68,7 +68,7 @@ public class CustomercashoutinfoServiceImpl extends ServiceImpl<Customercashouti
     public List<CustomercashoutinfoVo> getWithdraw(Long userId, int pageSize, int pageNum) throws HzzBizException {
 
         List<CustomercashoutinfoVo> list = lambdaQuery().eq(CustomercashoutinfoVo::getCbiId, userId)
-                .last("limit " + pageNum + "," + pageSize + " ").list();
+                .last("limit " + pageNum * pageSize + "," + pageSize + " ").list();
         return list;
     }
 }

@@ -112,7 +112,7 @@ public class AliPayH5SubmitPayServiceImpl extends SubmitPayService<SubmitPayMode
 
         try {
             // 页面跳转
-            form = client.pageExecute(request).getBody();
+            form = client.pageExecute(request, "GET").getBody();
             param.put("form", form);
         } catch (AlipayApiException e) {
             log.error("生成支付宝请求页面异常，请求参数={}", bizContent, e);
@@ -147,13 +147,13 @@ public class AliPayH5SubmitPayServiceImpl extends SubmitPayService<SubmitPayMode
         //submitPayResultModel.setRetContent(param);
         //return submitPayResultModel;
         //}
-        try {
+        //try {
             String result = String.valueOf(param.get("form"));
             log.info("支付宝H5下单返回参数 result={}", result);
-            submitPayResultModel.setResult(URLEncoder.encode(result, CommonConstant.CHARSET_UTF8));
-        } catch (UnsupportedEncodingException e) {
-            log.error("支付宝返回页面form异常-encode", e);
-        }
+            submitPayResultModel.setResult(result);
+        //} catch (UnsupportedEncodingException e) {
+        //    log.error("支付宝返回页面form异常-encode", e);
+        //}
         return submitPayResultModel;
     }
 }

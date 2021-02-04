@@ -1,5 +1,6 @@
 package com.akfly.hzz.service;
 
+import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.vo.GoodsbaseinfoVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,4 +14,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface GoodsbaseinfoService extends IService<GoodsbaseinfoVo> {
     public GoodsbaseinfoVo getGoodsbaseinfoVo(long gbiId);
+
+    GoodsbaseinfoVo getGoodsbaseinfoWithRedis(long gbiId) throws HzzBizException;
 }
