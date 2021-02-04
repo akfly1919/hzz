@@ -19,8 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.WeekFields;
 import java.util.*;
 
 /**
@@ -60,6 +62,9 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
     private CustomergoodsrelatedService customergoodsrelatedService;
     @Resource
     private CustomergoodsrelatedMapper customergoodsrelatedMapper;
+
+    @Resource
+    private ReporttradedateService reporttradedateService;
     @Override
     public List<TradeorderinfoVo> getTradeorderinfoVo(int pageNum, int pageSize, long cbiid, Date beginTime, Date endTime) throws HzzBizException {
         List<TradeorderinfoVo> tradeorderinfoVos = lambdaQuery()
@@ -97,7 +102,6 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         tp.setTpiBuyerid(cbiid);
         tp.setTpiPrice(price);
         tp.setTpiNum(num);
-        tp.setTpiType(TradepredictinfoVo.TYPE_NOMAL);
         tp.setTpiStatus(0);
         tp.setTpiCreatetime(LocalDateTime.now());
         tp.setTpiBuytime(LocalDateTime.now());
@@ -108,12 +112,14 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         tp.setTpiSucessnum(num);
         tp.setTpiSucessnum(0);
         tp.setTpiStatus(TradepredictinfoVo.STATUS_ENTRUST);
-
         //判断是否在交易时间
         String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm:ss"));
         if(tradetimeService.isInTradeTime(nowTime)){
+            tp.setTpiType(TradepredictinfoVo.TYPE_NOMAL);
+            tradepredictinfoService.saveTradepredictinfoVo(tp);
             dealSold(tp,tc);
         }else{
+            tp.setTpiType(TradepredictinfoVo.TYPE_ENTRUST);
             tradepredictinfoService.saveTradepredictinfoVo(tp);
         }
     }
@@ -209,12 +215,31 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
                 customerbaseinfoService.updateUserInfo(customerbaseinfoVo);
             }
 
+
+        }
+        {
+            //更新交易数据
+            LocalDateTime now=LocalDateTime.now();
+            ReporttradedateVo rt=new ReporttradedateVo();
+            rt.setRtiYear(now.getYear());
+            rt.setRtiMonth(now.getMonthValue());
+            rt.setRtiWeek(now.get(WeekFields.of(DayOfWeek.MONDAY,1).weekOfYear()));
+            rt.setRtiDate(now.getDayOfMonth());
+            rt.setRtiHour(now.getHour());
+            rt.setRtiGbid(tp.getGbiId());
+            GoodsbaseinfoVo gbi = goodsbaseinfoService.getGoodsbaseinfoVo(tp.getGbiId());
+            rt.setRitGbiname(gbi.getGbiName());
+            rt.setRtiNum(list.size());
+            rt.setRtiMoney(goodsprice.doubleValue());
+            rt.setRtiCreatetime(LocalDateTime.now());
+            rt.setRtiUpdatetime(LocalDateTime.now());
+            reporttradedateService.saveReporttradedateVo(rt);
         }
         {
             //更新预购信息
             if(list.size()<need){
                 tp.setTpiSucessnum(tp.getTpiSucessnum()+list.size());
-                tp.setTpiStatus(TradepredictinfoVo.STATUS_PARTIAL_SUCCESS);
+                //tp.setTpiStatus(TradepredictinfoVo.STATUS_PARTIAL_SUCCESS);
             }else{
                 tp.setTpiSucessnum(tp.getTpiSucessnum()+need);
                 tp.setTpiStatus(TradepredictinfoVo.STATUS_SUCCESS);

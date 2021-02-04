@@ -1,8 +1,11 @@
 package com.akfly.hzz.service.impl;
 
+import com.akfly.hzz.exception.HzzBizException;
+import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.mapper.ReporttradedateMapper;
 import com.akfly.hzz.service.ReporttradedateService;
 import com.akfly.hzz.vo.ReporttradedateVo;
+import com.akfly.hzz.vo.TradepredictinfoVo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +31,12 @@ public class ReporttradedateServiceImpl extends ServiceImpl<ReporttradedateMappe
     @Resource
     private ReporttradedateMapper reporttradedateMapper;
 
+    public void saveReporttradedateVo(ReporttradedateVo reporttradedateVo) throws HzzBizException {
+        if(!saveOrUpdate(reporttradedateVo)) {
+            throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
+        }
+    }
+
     @Override
     public int getRtiNum(long gbiId) {
 
@@ -50,25 +59,25 @@ public class ReporttradedateServiceImpl extends ServiceImpl<ReporttradedateMappe
         queryWrapper.eq("rti_gbid",gbid);
 
         if("YEAR".equalsIgnoreCase(queryType)){
-            queryWrapper.select(" rti_gbid,rti_year,sum(rti_num) as rti_num,sum(rti_money) as rti_money ");
+            queryWrapper.select(" rti_gbid,rti_year as time, sum(rti_num) as rti_num,sum(rti_money) as rti_money ");
             queryWrapper.groupBy("rti_year");
         }else if("MONTH".equalsIgnoreCase(queryType)){
-            queryWrapper.select(" rti_gbid,rti_year, rti_month,sum(rti_num) as rti_num,sum(rti_money) as rti_money ");
+            queryWrapper.select(" rti_gbid,rti_month as time,sum(rti_num) as rti_num,sum(rti_money) as rti_money ");
             queryWrapper.groupBy("rti_year,rti_month");
             queryWrapper.orderByDesc("rti_year,rti_month");
             queryWrapper.last("limit 12");
         }else if("DAY".equalsIgnoreCase(queryType)){
-            queryWrapper.select(" rti_gbid,rti_year, rti_month,rti_date,sum(rti_num) as rti_num,sum(rti_money) as rti_money ");
+            queryWrapper.select(" rti_gbid,rti_date  as time,sum(rti_num) as rti_num,sum(rti_money) as rti_money ");
             queryWrapper.groupBy("rti_year,rti_month,rti_date");
             queryWrapper.orderByDesc("rti_year,rti_month,rti_date");
             queryWrapper.last("limit 30");
         }else if("WEEK".equalsIgnoreCase(queryType)){
-            queryWrapper.select(" rti_gbid,rti_year, rti_week,sum(rti_num) as rti_num,sum(rti_money) as rti_money ");
+            queryWrapper.select(" rti_gbid, rti_week as time,sum(rti_num) as rti_num,sum(rti_money) as rti_money ");
             queryWrapper.groupBy("rti_year,rti_week");
             queryWrapper.orderByDesc("rti_year,rti_week");
             queryWrapper.last("limit 52");
         }else if("HOUR".equalsIgnoreCase(queryType)){
-            queryWrapper.select(" rti_gbid,rti_year, rti_month, rti_date,rti_hour,sum(rti_num) as rti_num,sum(rti_money) as rti_money ");
+            queryWrapper.select(" rti_gbid,rti_hour as time,sum(rti_num) as rti_num,sum(rti_money) as rti_money ");
             queryWrapper.groupBy("rti_year,rti_month,rti_date,rti_hour");
             queryWrapper.orderByDesc("rti_year,rti_month,rti_date,rti_hour");
             queryWrapper.last("limit 24");

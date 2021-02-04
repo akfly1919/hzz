@@ -36,4 +36,6 @@ public interface CustomergoodsrelatedService extends IService<Customergoodsrelat
 
     List<UserGoodsDto> getStockForUser(Long userId, StockEnum stockEnum, PickUpEnum pickUpEnum) throws HzzBizException;
 
+    public List<CustomergoodsrelatedVo> listStockCanSold(long cbiid);
+    public void unlock() throws HzzBizException;
 }

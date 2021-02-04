@@ -5,24 +5,20 @@ import com.akfly.hzz.constant.StockEnum;
 import com.akfly.hzz.dto.UserGoodsDto;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
-import com.akfly.hzz.service.GoodsbaseinfoService;
-import com.akfly.hzz.vo.CustomergoodsrelatedVo;
 import com.akfly.hzz.mapper.CustomergoodsrelatedMapper;
 import com.akfly.hzz.service.CustomergoodsrelatedService;
+import com.akfly.hzz.service.GoodsbaseinfoService;
+import com.akfly.hzz.vo.CustomergoodsrelatedVo;
 import com.akfly.hzz.vo.GoodsbaseinfoVo;
-import com.akfly.hzz.vo.ReporttradedateVo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.injector.methods.SelectList;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -95,5 +91,26 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
             userGoodsDtoList.add(userGoodsDto);
         }
         return userGoodsDtoList;
+    }
+
+    public List<CustomergoodsrelatedVo> listStockCanSold(long cbiid){
+        return getBaseMapper().listStockCanSold(cbiid);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void unlock() throws HzzBizException {
+        Map<String,Object> map=new HashMap<>();
+        map.put("cgr_isown",1);
+        map.put("cgr_islock",1);
+        QueryWrapper wrapper_c=new QueryWrapper();
+        wrapper_c.allEq(map);
+        //wrapper_c.lt("cgr_buytime", LocalDate.now());
+        wrapper_c.last("for update");
+        List<CustomergoodsrelatedVo> cgrlist = getBaseMapper().selectList(wrapper_c);
+
+        for(CustomergoodsrelatedVo cgr:cgrlist){
+            cgr.setCgrIslock(0);
+            saveCustomergoodsrelated(cgr);
+        }
     }
 }
