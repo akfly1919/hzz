@@ -86,7 +86,7 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
     public void dealSold(long cbiid,long gbid,int num,double price) throws HzzBizException {
         QueryWrapper wrapper_c=new QueryWrapper();
         wrapper_c.eq("gbi_id",gbid);
-        wrapper_c.in("tpi_status",1,3);
+        wrapper_c.eq("tpi_status",1);
         wrapper_c.ge("tpi_price",price);
         wrapper_c.orderByAsc("tpi_createtime");
         wrapper_c.last("for update");
@@ -106,6 +106,7 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
         map.put("gbi_id",gbid);
         map.put("cgr_isown",1);
         map.put("cgr_islock",0);
+        map.put("cgr_ispickup",0);
         QueryWrapper wrapper_c=new QueryWrapper();
         wrapper_c.allEq(map);
         //wrapper_c.lt("cgr_buytime", LocalDate.now());

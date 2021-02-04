@@ -4,6 +4,7 @@ import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.vo.CustomergoodsrelatedVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,4 +31,6 @@ public interface CustomergoodsrelatedService extends IService<Customergoodsrelat
 
     public void saveCustomergoodsrelated(CustomergoodsrelatedVo customergoodsrelatedVo) throws HzzBizException;
 
+    public List<CustomergoodsrelatedVo> listStockCanSold(long cbiid);
+    public void unlock() throws HzzBizException;
 }

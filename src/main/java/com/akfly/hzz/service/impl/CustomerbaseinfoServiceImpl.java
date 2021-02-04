@@ -183,5 +183,6 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
         if(balanceB.compareTo(new BigDecimal("0.0"))<0){
             throw new HzzBizException(HzzExceptionEnum.ACCOUNT_BALACE_ERROR);
         }
+        updateUserInfo(customerbaseinfoVo);
     }
 }

@@ -1,5 +1,6 @@
 package com.akfly.hzz.service;
 
+import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.vo.ReporttradedateVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -23,5 +24,5 @@ public interface ReporttradedateService extends IService<ReporttradedateVo> {
     int getRtiNum(long gbiId);
 
     public List<ReporttradedateVo> listReporttradedateStatistics(long gbid, String queryType);
-
+    public void saveReporttradedateVo(ReporttradedateVo reporttradedateVo) throws HzzBizException;
 }

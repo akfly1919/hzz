@@ -1,5 +1,6 @@
 package com.akfly.hzz.vo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -65,5 +66,10 @@ public class CustomergoodsrelatedVo implements Serializable {
 
     private LocalDateTime cgrUpdatetime;
 
-
+    @TableField(exist = false)
+    private Integer stock;
+    @TableField(exist = false)
+    private String name;
+    @TableField(exist = false)
+    private Double price;
 }

@@ -2,13 +2,19 @@ package com.akfly.hzz.service.impl;
 
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
+import com.akfly.hzz.util.RandomGenUtils;
 import com.akfly.hzz.vo.CustomergoodsrelatedVo;
 import com.akfly.hzz.mapper.CustomergoodsrelatedMapper;
 import com.akfly.hzz.service.CustomergoodsrelatedService;
+import com.akfly.hzz.vo.TradegoodsellVo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,6 +46,26 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
     public void saveCustomergoodsrelated(CustomergoodsrelatedVo customergoodsrelatedVo) throws HzzBizException {
         if(!saveOrUpdate(customergoodsrelatedVo)) {
             throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
+        }
+    }
+
+    public List<CustomergoodsrelatedVo> listStockCanSold(long cbiid){
+        return getBaseMapper().listStockCanSold(cbiid);
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public void unlock() throws HzzBizException {
+        Map<String,Object> map=new HashMap<>();
+        map.put("cgr_isown",1);
+        map.put("cgr_islock",1);
+        QueryWrapper wrapper_c=new QueryWrapper();
+        wrapper_c.allEq(map);
+        //wrapper_c.lt("cgr_buytime", LocalDate.now());
+        wrapper_c.last("for update");
+        List<CustomergoodsrelatedVo> cgrlist = getBaseMapper().selectList(wrapper_c);
+
+        for(CustomergoodsrelatedVo cgr:cgrlist){
+            cgr.setCgrIslock(0);
+            saveCustomergoodsrelated(cgr);
         }
     }
 }

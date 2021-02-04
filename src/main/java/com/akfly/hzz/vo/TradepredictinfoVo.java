@@ -23,6 +23,7 @@ public class TradepredictinfoVo implements Serializable {
 
     private static final long serialVersionUID=1L;
     public static int TYPE_NOMAL=2;
+    public static int TYPE_ENTRUST=1;
     public static int STATUS_PARTIAL_SUCCESS=3;
     public static  int STATUS_SUCCESS=4;
     public static int STATUS_ENTRUST=1;

@@ -1,8 +1,11 @@
 package com.akfly.hzz.service.impl;
 
+import com.akfly.hzz.exception.HzzBizException;
+import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.mapper.ReporttradedateMapper;
 import com.akfly.hzz.service.ReporttradedateService;
 import com.akfly.hzz.vo.ReporttradedateVo;
+import com.akfly.hzz.vo.TradepredictinfoVo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +30,12 @@ public class ReporttradedateServiceImpl extends ServiceImpl<ReporttradedateMappe
 
     @Resource
     private ReporttradedateMapper reporttradedateMapper;
+
+    public void saveReporttradedateVo(ReporttradedateVo reporttradedateVo) throws HzzBizException {
+        if(!saveOrUpdate(reporttradedateVo)) {
+            throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
+        }
+    }
 
     @Override
     public int getRtiNum(long gbiId) {
