@@ -82,7 +82,7 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
 
     }
 
-    @Transactional(rollbackFor = Exception.class)
+
     public void dealSold(long cbiid,long gbid,int num,double price) throws HzzBizException {
         QueryWrapper wrapper_c=new QueryWrapper();
         wrapper_c.eq("gbi_id",gbid);
@@ -95,7 +95,11 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
             return;
         }
         for(TradepredictinfoVo tp:list){
+            try{
             tradeorderinfoService.dealSold(tp,null);
+            }catch (Exception e){
+
+            }
         }
 
     }

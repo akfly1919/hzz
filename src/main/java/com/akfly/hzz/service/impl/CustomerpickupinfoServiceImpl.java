@@ -45,6 +45,10 @@ public class CustomerpickupinfoServiceImpl extends ServiceImpl<Customerpickupinf
     private GoodsbaseinfoService goodsbaseinfoService;
     @Transactional(rollbackFor = Exception.class)
     public void pickup(long cbiid,long gbid,int num,long caiid) throws HzzBizException {
+        GoodsbaseinfoVo gi = goodsbaseinfoService.getGoodsbaseinfoVo(gbid);
+        if(num<gi.getGbiLimitpickup()){
+            throw new HzzBizException(HzzExceptionEnum.LIMIT_PICKUP_ERROR);
+        }
         CustomeraddressinfoVo cai = customeraddressinfoService.getAddressInfoByCaiId(cbiid,caiid);
         if(cai==null){
             throw new HzzBizException(HzzExceptionEnum.GOODS_DEFAULT_ADDRESS_ERROR);
