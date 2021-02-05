@@ -13,6 +13,8 @@
         <result column="cpui_updatetime" property="cpuiUpdatetime" />
         <result column="cpui_finishtime" property="cpuiFinishtime" />
         <result column="cpui_status" property="cpuiStatus" />
+        <result column="cpui_trackingnumber" property="cpuiTrackingnumber" />
+        <result column="cpui_tracktype" property="cpuiTracktype" />
     </resultMap>
 
 </mapper>

@@ -18,4 +18,6 @@ public interface CustomeraddressinfoService extends IService<Customeraddressinfo
     public List<CustomeraddressinfoVo> getAddressInfoById(Long cbiId) throws HzzBizException;
     public void updateAddressInfo(CustomeraddressinfoVo customeraddressinfoVo) throws HzzBizException;
     public void createAddressInfo(CustomeraddressinfoVo customeraddressinfoVo) throws HzzBizException;
+    public CustomeraddressinfoVo getDefaultAddressInfoById(Long cbiId) throws HzzBizException;
+    public CustomeraddressinfoVo getAddressInfoByCaiId(Long cbiId,Long caiid);
 }

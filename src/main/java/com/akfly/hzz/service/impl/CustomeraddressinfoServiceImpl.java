@@ -6,6 +6,7 @@ import com.akfly.hzz.vo.CustomeraddressinfoVo;
 import com.akfly.hzz.mapper.CustomeraddressinfoMapper;
 import com.akfly.hzz.service.CustomeraddressinfoService;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -28,6 +29,27 @@ public class CustomeraddressinfoServiceImpl extends ServiceImpl<Customeraddressi
         List<CustomeraddressinfoVo> adresslist = lambdaQuery()
                 .eq(CustomeraddressinfoVo::getCbiId, cbiId).list();
         return adresslist;
+    }
+    public CustomeraddressinfoVo getAddressInfoByCaiId(Long cbiId,Long caiid) {
+
+        QueryWrapper wrapper_c=new QueryWrapper();
+        wrapper_c.eq("cai_id",caiid);
+        wrapper_c.eq("cbi_id",cbiId);
+        wrapper_c.eq("cai_valid",1);
+        return  getBaseMapper().selectOne(wrapper_c);
+    }
+    public CustomeraddressinfoVo getDefaultAddressInfoById(Long cbiId) throws HzzBizException {
+        QueryWrapper wrapper_c=new QueryWrapper();
+        wrapper_c.eq("cbi_id",cbiId);
+        wrapper_c.eq("cai_valid",1);
+        wrapper_c.orderByAsc("cai_sort");
+        wrapper_c.orderByDesc("cai_updatetime");
+        wrapper_c.last("limit 1");
+        CustomeraddressinfoVo defaultA= getBaseMapper().selectOne(wrapper_c);
+        if(defaultA==null){
+            throw  new HzzBizException(HzzExceptionEnum.GOODS_DEFAULT_ADDRESS_ERROR);
+        }
+        return defaultA;
     }
     @Override
     public void createAddressInfo(CustomeraddressinfoVo customeraddressinfoVo) throws HzzBizException {
