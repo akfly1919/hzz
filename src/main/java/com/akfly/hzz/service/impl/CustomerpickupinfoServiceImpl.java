@@ -61,6 +61,7 @@ public class CustomerpickupinfoServiceImpl extends ServiceImpl<Customerpickupinf
         QueryWrapper wrapper_c=new QueryWrapper();
         wrapper_c.allEq(map);
         wrapper_c.in("cgr_islock",0,1);
+        wrapper_c.last("limit "+num);
         //wrapper_c.lt("cgr_buytime", LocalDate.now());
         wrapper_c.last("for update");
         List<CustomergoodsrelatedVo> cgrlist = customergoodsrelatedMapper.selectList(wrapper_c);
