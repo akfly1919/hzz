@@ -245,7 +245,27 @@ public class TradeInfoController {
         }
         return rsp;
     }
+    @ApiOperation(value="获取用户可提货列表",notes="用户登录就可以")
+    @PostMapping(value = "/getCanPcikupStocks")
+    @VerifyToken
+    public BaseRspDto<List<UserGoodsDto>> getCanPcikupStocks(){
 
+        BaseRspDto<List<UserGoodsDto>> rsp = new BaseRspDto<List<UserGoodsDto>>();
+        try {
+            CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+            List<UserGoodsDto> userGoodsDtoList = customergoodsrelatedService.getStockForUser(userInfo.getCbiId(), StockEnum.XIANHUO, PickUpEnum.UNPICK);
+            rsp.setData(userGoodsDtoList);
+        } catch (HzzBizException e) {
+            log.error("获取用户现货商品信息业务错误 msg={}", e.getErrorMsg(), e);
+            rsp.setCode(e.getErrorCode());
+            rsp.setMsg(e.getErrorMsg());
+        } catch (Exception e) {
+            log.error("获取用户现货商品信息系统异常", e);
+            rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+            rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+        }
+        return rsp;
+    }
 
     private List<TradeInfoDto> buildBuyTradeRespList(List<TradepredictinfoVo> list) throws HzzBizException {
 
