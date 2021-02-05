@@ -24,6 +24,7 @@ public enum HzzExceptionEnum {
     PHONENUM_NOT_REGISTER("1015", "手机号未注册过"),
     NOT_SUPPORT_PAY("1016", "不支持的支付方式"),
     GOODS_NOTEXIST_ERROR("1017", "产品信息不存在"),
+    GOODS_DEFAULT_ADDRESS_ERROR("1018", "默认地址不存在"),
 
     /* 业务异常定义以2-8开头，顺序往下排号 */
     PARAM_INVALID("2000","参数不合法"),

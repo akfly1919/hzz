@@ -45,6 +45,26 @@ public class AddressInfoController {
         }
         return rsp;
     }
+    @ApiOperation(value="获取默认收货地址",notes="用户登录就可以")
+    @PostMapping(value = "getDefaultAddress")
+    @VerifyToken
+    public BaseRspDto<CustomeraddressinfoVo> getDefaultAddressInfo(){
+        BaseRspDto<CustomeraddressinfoVo> rsp = new BaseRspDto<CustomeraddressinfoVo>();
+        try {
+            CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+            CustomeraddressinfoVo list = customeraddressinfoService.getDefaultAddressInfoById(userInfo.getCbiId());
+            rsp.setData(list);
+        } catch (HzzBizException e) {
+            log.error("查询地址列表业务错误 msg={}", e.getErrorMsg(), e);
+            rsp.setCode(e.getErrorCode());
+            rsp.setMsg(e.getErrorMsg());
+        } catch (Exception e) {
+            log.error("查询地址列表系统异常", e);
+            rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+            rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+        }
+        return rsp;
+    }
     @PostMapping(value = "addAddress")
     @VerifyToken
     public  BaseRspDto<String> createCustomerAddressInfo(@Validated CustomeraddressinfoVo customeraddressinfoVo){
