@@ -51,11 +51,11 @@ public class TradeInfoController {
     @ApiOperation(value="获取已成交订单",notes="用户登录就可以")
     @PostMapping(value = "/getFinishedTradeOrder")
     @VerifyToken
-    public BaseRspDto<List<TradeorderinfoVo>> getTradeOrder(int pageNum, int pageSize, Date beginTime, Date endTime){
+    public BaseRspDto<List<TradeorderinfoVo>> getTradeOrder(int beg, int size, Date beginTime, Date endTime){
         BaseRspDto<List<TradeorderinfoVo>> rsp = new BaseRspDto<List<TradeorderinfoVo>>();
         try {
             CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
-            List<TradeorderinfoVo> list = tradeorderinfoService.getTradeorderinfoVo(pageNum, pageSize, userInfo.getCbiId(), beginTime, endTime);
+            List<TradeorderinfoVo> list = tradeorderinfoService.getTradeorderinfoVo(beg, size, userInfo.getCbiId(), beginTime, endTime);
             rsp.setData(list);
         } catch (HzzBizException e) {
             log.error("获取购买订单业务错误 msg={}", e.getErrorMsg(), e);
@@ -167,23 +167,23 @@ public class TradeInfoController {
     @ApiOperation(value="获取用户委托订单(所有订单)",notes="用户登录就可以")
     @ApiImplicitParams({
             @ApiImplicitParam(name="tradeType",value="交易类型(1: 买入交易 2: 卖出交易)",required=true),
-            @ApiImplicitParam(name="pageNum",value="第几页",required=true),
-            @ApiImplicitParam(name="pageSize",value="每页多少条",required=true)
+            @ApiImplicitParam(name="beg",value="第几页",required=true),
+            @ApiImplicitParam(name="size",value="每页多少条",required=true)
 
     })
     @PostMapping(value = "/getTradeOrder")
     @VerifyToken
-    public BaseRspDto<List<TradeInfoDto>> getBuyTradeOrder(int tradeType, int pageNum, int pageSize){
+    public BaseRspDto<List<TradeInfoDto>> getBuyTradeOrder(int tradeType, int beg, int size){
 
         BaseRspDto<List<TradeInfoDto>> rsp = new BaseRspDto<List<TradeInfoDto>>();
         try {
             CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
             List<TradeInfoDto> respList;
             if (tradeType == 1) {
-                List<TradepredictinfoVo> list = tradepredictinfoService.getBuyTrade(userInfo.getCbiId(), pageSize, pageNum);
+                List<TradepredictinfoVo> list = tradepredictinfoService.getBuyTrade(userInfo.getCbiId(), size, beg);
                 respList = buildBuyTradeRespList(list);
             } else if (tradeType == 2) {
-                List<TradegoodsellVo> list = tradegoodsellService.getSellTrade(userInfo.getCbiId(), pageSize, pageNum);
+                List<TradegoodsellVo> list = tradegoodsellService.getSellTrade(userInfo.getCbiId(), size, beg);
                 respList = buildSellTradeRespList(list);
             } else {
                 throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);

@@ -56,16 +56,16 @@ public class CustomerpayinfoServiceImpl extends ServiceImpl<CustomerpayinfoMappe
 
     @Override
     @Transactional
-    public void rechargeSuccess(CustomerpayinfoVo vo) throws HzzBizException {
+    public void rechargeSuccess(CustomerpayinfoVo vo, String rechargeAmount) throws HzzBizException {
 
         try {
             log.info("充值成功入参 vo={}", JsonUtils.toJson(vo));
             CustomerpayinfoVo payInfo = lambdaQuery().eq(CustomerpayinfoVo::getCpiOrderid, vo.getCpiOrderid()).one();
             customerpayinfoMapper.updateById(vo);
             CustomerbaseinfoVo userInfo = customerbaseinfoService.lambdaQuery().eq(CustomerbaseinfoVo::getCbiId, Long.valueOf(payInfo.getCbiId())).one();
-            double largeMoney = vo.getCaiAmount() * 1000000;
+            double largeMoney = Double.parseDouble(rechargeAmount) * 1000000;
             userInfo.setCbiBalance(userInfo.getCbiBalance() + largeMoney); // TODO 金额乘以1000000，后续需要去掉
-            userInfo.setCbiTotal(userInfo.getCbiBalance() + largeMoney);
+            userInfo.setCbiTotal(userInfo.getCbiTotal() + largeMoney);
             userInfo.setCbiUpdatetime(DateUtil.getLocalDateTime(new Date()));
 
             CustomerbillrelatedVo bill = new CustomerbillrelatedVo();
