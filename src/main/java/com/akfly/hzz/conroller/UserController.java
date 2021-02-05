@@ -214,7 +214,7 @@ public class UserController {
 			}
 			redisUtils.set(msg_prefix + phoneNum, code, 300); // 有效期5分钟
 
-			if (true) { // SmsUtils.smsSend(phoneNum,code)
+			if (SmsUtils.smsSend(phoneNum,code)) {
 				MessageCodeDto messageCodeDto = new MessageCodeDto();
 				messageCodeDto.setPhoneNum(phoneNum);
 				//messageCodeDto.setMsgCode(code);

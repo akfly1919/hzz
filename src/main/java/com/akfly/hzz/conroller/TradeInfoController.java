@@ -122,25 +122,25 @@ public class TradeInfoController {
         return rsp;
     }
 
-    @PostMapping(value = "/listCanSold")
-    @VerifyToken
-    public BaseRspDto<List<CustomergoodsrelatedVo>> listCanSold(){
-        BaseRspDto<List<CustomergoodsrelatedVo>> rsp = new BaseRspDto<List<CustomergoodsrelatedVo>>();
-        try {
-            CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
-            List<CustomergoodsrelatedVo>    list=customergoodsrelatedService.listStockCanSold(userInfo.getCbiId());
-            rsp.setData(list);
-        /*} catch (HzzBizException e) {
-            log.error("卖出业务错误 msg={}", e.getErrorMsg(), e);
-            rsp.setCode(e.getErrorCode());
-            rsp.setMsg(e.getErrorMsg());*/
-        } catch (Exception e) {
-            log.error("卖出系统异常", e);
-            rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
-            rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
-        }
-        return rsp;
-    }
+    //@PostMapping(value = "/listCanSold")
+    //@VerifyToken
+    //public BaseRspDto<List<CustomergoodsrelatedVo>> listCanSold(){
+    //    BaseRspDto<List<CustomergoodsrelatedVo>> rsp = new BaseRspDto<List<CustomergoodsrelatedVo>>();
+    //    try {
+    //        CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+    //        List<CustomergoodsrelatedVo>    list=customergoodsrelatedService.listStockCanSold(userInfo.getCbiId());
+    //        rsp.setData(list);
+    //    /*} catch (HzzBizException e) {
+    //        log.error("卖出业务错误 msg={}", e.getErrorMsg(), e);
+    //        rsp.setCode(e.getErrorCode());
+    //        rsp.setMsg(e.getErrorMsg());*/
+    //    } catch (Exception e) {
+    //        log.error("卖出系统异常", e);
+    //        rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+    //        rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+    //    }
+    //    return rsp;
+    //}
 
     @ApiOperation(value="获取用户可以卖出的商品信息(不分页)",notes="用户登录就可以")
     @PostMapping(value = "/getCanSellStocks")
