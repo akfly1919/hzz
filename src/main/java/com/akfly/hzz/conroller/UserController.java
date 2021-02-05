@@ -43,6 +43,7 @@ public class UserController {
 	@Resource
 	private IDFacade idFacade;
 
+
 	@ApiOperation(value="用户登录",notes="同时支持手机验证码或者密码登录")
 	@ApiImplicitParams({
 			@ApiImplicitParam(name="phoneNum",value="手机号",required=true),
@@ -286,7 +287,20 @@ public class UserController {
 		BaseRspDto<RealNameRspDto> rsp = new BaseRspDto<RealNameRspDto>();
 		try {
 			CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+
+			CustomerbaseinfoVo userInfoDb = customerbaseinfoService.getUserInfoById(String.valueOf(userInfo.getCbiId()));
 			RealNameRspDto rnDto = new RealNameRspDto();
+			if (StringUtils.isNoneBlank(userInfoDb.getCbiIdcard())) {
+				try {
+					customeridcardinfoService.getCardInfo(userInfo.getCbiId()); // 获取不到抛出了异常
+					rnDto.setIsRealName(1);
+				} catch (HzzBizException e) {
+					rnDto.setIsRealName(0);
+					log.error("获取实名信息异常 msg={}", e.getErrorMsg());
+				}
+			} else {
+				rnDto.setIsRealName(0);
+			}
 			rnDto.setName(userInfo.getCbiName());
 			rnDto.setIdentityCode(userInfo.getCbiIdcard());
 			rnDto.setPhoneNum(userInfo.getCbiPhonenum());

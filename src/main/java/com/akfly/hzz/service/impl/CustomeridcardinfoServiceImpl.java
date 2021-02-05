@@ -31,7 +31,7 @@ public class CustomeridcardinfoServiceImpl extends ServiceImpl<Customeridcardinf
         vo.setCiiIdcardback(idCardBack);
         vo.setCiiIdcardfront(idCardFront);
         vo.setCiiOperator("SYSTEM");
-        vo.setCiiStatus(1); // 未审核
+        vo.setCiiStatus(2); // 未审核
         if (!saveOrUpdate(vo)) {
             throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
         }
