@@ -19,4 +19,9 @@ public class RealNameRspDto {
 
     private String phoneNum;
 
+    /**
+     * 是否实名 0 未实名 1 实名
+     */
+    private int isRealName;
+
 }
