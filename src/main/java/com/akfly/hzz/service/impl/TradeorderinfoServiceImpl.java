@@ -116,20 +116,50 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm:ss"));
         if(tradetimeService.isInTradeTime(nowTime)){
             tp.setTpiType(TradepredictinfoVo.TYPE_NOMAL);
-            tradepredictinfoService.saveTradepredictinfoVo(tp);
+            //tradepredictinfoService.saveTradepredictinfoVo(tp);
             dealSold(tp,tc);
         }else{
             tp.setTpiType(TradepredictinfoVo.TYPE_ENTRUST);
+            int need=tp.getTpiNum()-tp.getTpiSucessnum();
+            {
+                QueryWrapper wrapper_c=new QueryWrapper();
+                wrapper_c.eq("cbi_id",tp.getTpiBuyerid());
+                wrapper_c.eq("gbi_id",tp.getGbiId());
+                wrapper_c.eq("cgr_isown",1);
+                List list = customergoodsrelatedService.list(wrapper_c);
+                if(gi.getGbiLimitperson()<list.size()+need){
+                    throw new HzzBizException(HzzExceptionEnum.LIMIT_PERSON_ERROR);
+                }
+            }
             tradepredictinfoService.saveTradepredictinfoVo(tp);
         }
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void dealSold(TradepredictinfoVo tp,TradeconfigVo tc) throws HzzBizException {
+        if(tp.getId()!=null){
+            //这里是已存在而非新创建的
+            tp= tradepredictinfoService.getById(tp.getId());
+        }
+        if(tp.getTpiStatus()!=1){
+            //预下单状态已变更，无需继续处理
+            return;
+        }
         if(tc==null){
             tc=tradeconfigService.getTradeconfig(TradeconfigVo.TCTYPE_BUY);
         }
+        GoodsbaseinfoVo gi = goodsbaseinfoService.getGoodsbaseinfoVo(tp.getGbiId());
         int need=tp.getTpiNum()-tp.getTpiSucessnum();
+        {
+            QueryWrapper wrapper_c=new QueryWrapper();
+            wrapper_c.eq("cbi_id",tp.getTpiBuyerid());
+            wrapper_c.eq("gbi_id",tp.getGbiId());
+            wrapper_c.eq("cgr_isown",1);
+            List list = customergoodsrelatedService.list(wrapper_c);
+            if(gi.getGbiLimitperson()<list.size()+need){
+                throw new HzzBizException(HzzExceptionEnum.LIMIT_PERSON_ERROR);
+            }
+        }
         QueryWrapper<TradegoodsellVo> wrapper = new QueryWrapper<TradegoodsellVo>();
         wrapper.eq("gbi_id",tp.getGbiId());
         wrapper.eq("tgs_status","0");
