@@ -4,6 +4,7 @@ package com.akfly.hzz.conroller;
 import com.akfly.hzz.constant.CommonConstant;
 import com.akfly.hzz.dto.BaseRspDto;
 import com.akfly.hzz.dto.GoodInfoDto;
+import com.akfly.hzz.dto.GoodsbaseinfoDto;
 import com.akfly.hzz.dto.ShouYeDto;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
@@ -19,6 +20,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
@@ -28,6 +30,7 @@ import javax.annotation.Resource;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -78,24 +81,40 @@ public class ShouYeController {
     @ApiImplicitParams({
             @ApiImplicitParam(name="beg",value="起始位置",required=true),
             @ApiImplicitParam(name="size",value="每页展示多少条数据",required=true),
-            @ApiImplicitParam(name="gbiType",value="商品类型(0: 全部, 1:普通商品, 2:新手商品)",required=true),
+            @ApiImplicitParam(name="gbiType",value="商品类型(0: 全部, 1:普通商品, 2:新手商品 3: 所有商品信息并带库存)",required=true),
     })
     @RequestMapping(value = "/goodList", method = {RequestMethod.GET, RequestMethod.POST})
     public String goodList(@RequestParam @Digits(integer = 10,fraction = 0) Integer beg, @RequestParam @Digits(integer = 10,fraction = 0) Integer size, @RequestParam @Digits(integer = 2,fraction = 0)Integer gbiType) {
 
-        BaseRspDto<List<GoodsbaseinfoVo>> rsp = new BaseRspDto<List<GoodsbaseinfoVo>>();
-        List<GoodsbaseinfoVo> zcgoods;
         if (gbiType == 0) {
-            zcgoods = goodsbaseinfoService.lambdaQuery()
+            BaseRspDto<List<GoodsbaseinfoVo>> rsp = new BaseRspDto<List<GoodsbaseinfoVo>>();
+            List<GoodsbaseinfoVo> zcgoods = goodsbaseinfoService.lambdaQuery()
                     .eq(GoodsbaseinfoVo::getGbiValid, 1)
                     .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit " + beg + "," + size + " ").list();
+            rsp.setData(zcgoods);
+            return JsonUtils.toJson(rsp);
+        } else if (gbiType == 3) {
+            BaseRspDto<List<GoodsbaseinfoDto>> rsp = new BaseRspDto<List<GoodsbaseinfoDto>>();
+            List<GoodsbaseinfoVo> zcgoods = goodsbaseinfoService.lambdaQuery().eq(GoodsbaseinfoVo::getGbiValid, 1)
+                    .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit " + beg + "," + size + " ").list();
+            List<GoodsbaseinfoDto> dtos = new ArrayList<>();
+            for (GoodsbaseinfoVo vo : zcgoods) {
+                GoodsbaseinfoDto dto = new GoodsbaseinfoDto();
+                BeanUtils.copyProperties(vo, dto);
+                int stock = customergoodsrelatedService.getStock(vo.getGbiId());
+                dto.setStock(stock);
+                dtos.add(dto);
+            }
+            rsp.setData(dtos);
+            return JsonUtils.toJson(rsp);
         } else {
-            zcgoods = goodsbaseinfoService.lambdaQuery()
+            BaseRspDto<List<GoodsbaseinfoVo>> rsp = new BaseRspDto<List<GoodsbaseinfoVo>>();
+            List<GoodsbaseinfoVo> zcgoods = goodsbaseinfoService.lambdaQuery()
                     .eq(GoodsbaseinfoVo::getGbiType, gbiType).eq(GoodsbaseinfoVo::getGbiValid, 1)
                     .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit " + beg + "," + size + " ").list();
+            rsp.setData(zcgoods);
+            return JsonUtils.toJson(rsp);
         }
-        rsp.setData(zcgoods);
-        return JsonUtils.toJson(rsp);
 
     }
 
