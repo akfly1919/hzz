@@ -172,7 +172,7 @@ public class UserController {
 			if (userInfo.getCbiId() == null) {
 				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
 			}
-			CustomerbaseinfoVo customerbaseinfoVo = customerbaseinfoService.getUserInfoById(String.valueOf(userInfo.getCbiId()));
+			CustomerbaseinfoVo customerbaseinfoVo = customerbaseinfoService.getUserInfoByIdInDb(String.valueOf(userInfo.getCbiId()));
 			rsp.setData(customerbaseinfoVo);
 		} catch (HzzBizException e) {
 			log.error("获取用户信息业务错误 msg={}", e.getErrorMsg(), e);

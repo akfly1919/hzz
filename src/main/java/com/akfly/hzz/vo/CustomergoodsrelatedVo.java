@@ -66,6 +66,11 @@ public class CustomergoodsrelatedVo implements Serializable {
 
     private LocalDateTime cgrUpdatetime;
 
+    /**
+     * 解冻时间
+     */
+    private LocalDateTime cgrForzentime;
+
     @TableField(exist = false)
     private Integer stock;
     @TableField(exist = false)

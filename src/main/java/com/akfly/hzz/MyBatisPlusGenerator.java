@@ -66,10 +66,10 @@ public class MyBatisPlusGenerator {
 
         //设置数据库类型
         dsc.setDbType(DbType.MYSQL);
-        dsc.setUrl("jdbc:mysql://localhost:3306/hzz?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC");
+        dsc.setUrl("jdbc:mysql://192.144.230.48:3306/hzzdev?useUnicode=true&useSSL=false&characterEncoding=utf8");
         dsc.setDriverName("com.mysql.jdbc.Driver");
         dsc.setUsername("root");
-        dsc.setPassword("1qaz2wsxE");
+        dsc.setPassword("3eufds983d");
         autoGenerator.setDataSource(dsc);
 
         // 策略配置
@@ -79,7 +79,7 @@ public class MyBatisPlusGenerator {
         strategy.setNaming(NamingStrategy.underline_to_camel);
 
         // 需要生成的表
-        strategy.setInclude(new String[]{"customerpickupinfo"});
+        strategy.setInclude(new String[]{"customergoodsrelated"});
         //strategy.setSuperServiceClass(null);
         //strategy.setSuperServiceImplClass(null);
         //strategy.setSuperMapperClass(null);

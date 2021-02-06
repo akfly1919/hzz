@@ -3,6 +3,7 @@ package com.akfly.hzz.service.impl;
 import com.akfly.hzz.constant.PickUpEnum;
 import com.akfly.hzz.constant.StockEnum;
 import com.akfly.hzz.dto.UserGoodsDto;
+import com.akfly.hzz.dto.UserGoodsWithPickUpDto;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.mapper.CustomergoodsrelatedMapper;
@@ -12,6 +13,7 @@ import com.akfly.hzz.vo.CustomergoodsrelatedVo;
 import com.akfly.hzz.vo.GoodsbaseinfoVo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ import java.util.*;
  * @since 2021-01-18
  */
 @Service
+@Slf4j
 public class CustomergoodsrelatedServiceImpl extends ServiceImpl<CustomergoodsrelatedMapper, CustomergoodsrelatedVo> implements CustomergoodsrelatedService {
 
     @Resource
@@ -112,5 +115,34 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
             cgr.setCgrIslock(0);
             saveCustomergoodsrelated(cgr);
         }
+    }
+
+    @Override
+    public List<UserGoodsWithPickUpDto> getCanPickUpOfGbi(long cbiid, long gbiid) {
+
+        List<CustomergoodsrelatedVo> list = lambdaQuery().eq(CustomergoodsrelatedVo::getCbiId, cbiid)
+                .eq(CustomergoodsrelatedVo::getGbiId, gbiid).eq(CustomergoodsrelatedVo::getCgrIspickup, 0)
+                .in(CustomergoodsrelatedVo::getCgrIslock, Arrays.asList(0, 1))
+                .eq(CustomergoodsrelatedVo::getCgrIsown, 1).list();
+
+        List<UserGoodsWithPickUpDto> userGoodsDtoList = new ArrayList<>();
+        int stock = list.size();
+        for (CustomergoodsrelatedVo temp : list) {
+            if (temp.getGbiId() == null) continue;
+            try {
+                GoodsbaseinfoVo vo = goodsbaseinfoService.getGoodsbaseinfoWithRedis(temp.getGbiId());
+                UserGoodsWithPickUpDto userGoodsDto = new UserGoodsWithPickUpDto();
+                userGoodsDto.setCbiid(cbiid);
+                userGoodsDto.setCgrBuytime(temp.getCgrBuytime());
+                userGoodsDto.setCgrForzentime(temp.getCgrForzentime());
+                userGoodsDto.setCgrSelltime(temp.getCgrSelltime());
+                userGoodsDto.setStock(Long.parseLong(String.valueOf(stock)));
+                BeanUtils.copyProperties(vo, userGoodsDto);
+                userGoodsDtoList.add(userGoodsDto);
+            } catch (HzzBizException e) {
+                log.error("从redis获取商品信息异常 msg={}", e.getErrorMsg(), e);
+            }
+        }
+        return userGoodsDtoList;
     }
 }

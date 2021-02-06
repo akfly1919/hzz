@@ -13,7 +13,7 @@ import java.util.List;
  * </p>
  *
  * @author wangfei
- * @since 2021-01-18
+ * @since 2021-02-05
  */
 public interface CustomergoodsrelatedMapper extends BaseMapper<CustomergoodsrelatedVo> {
 

@@ -104,4 +104,16 @@ public class CustomerpickupinfoServiceImpl extends ServiceImpl<Customerpickupinf
         }
         return list;
     }
+
+    @Override
+    public List<CustomerpickupinfoVo> getCustomerpickupinfos(long cbiid, int pageSize, int pageNum) throws HzzBizException {
+
+        List<CustomerpickupinfoVo> list = lambdaQuery().eq(CustomerpickupinfoVo::getCbiId, cbiid)
+                .last("limit " + pageNum * pageSize + "," + pageSize + " ").list();
+        for (CustomerpickupinfoVo cpi : list) {
+            GoodsbaseinfoVo vo = goodsbaseinfoService.getGoodsbaseinfoWithRedis(cpi.getGbiId());
+            cpi.setGbi(vo);
+        }
+        return list;
+    }
 }

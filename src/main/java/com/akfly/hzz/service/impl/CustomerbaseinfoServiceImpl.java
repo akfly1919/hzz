@@ -185,4 +185,17 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
         }
         updateUserInfo(customerbaseinfoVo);
     }
+
+    @Override
+    public CustomerbaseinfoVo getUserInfoByIdInDb(String cbiId) throws HzzBizException {
+
+        List<CustomerbaseinfoVo> users = lambdaQuery()
+                .eq(CustomerbaseinfoVo::getCbiId, cbiId).list();
+        if (CollectionUtils.isEmpty(users)) {
+            throw new HzzBizException(HzzExceptionEnum.USER_NOTEXIST_ERROR);
+        }
+
+        CustomerbaseinfoVo vo = users.get(0);
+        return vo;
+    }
 }

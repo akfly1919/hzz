@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50650
 File Encoding         : 65001
 
-Date: 2021-01-31 17:46:03
+Date: 2021-02-05 21:35:00
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -31,7 +31,7 @@ CREATE TABLE `broadcastnoteinfo` (
                                      `bni_updatetime` timestamp NULL DEFAULT NULL,
                                      `bni_valid` int(11) DEFAULT '1' COMMENT '0不可用 1可用',
                                      PRIMARY KEY (`bni_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8 COMMENT='轮播信息';
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8 COMMENT='轮播信息';
 
 -- ----------------------------
 -- Table structure for customeraddressinfo
@@ -51,7 +51,7 @@ CREATE TABLE `customeraddressinfo` (
                                        `cai_updatetime` timestamp NULL DEFAULT NULL,
                                        `cai_valid` int(11) DEFAULT '1' COMMENT '0不可用 1可用',
                                        PRIMARY KEY (`cai_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COMMENT='用户地址信息';
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 COMMENT='用户地址信息';
 
 -- ----------------------------
 -- Table structure for customerbaseinfo
@@ -78,7 +78,7 @@ CREATE TABLE `customerbaseinfo` (
                                     `cbi_goodsnum` int(11) DEFAULT NULL COMMENT '库存数量',
                                     `cbi_shareurl` varchar(100) DEFAULT NULL COMMENT '邀请链接',
                                     PRIMARY KEY (`cbi_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10015 DEFAULT CHARSET=utf8 COMMENT='用户基础信息';
+) ENGINE=InnoDB AUTO_INCREMENT=10020 DEFAULT CHARSET=utf8 COMMENT='用户基础信息';
 
 -- ----------------------------
 -- Table structure for customerbillrelated
@@ -93,7 +93,7 @@ CREATE TABLE `customerbillrelated` (
                                        `cbr_createtime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                                        `cbr_updatetime` timestamp NULL DEFAULT NULL,
                                        PRIMARY KEY (`cbr_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='客户账单流水对应表';
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COMMENT='客户账单流水对应表';
 
 -- ----------------------------
 -- Table structure for customercardinfo
@@ -131,7 +131,7 @@ CREATE TABLE `customercashoutinfo` (
                                        `ccoi_finishtime` timestamp NULL DEFAULT NULL,
                                        `ccoi_operator` varchar(50) DEFAULT NULL COMMENT '审核人',
                                        PRIMARY KEY (`ccoi_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='用户提现表';
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='用户提现表';
 
 -- ----------------------------
 -- Table structure for customergoodsrelated
@@ -148,8 +148,9 @@ CREATE TABLE `customergoodsrelated` (
                                         `cgr_buytime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '可用来判断锁住,当日买的当日不能卖',
                                         `cgr_selltime` timestamp NULL DEFAULT NULL,
                                         `cgr_updatetime` timestamp NULL DEFAULT NULL,
+                                        `cgr_forzentime` timestamp NULL DEFAULT NULL COMMENT '解冻时间',
                                         PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='客户商品物料对应表';
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COMMENT='客户商品物料对应表';
 
 -- ----------------------------
 -- Table structure for customeridcardinfo
@@ -165,7 +166,7 @@ CREATE TABLE `customeridcardinfo` (
                                       `cii_status` int(11) DEFAULT '1' COMMENT '1未审核 2审核',
                                       `cii_operator` varchar(150) DEFAULT NULL COMMENT '操作人',
                                       PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COMMENT='用户身份证信息';
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8 COMMENT='用户身份证信息';
 
 -- ----------------------------
 -- Table structure for customerpayinfo
@@ -185,26 +186,35 @@ CREATE TABLE `customerpayinfo` (
                                    `cpi_channelorderid` varchar(100) DEFAULT NULL COMMENT '充值平台返回的订单号',
                                    `cpi_operator` varchar(50) DEFAULT NULL COMMENT '审核人',
                                    PRIMARY KEY (`cpi_orderid`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COMMENT='用户充值信息';
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8 COMMENT='用户充值信息';
 
 -- ----------------------------
 -- Table structure for customerpickupinfo
 -- ----------------------------
 DROP TABLE IF EXISTS `customerpickupinfo`;
 CREATE TABLE `customerpickupinfo` (
-                                      `cpui_orderid` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '提货单号',
+                                      `cpui_orderid` bigint(20) NOT NULL COMMENT '提货单号',
                                       `cbi_id` bigint(20) DEFAULT NULL COMMENT '用户ID',
-                                      `gii_id` bigint(20) DEFAULT NULL COMMENT '物料id',
                                       `gbi_id` bigint(20) DEFAULT NULL COMMENT '例如:某品牌价格红酒',
                                       `cai_id` int(11) DEFAULT NULL COMMENT '用户地址ID',
+                                      `cpui_num` bigint(20) DEFAULT NULL COMMENT '商品数量',
                                       `cpui_createtime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                       `cpui_updatetime` timestamp NULL DEFAULT NULL,
                                       `cpui_finishtime` timestamp NULL DEFAULT NULL,
-                                      `cpui_status` int(11) DEFAULT '1' COMMENT '0待审核 1已审批(已发货) 2拒绝',
+                                      `cpui_status` int(11) DEFAULT '0' COMMENT '0待审核 1已审批(已发货) 2拒绝',
                                       `cpui_trackingnumber` varchar(100) DEFAULT NULL COMMENT '快递单号',
                                       `cpui_tracktype` varchar(100) DEFAULT NULL COMMENT '快递名称/类型',
                                       PRIMARY KEY (`cpui_orderid`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COMMENT='用户提货表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户提货表';
+
+
+DROP TABLE IF EXISTS `customerpickupdetail`;
+CREATE TABLE `customerpickupdetail` (
+                                        `cpui_orderid` bigint(20) NOT NULL COMMENT '提货单号',
+                                        `gii_id` bigint(20) DEFAULT NULL COMMENT '物料id',
+                                        PRIMARY KEY (`cpui_orderid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户提货明细表';
+
 
 -- ----------------------------
 -- Table structure for customerteaminfo
@@ -236,8 +246,9 @@ CREATE TABLE `dimday` (
                           `quarterdesc` varchar(100) DEFAULT NULL,
                           `yearid` varchar(100) DEFAULT NULL,
                           `yeardesc` varchar(100) DEFAULT NULL,
-                          PRIMARY KEY (`dayid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+                          PRIMARY KEY (`dayid`),
+                          KEY `daydesc` (`daydesc`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='日期维度';
 
 -- ----------------------------
 -- Table structure for goodsbaseinfo
@@ -246,7 +257,7 @@ DROP TABLE IF EXISTS `goodsbaseinfo`;
 CREATE TABLE `goodsbaseinfo` (
                                  `gbi_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '产品名称ID 例如:某品牌价格红酒',
                                  `gbi_name` varchar(100) DEFAULT NULL COMMENT '产品名称',
-                                 `gbi_cid` int(11) DEFAULT '1' COMMENT '1酒类',
+                                 `gbi_cid` int(11) DEFAULT '1' COMMENT '1酒类2茶水 3电子设备',
                                  `gbi_title` varchar(100) DEFAULT NULL COMMENT '商品id',
                                  `gbi_desc` varchar(255) DEFAULT NULL COMMENT '商品id',
                                  `gbi_discountprice` double(20,0) DEFAULT NULL COMMENT '特惠价格',
@@ -268,8 +279,21 @@ CREATE TABLE `goodsbaseinfo` (
   `gbi_sort` int(11) DEFAULT NULL COMMENT '排序',
   `gbi_picture` varchar(100) DEFAULT NULL COMMENT '商品主图',
   `gbi_limitpickup` int(11) DEFAULT NULL COMMENT '提货最低限制',
+  `gbi_frozendays` int(11) DEFAULT NULL COMMENT '售卖冻结天数',
   PRIMARY KEY (`gbi_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8 COMMENT='商品基础信息-用于展示';
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8 COMMENT='商品基础信息-用于展示';
+
+-- ----------------------------
+-- Table structure for goodscategrey
+-- ----------------------------
+DROP TABLE IF EXISTS `goodscategrey`;
+CREATE TABLE `goodscategrey` (
+                                 `gc_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+                                 `gc_cate` varchar(50) NOT NULL COMMENT '所属类型',
+                                 `gc_createtime` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+                                 `gc_updatetime` timestamp NULL DEFAULT NULL,
+                                 PRIMARY KEY (`gc_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COMMENT='商品类型表';
 
 -- ----------------------------
 -- Table structure for goodsiteminfo
@@ -285,7 +309,7 @@ CREATE TABLE `goodsiteminfo` (
                                  `gii_receivetime` timestamp NULL DEFAULT NULL,
                                  `gii_updatetime` timestamp NULL DEFAULT NULL,
                                  PRIMARY KEY (`gii_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=166 DEFAULT CHARSET=utf8 COMMENT='商品物料信息-最细颗粒度';
+) ENGINE=InnoDB AUTO_INCREMENT=1737 DEFAULT CHARSET=utf8 COMMENT='商品物料信息-最细颗粒度';
 
 -- ----------------------------
 -- Table structure for pictureinfo
@@ -303,7 +327,7 @@ CREATE TABLE `pictureinfo` (
                                `pi_updatetime` timestamp NULL DEFAULT NULL,
                                `pi_operator` varchar(20) DEFAULT NULL,
                                PRIMARY KEY (`pi_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=152 DEFAULT CHARSET=utf8 COMMENT='图片信息与商品关联(goodsbaseinfo)';
+) ENGINE=InnoDB AUTO_INCREMENT=242 DEFAULT CHARSET=utf8 COMMENT='图片信息与商品关联(goodsbaseinfo)';
 
 -- ----------------------------
 -- Table structure for receiveinfo
@@ -319,24 +343,27 @@ CREATE TABLE `receiveinfo` (
                                `ri_updatetime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
                                `ri_operator` varchar(50) DEFAULT NULL COMMENT '操作人',
                                PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='收款二维码';
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COMMENT='收款二维码';
 
 -- ----------------------------
 -- Table structure for reporttradedate
 -- ----------------------------
 DROP TABLE IF EXISTS `reporttradedate`;
 CREATE TABLE `reporttradedate` (
+                                   `id` int(10) NOT NULL AUTO_INCREMENT,
                                    `rti_year` int(11) DEFAULT NULL COMMENT '年',
                                    `rti_month` int(11) DEFAULT NULL COMMENT '月',
                                    `rti_week` int(11) DEFAULT NULL COMMENT '周',
                                    `rti_date` int(11) DEFAULT NULL COMMENT '日期',
+                                   `rti_hour` int(11) DEFAULT NULL COMMENT '0-24',
                                    `rti_gbid` bigint(20) DEFAULT NULL COMMENT '物品id',
                                    `rit_gbiname` varchar(100) DEFAULT NULL COMMENT '物品名称',
                                    `rti_num` int(150) DEFAULT NULL COMMENT '交易量',
                                    `rti_money` double(50,0) DEFAULT NULL COMMENT '交易金额',
   `rti_createtime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `rti_updatetime` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='交易行情日期';
+  `rti_updatetime` timestamp NULL DEFAULT NULL,
+  KEY `idx_id` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1505 DEFAULT CHARSET=utf8 COMMENT='交易行情日期';
 
 -- ----------------------------
 -- Table structure for taskinfo
@@ -369,7 +396,7 @@ CREATE TABLE `tradeconfig` (
                                `tc_updatetime` timestamp NULL DEFAULT NULL COMMENT '更新时间',
                                `tc_operator` varchar(50) DEFAULT NULL,
                                PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8 COMMENT='交易配置信息 如费率等';
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8 COMMENT='交易配置信息 如费率等';
 
 -- ----------------------------
 -- Table structure for tradegoodsell
@@ -395,7 +422,7 @@ CREATE TABLE `tradegoodsell` (
                                  `tgs_selltype` int(11) NOT NULL DEFAULT '2' COMMENT '1.委托卖出2正常卖出',
                                  PRIMARY KEY (`id`),
                                  UNIQUE KEY `tgs_id` (`tgs_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=174 DEFAULT CHARSET=utf8 COMMENT='交易市场卖货订';
+) ENGINE=InnoDB AUTO_INCREMENT=1712 DEFAULT CHARSET=utf8 COMMENT='交易市场卖方预卖表';
 
 -- ----------------------------
 -- Table structure for tradeorderinfo
@@ -415,9 +442,10 @@ CREATE TABLE `tradeorderinfo` (
                                   `toi_updatetime` timestamp NULL DEFAULT NULL,
                                   `toi_buyservicefee` double DEFAULT NULL COMMENT '买方服务费金额',
                                   `toi_sellservicefee` double DEFAULT NULL COMMENT '卖货服务费金额',
+                                  `toi_type` int(11) DEFAULT NULL COMMENT '1.正常商品2新手商品3特价',
                                   PRIMARY KEY (`id`),
                                   UNIQUE KEY `toi_orderid` (`toi_orderid`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='交易市场买货订单';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='交易市场成交订单表';
 
 -- ----------------------------
 -- Table structure for tradepredictinfo
@@ -441,7 +469,7 @@ CREATE TABLE `tradepredictinfo` (
                                     `tpi_servicefee` double DEFAULT NULL COMMENT '预购服务费金额',
                                     PRIMARY KEY (`id`),
                                     UNIQUE KEY `tpi_id` (`tpi_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='交易预购买表';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='交易市场买方预买表';
 
 -- ----------------------------
 -- Table structure for tradetime
@@ -487,5 +515,69 @@ set i=i+1;
 set start_date = DATE_FORMAT(date_add(STR_TO_DATE(start_date,'%Y-%m-%d %H:%i:%s'),interval 1 day),'%Y-%m-%d');
 end while;
 end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for test_report
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `test_report`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `test_report`( )
+BEGIN
+DECLARE
+i INT DEFAULT 0;
+WHILE
+i < 100 DO
+INSERT INTO `hzzdev`.`reporttradedate` ( `rti_year`, `rti_month`, `rti_week`, `rti_date`, `rti_hour`, `rti_gbid`, `rit_gbiname`, `rti_num`, `rti_money`, `rti_createtime`, `rti_updatetime` )
+VALUES
+	( 2021, 202101, 202101, 20210103,  FLOOR(Rand()*23) ,(SELECT
+	gbi_id
+FROM
+	goodsbaseinfo
+WHERE
+	gbi_valid = 1 ORDER BY RAND() LIMIT 1), 'test1',FLOOR(RAND( ) * 100 ),
+ FLOOR( RAND( ) * 1000 )
+, now(), NULL );
+SET i = i + 1;
+
+END WHILE;
+update reporttradedate r inner join goodsbaseinfo g
+on r.rti_gbid=g.gbi_id
+    set r.rit_gbiname=g.gbi_name, r.rti_money=r.rti_num*g.gbi_price;
+
+delete from reporttradedate
+where
+        (rti_date, rti_gbid,rit_gbiname,rti_hour) IN (
+        SELECT
+            t.rti_date,t.rti_gbid,t.rit_gbiname,
+            t.rti_hour
+        FROM
+            (
+                SELECT
+                    rti_date,					rti_gbid,
+                    rit_gbiname,
+
+                    rti_hour
+                FROM
+                    reporttradedate
+                GROUP BY
+                    rti_date,					rti_gbid,
+                    rit_gbiname,
+
+                    rti_hour
+                HAVING
+                        count(1) > 1
+            ) t
+    )
+  AND
+        id not in ( select id from (
+                                       select min(id) id from reporttradedate
+                                       GROUP BY
+                                           `rti_date`, `rti_hour`, `rti_gbid`, `rit_gbiname`   HAVING
+                                               count(*) > 1     -- 根据关键字查询出重复数据其中最小的id 数据 保留不删除，其他重复数据删除
+                                   )tt
+    );
+END
 ;;
 DELIMITER ;

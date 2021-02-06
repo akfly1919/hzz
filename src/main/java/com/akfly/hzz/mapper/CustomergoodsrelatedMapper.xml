@@ -14,6 +14,7 @@
         <result column="cgr_buytime" property="cgrBuytime" />
         <result column="cgr_selltime" property="cgrSelltime" />
         <result column="cgr_updatetime" property="cgrUpdatetime" />
+        <result column="cgr_forzentime" property="cgrForzentime" />
     </resultMap>
 
 </mapper>

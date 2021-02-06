@@ -85,10 +85,11 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
     }
     public void nomalBuy(long cbiid,long gbid,int num,double price) throws HzzBizException {
         GoodsbaseinfoVo gi = goodsbaseinfoService.getGoodsbaseinfoVo(gbid);
-        if (gi.getGbiPrice().doubleValue()!=price){
-            //TODO 价格不正确
-            price=gi.getGbiPrice().doubleValue();
-        }
+        //if (gi.getGbiPrice() != price){
+        //    //TODO 价格不正确
+        //    price = gi.getGbiPrice();
+        //}
+        price = gi.getGbiPrice();
         TradeconfigVo tc = tradeconfigService.getTradeconfig(TradeconfigVo.TCTYPE_BUY);
         BigDecimal priceB=new BigDecimal(price);
         BigDecimal feeB=priceB.multiply(new BigDecimal(tc.getTcRate()));

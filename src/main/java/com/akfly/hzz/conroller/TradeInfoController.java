@@ -4,6 +4,7 @@ import com.akfly.hzz.annotation.VerifyToken;
 import com.akfly.hzz.constant.PickUpEnum;
 import com.akfly.hzz.constant.StockEnum;
 import com.akfly.hzz.dto.BaseRspDto;
+import com.akfly.hzz.dto.GoodsbaseinfoDto;
 import com.akfly.hzz.dto.TradeInfoDto;
 import com.akfly.hzz.dto.UserGoodsDto;
 import com.akfly.hzz.exception.HzzBizException;
@@ -70,18 +71,20 @@ public class TradeInfoController {
     }
     @ApiOperation(value="买入",notes="用户登录就可以")
     @ApiImplicitParams({
-            @ApiImplicitParam(name="price",value="买入价格",required=true),
+            @ApiImplicitParam(name="price",value="买入价格"),
             @ApiImplicitParam(name="gbid",value="商品id",required=true),
-            @ApiImplicitParam(name="num",value="买入数量",required=true)
+            @ApiImplicitParam(name="num",value="买入数量",required=true),
+            @ApiImplicitParam(name="type",value="买入类型(1: 委托买入 2: 正常买入)",required=true)
 
     })
     @PostMapping(value = "/buy")
     @VerifyToken
-    public BaseRspDto<String> buy(@RequestParam @NotNull @Digits(integer = 6,fraction = 2) Double price,@RequestParam @NotNull Long gbid,@RequestParam @NotNull Integer num){
+    public BaseRspDto<String> buy(@RequestParam @Digits(integer = 6,fraction = 2) Double price,
+                                  @RequestParam @NotNull Long gbid,@RequestParam @NotNull Integer num, Integer type){
         BaseRspDto<String> rsp = new BaseRspDto<String>();
         try {
             CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
-            tradeorderinfoService.nomalBuy(userInfo.getCbiId(),gbid.longValue(),num,price.doubleValue());
+            tradeorderinfoService.nomalBuy(userInfo.getCbiId(), gbid, num, price);
 
         } catch (HzzBizException e) {
             log.error("购买业务错误 msg={}", e.getErrorMsg(), e);
@@ -202,6 +205,7 @@ public class TradeInfoController {
     }
 
 
+    
     @ApiOperation(value="获取用户冻结商品信息(不分页)",notes="用户登录就可以")
     @PostMapping(value = "/getFrozenStocks")
     @VerifyToken
