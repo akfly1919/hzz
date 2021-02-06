@@ -20,5 +20,5 @@ public interface CustomerpickupinfoService extends IService<CustomerpickupinfoVo
     public List<CustomerpickupinfoVo> listCustomerpickupinfo(long cbiid) throws HzzBizException;
 
 
-    List<CustomerpickupinfoVo> getCustomerpickupinfos(long cbiid, int pageSize, int pageNum) throws HzzBizException;
+    List<CustomerpickupinfoVo> getCustomerpickupinfos(long cbiid, int pageNum, int pageSize) throws HzzBizException;
 }

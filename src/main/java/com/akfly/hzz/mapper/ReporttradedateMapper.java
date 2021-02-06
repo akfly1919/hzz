@@ -2,7 +2,6 @@ package com.akfly.hzz.mapper;
 
 import com.akfly.hzz.vo.ReporttradedateVo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Select;
 
 /**
  * <p>
@@ -10,7 +9,7 @@ import org.apache.ibatis.annotations.Select;
  * </p>
  *
  * @author wangfei
- * @since 2021-02-01
+ * @since 2021-02-06
  */
 public interface ReporttradedateMapper extends BaseMapper<ReporttradedateVo> {
 

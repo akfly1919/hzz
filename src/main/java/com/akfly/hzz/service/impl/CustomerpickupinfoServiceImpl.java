@@ -35,6 +35,7 @@ import java.util.Map;
  */
 @Service
 public class CustomerpickupinfoServiceImpl extends ServiceImpl<CustomerpickupinfoMapper, CustomerpickupinfoVo> implements CustomerpickupinfoService {
+
     @Resource
     private CustomergoodsrelatedMapper customergoodsrelatedMapper;
     @Resource
@@ -43,8 +44,10 @@ public class CustomerpickupinfoServiceImpl extends ServiceImpl<Customerpickupinf
     private CustomeraddressinfoService customeraddressinfoService;
     @Resource
     private GoodsbaseinfoService goodsbaseinfoService;
+
     @Transactional(rollbackFor = Exception.class)
     public void pickup(long cbiid,long gbid,int num,long caiid) throws HzzBizException {
+
         GoodsbaseinfoVo gi = goodsbaseinfoService.getGoodsbaseinfoVo(gbid);
 
         if(gi.getGbiLimitpickup()!=null&&num<gi.getGbiLimitpickup()){
@@ -63,7 +66,8 @@ public class CustomerpickupinfoServiceImpl extends ServiceImpl<Customerpickupinf
         wrapper_c.allEq(map);
         wrapper_c.in("cgr_islock",0,1);
         //wrapper_c.lt("cgr_buytime", LocalDate.now());
-        wrapper_c.last("limit "+num+"for update");
+        wrapper_c.orderByAsc("Id");
+        wrapper_c.last("limit " + num + " for update");
         List<CustomergoodsrelatedVo> cgrlist = customergoodsrelatedMapper.selectList(wrapper_c);
         if(cgrlist==null||cgrlist.size()<num){
             throw new HzzBizException(HzzExceptionEnum.STOCK_ERROR);
@@ -72,21 +76,19 @@ public class CustomerpickupinfoServiceImpl extends ServiceImpl<Customerpickupinf
             cgr.setCgrIspickup(1);
             cgr.setCgrUpdatetime(LocalDateTime.now());
             customergoodsrelatedService.saveCustomergoodsrelated(cgr);
-            CustomerpickupinfoVo cpi=new CustomerpickupinfoVo();
-            cpi.setCpuiTrackingnumber("");
-            cpi.setCpuiTracktype("");
-
-            cpi.setCbiId(cgr.getCbiId());
-            cpi.setGiiId(cgr.getGiiId());
-            cpi.setGbiId(cgr.getGbiId());
-            cpi.setCaiId(cai.getCaiId());
-            cpi.setCpuiCreatetime(LocalDateTime.now());
-            cpi.setCpuiUpdatetime(LocalDateTime.now());
-            cpi.setCpuiFinishtime(LocalDateTime.now());
-            cpi.setCpuiStatus(0);
-            saveCustomerpickupinfo(cpi);
-
         }
+        CustomerpickupinfoVo cpi=new CustomerpickupinfoVo();
+        cpi.setCpuiTrackingnumber("");
+        cpi.setCpuiTracktype("");
+        cpi.setCpuiNum((long) num);
+        cpi.setCbiId(cbiid);
+        cpi.setGbiId(gbid);
+        cpi.setCaiId(cai.getCaiId());
+        cpi.setCpuiCreatetime(LocalDateTime.now());
+        cpi.setCpuiUpdatetime(LocalDateTime.now());
+        cpi.setCpuiFinishtime(LocalDateTime.now());
+        cpi.setCpuiStatus(0);
+        saveCustomerpickupinfo(cpi);
     }
     public void saveCustomerpickupinfo(CustomerpickupinfoVo customerpickupinfoVo) throws HzzBizException {
         if(!saveOrUpdate(customerpickupinfoVo)) {
@@ -107,7 +109,7 @@ public class CustomerpickupinfoServiceImpl extends ServiceImpl<Customerpickupinf
     }
 
     @Override
-    public List<CustomerpickupinfoVo> getCustomerpickupinfos(long cbiid, int pageSize, int pageNum) throws HzzBizException {
+    public List<CustomerpickupinfoVo> getCustomerpickupinfos(long cbiid, int pageNum, int pageSize) throws HzzBizException {
 
         List<CustomerpickupinfoVo> list = lambdaQuery().eq(CustomerpickupinfoVo::getCbiId, cbiid)
                 .last("limit " + pageNum * pageSize + "," + pageSize + " ").list();

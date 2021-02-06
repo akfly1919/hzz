@@ -3,7 +3,7 @@
 <mapper namespace="com.akfly.hzz.mapper.TradepredictinfoMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.TradepredictinfoVo1">
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.TradepredictinfoVo">
         <id column="id" property="id" />
         <result column="tpi_id" property="tpiId" />
         <result column="gbi_id" property="gbiId" />

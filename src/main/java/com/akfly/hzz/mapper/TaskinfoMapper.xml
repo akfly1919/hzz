@@ -13,7 +13,6 @@
         <result column="ti_type" property="tiType" />
         <result column="ti_starttime" property="tiStarttime" />
         <result column="ti_endtime" property="tiEndtime" />
-        <result column="ti_createtime" property="tiCreatetime" />
         <result column="ti_updatetime" property="tiUpdatetime" />
     </resultMap>
 

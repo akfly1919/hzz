@@ -118,31 +118,30 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
     }
 
     @Override
-    public List<UserGoodsWithPickUpDto> getCanPickUpOfGbi(long cbiid, long gbiid) {
+    public UserGoodsWithPickUpDto getCanPickUpOfGbi(long cbiid, long gbiid) throws HzzBizException {
 
         List<CustomergoodsrelatedVo> list = lambdaQuery().eq(CustomergoodsrelatedVo::getCbiId, cbiid)
                 .eq(CustomergoodsrelatedVo::getGbiId, gbiid).eq(CustomergoodsrelatedVo::getCgrIspickup, 0)
                 .in(CustomergoodsrelatedVo::getCgrIslock, Arrays.asList(0, 1))
                 .eq(CustomergoodsrelatedVo::getCgrIsown, 1).list();
 
-        List<UserGoodsWithPickUpDto> userGoodsDtoList = new ArrayList<>();
-        int stock = list.size();
-        for (CustomergoodsrelatedVo temp : list) {
-            if (temp.getGbiId() == null) continue;
-            try {
-                GoodsbaseinfoVo vo = goodsbaseinfoService.getGoodsbaseinfoWithRedis(temp.getGbiId());
-                UserGoodsWithPickUpDto userGoodsDto = new UserGoodsWithPickUpDto();
-                userGoodsDto.setCbiid(cbiid);
-                userGoodsDto.setCgrBuytime(temp.getCgrBuytime());
-                userGoodsDto.setCgrForzentime(temp.getCgrForzentime());
-                userGoodsDto.setCgrSelltime(temp.getCgrSelltime());
-                userGoodsDto.setStock(Long.parseLong(String.valueOf(stock)));
-                BeanUtils.copyProperties(vo, userGoodsDto);
-                userGoodsDtoList.add(userGoodsDto);
-            } catch (HzzBizException e) {
-                log.error("从redis获取商品信息异常 msg={}", e.getErrorMsg(), e);
-            }
+        UserGoodsWithPickUpDto userGoodsDto = new UserGoodsWithPickUpDto();
+        try {
+            int stock = list.size();
+            CustomergoodsrelatedVo temp = list.get(0);
+            GoodsbaseinfoVo vo = goodsbaseinfoService.getGoodsbaseinfoWithRedis(temp.getGbiId());
+            userGoodsDto.setCbiid(cbiid);
+            userGoodsDto.setCgrBuytime(temp.getCgrBuytime());
+            userGoodsDto.setCgrForzentime(temp.getCgrForzentime());
+            userGoodsDto.setCgrSelltime(temp.getCgrSelltime());
+            userGoodsDto.setStock(Long.parseLong(String.valueOf(stock)));
+            BeanUtils.copyProperties(vo, userGoodsDto);
+        } catch (HzzBizException e) {
+            log.error("从redis获取商品信息异常 msg={}", e.getErrorMsg(), e);
+        } catch (Exception e) {
+            log.error("获取提货明细异常", e);
+            throw new HzzBizException(HzzExceptionEnum.SYSTEM_ERROR);
         }
-        return userGoodsDtoList;
+        return userGoodsDto;
     }
 }

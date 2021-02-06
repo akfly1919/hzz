@@ -47,5 +47,5 @@ public interface CustomergoodsrelatedService extends IService<Customergoodsrelat
      * @param gbiid
      * @return
      */
-    List<UserGoodsWithPickUpDto> getCanPickUpOfGbi(long cbiid, long gbiid);
+    UserGoodsWithPickUpDto getCanPickUpOfGbi(long cbiid, long gbiid) throws HzzBizException;
 }

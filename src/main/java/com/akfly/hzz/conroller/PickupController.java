@@ -84,17 +84,17 @@ public class PickupController {
     @ApiOperation(value="提货明细",notes="用户登录就可以")
     @PostMapping(value = "/getPickupDetail")
     @VerifyToken
-    public BaseRspDto<List<UserGoodsWithPickUpDto>> getPickupDetail(@RequestParam @Digits(integer = 10,fraction = 0) Integer gbiid){
+    public BaseRspDto<UserGoodsWithPickUpDto> getPickupDetail(@RequestParam @Digits(integer = 10,fraction = 0) Integer gbiid){
 
-        BaseRspDto<List<UserGoodsWithPickUpDto>> rsp = new BaseRspDto<List<UserGoodsWithPickUpDto>>();
+        BaseRspDto<UserGoodsWithPickUpDto> rsp = new BaseRspDto<UserGoodsWithPickUpDto>();
         try {
             CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
-            List<UserGoodsWithPickUpDto> userGoodsDtoList = customergoodsrelatedService.getCanPickUpOfGbi(userInfo.getCbiId(), gbiid);
-            rsp.setData(userGoodsDtoList);
-       /* } catch (HzzBizException e) {
-            log.error("获取用户现货商品信息业务错误 msg={}", e.getErrorMsg(), e);
+            UserGoodsWithPickUpDto userGoodsDto = customergoodsrelatedService.getCanPickUpOfGbi(userInfo.getCbiId(), gbiid);
+            rsp.setData(userGoodsDto);
+        } catch (HzzBizException e) {
+            log.error("获取提货明细业务错误 msg={}", e.getErrorMsg(), e);
             rsp.setCode(e.getErrorCode());
-            rsp.setMsg(e.getErrorMsg());*/
+            rsp.setMsg(e.getErrorMsg());
         } catch (Exception e) {
             log.error("获取提货明细系统异常", e);
             rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());

@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author wangfei
- * @since 2021-01-24
+ * @since 2021-02-06
  */
 public interface CustomerbillrelatedMapper extends BaseMapper<CustomerbillrelatedVo> {
 

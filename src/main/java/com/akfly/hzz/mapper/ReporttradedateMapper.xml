@@ -4,6 +4,7 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.ReporttradedateVo">
+        <result column="id" property="id" />
         <result column="rti_year" property="rtiYear" />
         <result column="rti_month" property="rtiMonth" />
         <result column="rti_week" property="rtiWeek" />

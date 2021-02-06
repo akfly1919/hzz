@@ -28,6 +28,7 @@
         <result column="gbi_sort" property="gbiSort" />
         <result column="gbi_picture" property="gbiPicture" />
         <result column="gbi_limitpickup" property="gbiLimitpickup" />
+        <result column="gbi_frozendays" property="gbiFrozendays" />
     </resultMap>
 
 </mapper>

@@ -12,7 +12,7 @@ import java.io.Serializable;
  * </p>
  *
  * @author wangfei
- * @since 2021-01-18
+ * @since 2021-02-06
  */
 public interface CustomerbaseinfoMapper extends BaseMapper<CustomerbaseinfoVo> {
 

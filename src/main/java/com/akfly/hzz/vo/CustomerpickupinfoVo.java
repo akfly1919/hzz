@@ -23,23 +23,16 @@ import lombok.EqualsAndHashCode;
 @TableName("customerpickupinfo")
 public class CustomerpickupinfoVo implements Serializable {
 
-    private static final long serialVersionUID=1L;
-
     /**
      * 提货单号
      */
-      @TableId(value = "cpui_orderid", type = IdType.AUTO)
+    @TableId(value = "cpui_orderid", type = IdType.AUTO)
     private Long cpuiOrderid;
 
     /**
      * 用户ID
      */
     private Long cbiId;
-
-    /**
-     * 物料id
-     */
-    private Long giiId;
 
     /**
      * 例如:某品牌价格红酒
@@ -50,6 +43,11 @@ public class CustomerpickupinfoVo implements Serializable {
      * 用户地址ID
      */
     private Integer caiId;
+
+    /**
+     * 商品数量
+     */
+    private Long cpuiNum;
 
     private LocalDateTime cpuiCreatetime;
 
