@@ -1,5 +1,6 @@
 package com.akfly.hzz.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @Data
 public class UserGoodsWithPickUpDto extends UserGoodsDto {
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private LocalDateTime cgrBuytime;
 
     private LocalDateTime cgrSelltime;

@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
@@ -77,7 +78,7 @@ public class NotifyController {
                 String payTime = notifyMap.get("gmt_payment");
                 Date date = DateUtils.parseDate(payTime, "yyyy-MM-dd HH:mm:ss");
                 vo.setCpiFinishtime(DateUtil.getLocalDateTime(date));
-                vo.setCpiUpdatetime(DateUtil.getLocalDateTime(new Date()));
+                vo.setCpiUpdatetime(LocalDateTime.now());
                 vo.setCpiPaystatus(PayStatus.PAYED.getStatus());
                 vo.setCpiChannelorderid(channelTransId);
                 customerpayinfoService.rechargeSuccess(vo, amount);

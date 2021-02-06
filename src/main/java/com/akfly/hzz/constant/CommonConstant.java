@@ -17,6 +17,8 @@ public  class CommonConstant {
     public static final String USER_PREFIX = "user:";
     public static final String GOODS_PREFIX = "goods:";
 
+    public static final String GOODS_STOCK_PREFIX = "goods:stock:";
+
 
     public static final String USER_INFO = "user_info";
 

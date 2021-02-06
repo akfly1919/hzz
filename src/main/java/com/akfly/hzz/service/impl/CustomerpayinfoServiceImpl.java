@@ -17,8 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.time.Instant;
-import java.time.ZoneId;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -66,14 +65,14 @@ public class CustomerpayinfoServiceImpl extends ServiceImpl<CustomerpayinfoMappe
             double largeMoney = Double.parseDouble(rechargeAmount) * 1000000;
             userInfo.setCbiBalance(userInfo.getCbiBalance() + largeMoney); // TODO 金额乘以1000000，后续需要去掉
             userInfo.setCbiTotal(userInfo.getCbiTotal() + largeMoney);
-            userInfo.setCbiUpdatetime(DateUtil.getLocalDateTime(new Date()));
+            userInfo.setCbiUpdatetime(LocalDateTime.now());
 
             CustomerbillrelatedVo bill = new CustomerbillrelatedVo();
             bill.setCbiId(Long.valueOf(payInfo.getCbiId()));
             bill.setCbrorderid(String.valueOf(vo.getCpiOrderid()));
             bill.setCbrMoney(largeMoney);
             bill.setCbrType(1); // 1收入  2支出
-            bill.setCbrCreatetime(DateUtil.getLocalDateTime(new Date()));
+            bill.setCbrCreatetime(LocalDateTime.now());
             //bill.setCbrUpdatetime(copy.getCbrUpdatetime());
             customerbillrelatedService.save(bill);
             customerbaseinfoService.updateById(userInfo);

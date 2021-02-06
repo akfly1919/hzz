@@ -48,4 +48,7 @@ public interface CustomergoodsrelatedService extends IService<Customergoodsrelat
      * @return
      */
     UserGoodsWithPickUpDto getCanPickUpOfGbi(long cbiid, long gbiid) throws HzzBizException;
+
+    UserGoodsDto getCanSellOfGbi(long cbiid, long gbiid) throws HzzBizException;
+
 }

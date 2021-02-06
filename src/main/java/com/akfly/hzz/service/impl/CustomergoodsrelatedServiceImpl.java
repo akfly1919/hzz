@@ -1,5 +1,6 @@
 package com.akfly.hzz.service.impl;
 
+import com.akfly.hzz.constant.CommonConstant;
 import com.akfly.hzz.constant.PickUpEnum;
 import com.akfly.hzz.constant.StockEnum;
 import com.akfly.hzz.dto.UserGoodsDto;
@@ -9,6 +10,8 @@ import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.mapper.CustomergoodsrelatedMapper;
 import com.akfly.hzz.service.CustomergoodsrelatedService;
 import com.akfly.hzz.service.GoodsbaseinfoService;
+import com.akfly.hzz.util.JsonUtils;
+import com.akfly.hzz.util.RedisUtils;
 import com.akfly.hzz.vo.CustomergoodsrelatedVo;
 import com.akfly.hzz.vo.GoodsbaseinfoVo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -37,13 +40,27 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
     @Resource
     private GoodsbaseinfoService goodsbaseinfoService;
 
+    @Resource
+    private RedisUtils redisUtils;
+
     @Override
     public int getStock(long gbiId) {
 
-        int stock = lambdaQuery().eq(CustomergoodsrelatedVo::getGbiId, gbiId)
-                .eq(CustomergoodsrelatedVo::getCgrIsown, 1).eq(CustomergoodsrelatedVo::getCgrIslock, 0)
-                .eq(CustomergoodsrelatedVo::getCgrIspickup, 0).count();
+        String key = CommonConstant.GOODS_STOCK_PREFIX + gbiId;
+        Object o = redisUtils.get(key);
+
+        int stock;
+        if (o == null) {
+            stock = lambdaQuery().eq(CustomergoodsrelatedVo::getGbiId, gbiId)
+                    .eq(CustomergoodsrelatedVo::getCgrIsown, 1).eq(CustomergoodsrelatedVo::getCgrIslock, 0)
+                    .eq(CustomergoodsrelatedVo::getCgrIspickup, 0).count();
+            redisUtils.set(key, stock, 60 *60);
+        } else {
+            stock = (int) o;
+            log.warn("从redis获取商品销量stock={}", stock);
+        }
         return stock;
+
     }
 
     public CustomergoodsrelatedVo selectCustomergoodsrelatedVoForUpdate(Map<String,Object> condition){
@@ -143,5 +160,29 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
             throw new HzzBizException(HzzExceptionEnum.SYSTEM_ERROR);
         }
         return userGoodsDto;
+    }
+
+    @Override
+    public UserGoodsDto getCanSellOfGbi(long cbiid, long gbiid) throws HzzBizException {
+
+        int stock = lambdaQuery().eq(CustomergoodsrelatedVo::getCbiId, cbiid)
+                .eq(CustomergoodsrelatedVo::getGbiId, gbiid).eq(CustomergoodsrelatedVo::getCgrIspickup, 0)
+                .in(CustomergoodsrelatedVo::getCgrIslock, 0)
+                .eq(CustomergoodsrelatedVo::getCgrIsown, 1).count();
+
+        UserGoodsDto userGoodsDto = new UserGoodsDto();
+        try {
+            GoodsbaseinfoVo vo = goodsbaseinfoService.getGoodsbaseinfoWithRedis(gbiid);
+            userGoodsDto.setCbiid(cbiid);
+            userGoodsDto.setStock((long) stock);
+            BeanUtils.copyProperties(vo, userGoodsDto);
+        } catch (HzzBizException e) {
+            log.error("从redis获取商品信息异常 msg={}", e.getErrorMsg(), e);
+        } catch (Exception e) {
+            log.error("获取用户可卖出商品信息异常", e);
+            throw new HzzBizException(HzzExceptionEnum.SYSTEM_ERROR);
+        }
+        return userGoodsDto;
+
     }
 }

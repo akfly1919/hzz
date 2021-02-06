@@ -49,7 +49,7 @@ public class TradeInfoController {
     @Resource
     private CustomergoodsrelatedService customergoodsrelatedService;
 
-    @ApiOperation(value="获取已成交订单",notes="用户登录就可以")
+    @ApiOperation(value="获取已成交订单",notes="用户登录")
     @PostMapping(value = "/getFinishedTradeOrder")
     @VerifyToken
     public BaseRspDto<List<TradeorderinfoVo>> getTradeOrder(int beg, int size, Date beginTime, Date endTime){
@@ -80,7 +80,7 @@ public class TradeInfoController {
     @PostMapping(value = "/buy")
     @VerifyToken
     public BaseRspDto<String> buy(@RequestParam @Digits(integer = 6,fraction = 2) Double price,
-                                  @RequestParam @NotNull Long gbid,@RequestParam @NotNull Integer num, Integer type){
+                                  @RequestParam @NotNull Long gbid,@RequestParam @NotNull Integer num, @RequestParam @NotNull Integer type){
         BaseRspDto<String> rsp = new BaseRspDto<String>();
         try {
             CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
@@ -98,20 +98,21 @@ public class TradeInfoController {
         return rsp;
     }
 
-    @ApiOperation(value="卖出",notes="用户登录就可以")
+    @ApiOperation(value="卖出",notes="用户登录")
     @ApiImplicitParams({
             @ApiImplicitParam(name="price",value="卖出价格",required=true),
             @ApiImplicitParam(name="gbid",value="商品id",required=true),
-            @ApiImplicitParam(name="num",value="卖出数量",required=true)
-
+            @ApiImplicitParam(name="num",value="卖出数量",required=true),
+            @ApiImplicitParam(name="type",value="卖出类型(1: 委托卖出 2: 正常卖出)",required=true)
     })
     @PostMapping(value = "/sell")
     @VerifyToken
-    public BaseRspDto<String> sell(@RequestParam @NotNull @Digits(integer = 6,fraction = 2) Double price,@RequestParam @NotNull Long gbid,@RequestParam @NotNull Integer num){
+    public BaseRspDto<String> sell(@RequestParam @NotNull @Digits(integer = 6,fraction = 2) Double price, @RequestParam @NotNull Long gbid,
+                                   @RequestParam @NotNull Integer num, @RequestParam @NotNull Integer type){
         BaseRspDto<String> rsp = new BaseRspDto<String>();
         try {
             CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
-             tradegoodsellService.sell(userInfo.getCbiId(),gbid.longValue(),num,price.doubleValue());
+             tradegoodsellService.sell(userInfo.getCbiId(), gbid, num, price);
 
         } catch (HzzBizException e) {
             log.error("卖出业务错误 msg={}", e.getErrorMsg(), e);

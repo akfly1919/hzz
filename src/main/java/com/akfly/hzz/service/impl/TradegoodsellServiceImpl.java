@@ -57,10 +57,11 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
 
     public void sell(long cbiid,long gbid,int num,double price) throws HzzBizException {
         GoodsbaseinfoVo gi = goodsbaseinfoService.getGoodsbaseinfoVo(gbid);
-        if (gi.getGbiPrice().doubleValue()!=price){
-            //TODO 价格不正确
-            price=gi.getGbiPrice().doubleValue();
-        }
+        //if (gi.getGbiPrice().doubleValue()!=price){
+        //    //TODO 价格不正确
+        //    price=gi.getGbiPrice().doubleValue();
+        //}
+        price = gi.getGbiPrice();
         TradeconfigVo tc = tradeconfigService.getTradeconfig(TradeconfigVo.TCTYPE_SELL);
         BigDecimal priceB=new BigDecimal(price);
         BigDecimal feeB=priceB.multiply(new BigDecimal(tc.getTcRate()));
@@ -80,6 +81,13 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
                 .last("limit " + pageNum * pageSize + "," + pageSize + " ").list();
         return list;
 
+    }
+
+    @Override
+    public int getSellVolume(long gbid) {
+
+        int sellVolume = lambdaQuery().eq(TradegoodsellVo::getGbiId, gbid).eq(TradegoodsellVo::getTgsStatus, 0).count();
+        return sellVolume;
     }
 
 

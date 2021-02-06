@@ -7,6 +7,7 @@ import com.akfly.hzz.mapper.CustomergoodsrelatedMapper;
 import com.akfly.hzz.service.CustomeraddressinfoService;
 import com.akfly.hzz.service.CustomergoodsrelatedService;
 import com.akfly.hzz.service.GoodsbaseinfoService;
+import com.akfly.hzz.util.DateUtil;
 import com.akfly.hzz.util.RandomGenUtils;
 import com.akfly.hzz.vo.*;
 import com.akfly.hzz.mapper.CustomerpickupinfoMapper;
@@ -19,7 +20,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -113,6 +118,7 @@ public class CustomerpickupinfoServiceImpl extends ServiceImpl<Customerpickupinf
 
         List<CustomerpickupinfoVo> list = lambdaQuery().eq(CustomerpickupinfoVo::getCbiId, cbiid)
                 .last("limit " + pageNum * pageSize + "," + pageSize + " ").list();
+
         for (CustomerpickupinfoVo cpi : list) {
             GoodsbaseinfoVo vo = goodsbaseinfoService.getGoodsbaseinfoWithRedis(cpi.getGbiId());
             cpi.setGbi(vo);
