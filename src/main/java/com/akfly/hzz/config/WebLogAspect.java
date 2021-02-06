@@ -25,7 +25,6 @@ public class WebLogAspect {
     public void logPointCut() {
 
     }
-
     /**
      * 指定当前执行方法在logPointCut之前执行
      * */
