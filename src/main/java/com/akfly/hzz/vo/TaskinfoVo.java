@@ -70,11 +70,6 @@ public class TaskinfoVo implements Serializable {
     private LocalDateTime tiEndtime;
 
     /**
-     * 创建时间
-     */
-    private LocalDateTime tiCreatetime;
-
-    /**
      * 更新时间
      */
     private LocalDateTime tiUpdatetime;

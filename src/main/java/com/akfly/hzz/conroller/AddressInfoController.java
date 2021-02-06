@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -45,21 +46,21 @@ public class AddressInfoController {
         }
         return rsp;
     }
-    @ApiOperation(value="获取默认收货地址",notes="用户登录就可以")
-    @PostMapping(value = "getDefaultAddress")
+    @ApiOperation(value="根据id获取收货地址",notes="用户登录就可以")
+    @PostMapping(value = "getAddressById")
     @VerifyToken
-    public BaseRspDto<CustomeraddressinfoVo> getDefaultAddressInfo(){
+    public BaseRspDto<CustomeraddressinfoVo> getAddressById(@RequestParam @NotNull Long caiId){
         BaseRspDto<CustomeraddressinfoVo> rsp = new BaseRspDto<CustomeraddressinfoVo>();
         try {
             CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
-            CustomeraddressinfoVo list = customeraddressinfoService.getDefaultAddressInfoById(userInfo.getCbiId());
+            CustomeraddressinfoVo list = customeraddressinfoService.getAddressInfoByCaiId(userInfo.getCbiId(), caiId);
             rsp.setData(list);
-        } catch (HzzBizException e) {
-            log.error("查询地址列表业务错误 msg={}", e.getErrorMsg(), e);
-            rsp.setCode(e.getErrorCode());
-            rsp.setMsg(e.getErrorMsg());
+        //} catch (HzzBizException e) {
+        //    log.error("查询地址列表业务错误 msg={}", e.getErrorMsg(), e);
+        //    rsp.setCode(e.getErrorCode());
+        //    rsp.setMsg(e.getErrorMsg());
         } catch (Exception e) {
-            log.error("查询地址列表系统异常", e);
+            log.error("根据id查询地址系统异常", e);
             rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
             rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
         }
