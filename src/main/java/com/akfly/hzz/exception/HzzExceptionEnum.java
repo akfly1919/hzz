@@ -35,6 +35,7 @@ public enum HzzExceptionEnum {
     STOCK_ERROR("3001","库存不足"),
     LIMIT_PERSON_ERROR("3002","超过限购数量"),
     LIMIT_PICKUP_ERROR("3003","低于最小提货数量"),
+    TRADE_TIME_ERROR("3004","不在交易时间内"),
     /* 未知异常定义以9开头 */
     SYSTEM_ERROR("9000", "系统繁忙"),
     DB_ERROR("9001", "数据库异常"),

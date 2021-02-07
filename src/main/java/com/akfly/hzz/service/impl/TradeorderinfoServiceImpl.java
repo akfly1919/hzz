@@ -83,7 +83,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
     public void updateTradeOrder(TradeorderinfoVo vo) throws HzzBizException {
 
     }
-    public void nomalBuy(long cbiid,long gbid,int num,double price,boolean isOnSale) throws HzzBizException {
+    public void nomalBuy(long cbiid,long gbid,int num,double price,boolean isOnSale,int type) throws HzzBizException {
         GoodsbaseinfoVo gi = goodsbaseinfoService.getGoodsbaseinfoVo(gbid);
         //if (gi.getGbiPrice() != price){
         //    //TODO 价格不正确
@@ -116,10 +116,13 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         //判断是否在交易时间
         String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm:ss"));
         if(tradetimeService.isInTradeTime(nowTime)){
-            tp.setTpiType(TradepredictinfoVo.TYPE_NOMAL);
+            tp.setTpiType(type);
             //tradepredictinfoService.saveTradepredictinfoVo(tp);
             dealSold(tp,tc,isOnSale);
         }else{
+            if(type!=TradepredictinfoVo.TYPE_ENTRUST){
+                throw new HzzBizException(HzzExceptionEnum.TRADE_TIME_ERROR);
+            }
             tp.setTpiType(TradepredictinfoVo.TYPE_ENTRUST);
             int need=tp.getTpiNum()-tp.getTpiSucessnum();
             {
