@@ -460,7 +460,7 @@ CREATE TABLE `tradepredictinfo` (
                                     `tpi_num` int(11) DEFAULT NULL COMMENT '购买数量',
                                     `tpi_sucessnum` int(11) DEFAULT NULL COMMENT '成功购买数量',
                                     `tpi_type` int(11) NOT NULL DEFAULT '1' COMMENT '1委托买入 2正常买入',
-                                    `tpi_status` int(11) NOT NULL DEFAULT '1' COMMENT '1已委托,初始状态 2 已取消 3部分成功 4交易成功 5交易失败',
+                                    `tpi_status` int(11) NOT NULL DEFAULT '1' COMMENT '1已委托,初始状态 2 已取消 3部分成功 4交易成功 5交易失败 6部分成功已取消',
                                     `tpi_createtime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                                     `tpi_buytime` timestamp NULL DEFAULT NULL COMMENT '预购买时间',
                                     `tpi_finishtime` timestamp NULL DEFAULT NULL COMMENT '预购完成时间',

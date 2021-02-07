@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -145,12 +146,14 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
         UserGoodsWithPickUpDto userGoodsDto = new UserGoodsWithPickUpDto();
         try {
             int stock = list.size();
-            CustomergoodsrelatedVo temp = list.get(0);
-            GoodsbaseinfoVo vo = goodsbaseinfoService.getGoodsbaseinfoWithRedis(temp.getGbiId());
+            GoodsbaseinfoVo vo = goodsbaseinfoService.getGoodsbaseinfoWithRedis(gbiid);
             userGoodsDto.setCbiid(cbiid);
-            userGoodsDto.setCgrBuytime(temp.getCgrBuytime());
-            userGoodsDto.setCgrForzentime(temp.getCgrForzentime());
-            userGoodsDto.setCgrSelltime(temp.getCgrSelltime());
+            if (!CollectionUtils.isEmpty(list)) {
+                CustomergoodsrelatedVo temp = list.get(0);
+                userGoodsDto.setCgrBuytime(temp.getCgrBuytime());
+                userGoodsDto.setCgrForzentime(temp.getCgrForzentime());
+                userGoodsDto.setCgrSelltime(temp.getCgrSelltime());
+            }
             userGoodsDto.setStock(Long.parseLong(String.valueOf(stock)));
             BeanUtils.copyProperties(vo, userGoodsDto);
         } catch (HzzBizException e) {

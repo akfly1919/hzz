@@ -1,16 +1,14 @@
 package com.akfly.hzz.service.impl;
 
-import com.akfly.hzz.constant.CommonConstant;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.mapper.CustomerbaseinfoMapper;
 import com.akfly.hzz.mapper.CustomergoodsrelatedMapper;
 import com.akfly.hzz.mapper.TradegoodsellMapper;
+import com.akfly.hzz.mapper.TradeorderinfoMapper;
 import com.akfly.hzz.service.*;
-import com.akfly.hzz.util.DateUtil;
 import com.akfly.hzz.util.RandomGenUtils;
 import com.akfly.hzz.vo.*;
-import com.akfly.hzz.mapper.TradeorderinfoMapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
@@ -18,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -304,6 +301,25 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         }
 
     }
+
+    //@Override
+    //public List<TradeorderinfoVo> getBuyNoSpecialNum(long userid) {
+    //
+    //    QueryWrapper wrapper_c=new QueryWrapper();
+    //    wrapper_c.select("tgs_buyerid,gbi_id,count(id) as stock");
+    //    wrapper_c.eq("tgs_buyerid", userid);
+    //    wrapper_c.eq("toi_status", 3);
+    //    wrapper_c.in("toi_type", Arrays.asList(1, 2));
+    //    wrapper_c.groupBy("gbi_id");
+    //    List<CustomerpickupinfoVo> list = getBaseMapper().selectList(wrapper_c);
+    //    for (CustomerpickupinfoVo cpi : list) {
+    //        GoodsbaseinfoVo vo = goodsbaseinfoService.getGoodsbaseinfoWithRedis(cpi.getGbiId());
+    //        cpi.setGbi(vo);
+    //    }
+    //    return list;
+    //
+    //}
+
     public void saveTradeorderinfo(TradeorderinfoVo tradeorderinfoVo) throws HzzBizException {
         if(!saveOrUpdate(tradeorderinfoVo)) {
             throw new HzzBizException(HzzExceptionEnum.DB_ERROR);

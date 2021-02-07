@@ -11,9 +11,7 @@ import com.akfly.hzz.dto.BaseRspDto;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.interceptor.AuthInterceptor;
-import com.akfly.hzz.service.CustomerbillrelatedService;
-import com.akfly.hzz.service.CustomercashoutinfoService;
-import com.akfly.hzz.service.TaskinfoService;
+import com.akfly.hzz.service.*;
 import com.akfly.hzz.vo.*;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -41,6 +39,16 @@ public class TaskInfoController {
     @Resource
     private TaskinfoService taskinfoService;
 
+    @Resource
+    private TaskstatisticsService taskstatisticsService;
+
+
+    @Resource
+    private TradeorderinfoService tradeorderinfoService;
+
+    @Resource
+    private TradepredictinfoService tradepredictinfoService;
+
     @ApiOperation(value="我的任务列表",notes="要求用户登录")
     @ApiImplicitParams({
             @ApiImplicitParam(name="beg",value="第几页",required=true),
@@ -48,7 +56,7 @@ public class TaskInfoController {
     })
     @PostMapping(value = "/myTask")
     @VerifyToken
-    public BaseRspDto<List<TaskinfoVo>> recharge(@RequestParam @Digits(integer = 10,fraction = 0) Integer beg,
+    public BaseRspDto<List<TaskinfoVo>> getTasks(@RequestParam @Digits(integer = 10,fraction = 0) Integer beg,
                                                      @RequestParam @Digits(integer = 10,fraction = 0) Integer size){
 
         BaseRspDto<List<TaskinfoVo>> rsp = new BaseRspDto<List<TaskinfoVo>>();
@@ -56,6 +64,8 @@ public class TaskInfoController {
             CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
             List<TaskinfoVo> list = taskinfoService.getTaskinfoVos(userInfo.getCbiId(), beg, size);
             rsp.setData(list);
+
+            //tradeorderinfoService.getBuyNoSpecialNum(userInfo.getCbiId(),)
         //} catch (HzzBizException e) {
         //    log.error("我的任务列表业务错误 msg={}", e.getErrorMsg(), e);
         //    rsp.setCode(e.getErrorCode());
