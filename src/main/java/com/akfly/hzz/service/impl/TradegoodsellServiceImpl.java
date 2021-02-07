@@ -170,6 +170,17 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
         tgs.setTgsFinshitime(LocalDateTime.now());
         tgs.setTgsUpdatetime(LocalDateTime.now());
         saveTradegoodsell(tgs);
+        Map<String,Object> map=new HashMap<>();
+        map.put("cbi_id",tgs.getTgsSellerid());
+        map.put("gbi_id",tgs.getGbiId());
+        map.put("gii_id",tgs.getGiiId());
+        map.put("cgr_isown",1);
+        QueryWrapper wrapper_c=new QueryWrapper();
+        wrapper_c.allEq(map);
+
+        CustomergoodsrelatedVo cgr = customergoodsrelatedService.getOne(wrapper_c);
+        cgr.setCgrIslock(0);
+        customergoodsrelatedService.saveCustomergoodsrelated(cgr);
     }
 
 }
