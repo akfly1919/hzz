@@ -325,23 +325,20 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
 
     }
 
-    //@Override
-    //public List<TradeorderinfoVo> getBuyNoSpecialNum(long userid) {
-    //
-    //    QueryWrapper wrapper_c=new QueryWrapper();
-    //    wrapper_c.select("tgs_buyerid,gbi_id,count(id) as stock");
-    //    wrapper_c.eq("tgs_buyerid", userid);
-    //    wrapper_c.eq("toi_status", 3);
-    //    wrapper_c.in("toi_type", Arrays.asList(1, 2));
-    //    wrapper_c.groupBy("gbi_id");
-    //    List<CustomerpickupinfoVo> list = getBaseMapper().selectList(wrapper_c);
-    //    for (CustomerpickupinfoVo cpi : list) {
-    //        GoodsbaseinfoVo vo = goodsbaseinfoService.getGoodsbaseinfoWithRedis(cpi.getGbiId());
-    //        cpi.setGbi(vo);
-    //    }
-    //    return list;
-    //
-    //}
+    @Override
+    public List<TradeorderinfoVo> getBuyNoSpecialTrade(long userid) {
+
+        QueryWrapper wrapper_c = new QueryWrapper();
+        wrapper_c.select("tgs_buyerid,gbi_id,count(id) as stock");
+        wrapper_c.eq("tgs_buyerid", userid);
+        wrapper_c.eq("toi_status", 3);
+        wrapper_c.in("toi_type", Arrays.asList(1, 2));
+        wrapper_c.groupBy("gbi_id");
+
+        List<TradeorderinfoVo> list = getBaseMapper().selectList(wrapper_c);
+        return list;
+
+    }
 
     public void saveTradeorderinfo(TradeorderinfoVo tradeorderinfoVo) throws HzzBizException {
         if(!saveOrUpdate(tradeorderinfoVo)) {

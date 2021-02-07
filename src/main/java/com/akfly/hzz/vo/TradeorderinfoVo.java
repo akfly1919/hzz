@@ -1,5 +1,6 @@
 package com.akfly.hzz.vo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -92,6 +93,9 @@ public class TradeorderinfoVo implements Serializable {
      * 1.正常商品2新手商品3特价
      */
     private Integer toiType;
+
+    @TableField(exist = false)
+    private Integer stock;
 
 
 }

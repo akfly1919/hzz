@@ -29,5 +29,5 @@ public interface TradeorderinfoService extends IService<TradeorderinfoVo> {
     public void dealSold(TradepredictinfoVo tp, TradeconfigVo tc) throws HzzBizException;
 
 
-    //int getBuyNoSpecialNum(long userid);
+    List<TradeorderinfoVo> getBuyNoSpecialTrade(long userid);
 }

@@ -125,4 +125,20 @@ public class CustomerpickupinfoServiceImpl extends ServiceImpl<Customerpickupinf
         }
         return list;
     }
+
+    @Override
+    public int getPickUpNum(long cbiid, long gbid) {
+
+        QueryWrapper queryWrapper = new QueryWrapper<>();
+
+        queryWrapper.eq("cbi_id", cbiid);
+        queryWrapper.eq("gbi_id", gbid);
+        queryWrapper.eq("cpui_status", 1); // 已审核
+
+        queryWrapper.select("ifnull(sum(cpui_num),0) as total_num ");
+        Map<String, Object> map = getMap(queryWrapper);
+        int num = Integer.parseInt(String.valueOf(map.get("total_num")));
+
+        return num;
+    }
 }

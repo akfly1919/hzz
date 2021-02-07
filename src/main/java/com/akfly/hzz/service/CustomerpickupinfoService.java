@@ -15,10 +15,14 @@ import java.util.List;
  * @since 2021-01-18
  */
 public interface CustomerpickupinfoService extends IService<CustomerpickupinfoVo> {
+
     public void saveCustomerpickupinfo(CustomerpickupinfoVo customerpickupinfoVo) throws HzzBizException;
+
     public void pickup(long cbiid,long gbid,int num,long caiid) throws HzzBizException;
+
     public List<CustomerpickupinfoVo> listCustomerpickupinfo(long cbiid) throws HzzBizException;
 
-
     List<CustomerpickupinfoVo> getCustomerpickupinfos(long cbiid, int pageNum, int pageSize) throws HzzBizException;
+
+    int getPickUpNum(long cbiid, long gbid);
 }
