@@ -61,6 +61,9 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
     private CustomergoodsrelatedMapper customergoodsrelatedMapper;
 
     @Resource
+    private TaskstatisticsService taskstatisticsService;
+
+    @Resource
     private ReporttradedateService reporttradedateService;
     @Override
     public List<TradeorderinfoVo> getTradeorderinfoVo(int pageNum, int pageSize, long cbiid, Date beginTime, Date endTime) throws HzzBizException {
@@ -140,6 +143,8 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
             if(release){
                 //释放成功说明没有买入成功
                 throw new HzzBizException(HzzExceptionEnum.STOCK_ERROR);
+            } else {
+                taskstatisticsService.saveOrUpdateForNoSpecial(cbiid, gbid, num);
             }
         }
     }
@@ -348,5 +353,6 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
             throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
         }
     }
+
 
 }

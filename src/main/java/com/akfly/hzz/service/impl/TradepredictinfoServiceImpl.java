@@ -85,7 +85,7 @@ public class TradepredictinfoServiceImpl extends ServiceImpl<TradepredictinfoMap
     public boolean releaseOne(String tpiid,int status) throws HzzBizException {
         TradepredictinfoVo tpi= lambdaQuery().eq(TradepredictinfoVo::getTpiId,tpiid).one();
         if (tpi==null){
-            throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
+            throw new HzzBizException(HzzExceptionEnum.ORDER_NOTEXIST_ERROR);
         }
         if(tpi.getTpiStatus().intValue()!=1){
             //状态已变，无需处理

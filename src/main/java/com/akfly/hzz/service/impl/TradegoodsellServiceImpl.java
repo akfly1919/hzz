@@ -160,7 +160,7 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
     public void cancel(String orderId) throws HzzBizException {
         TradegoodsellVo tgs = lambdaQuery().eq(TradegoodsellVo::getTgsId, orderId).one();
         if(tgs==null){
-            throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
+            throw new HzzBizException(HzzExceptionEnum.ORDER_NOTEXIST_ERROR);
         }
         if(tgs.getTgsStatus()!=0){
             //不满足取消状态

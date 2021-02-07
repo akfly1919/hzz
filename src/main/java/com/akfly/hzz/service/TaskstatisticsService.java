@@ -1,7 +1,10 @@
 package com.akfly.hzz.service;
 
+import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.vo.TaskstatisticsVo;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * <p>
@@ -12,5 +15,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2021-02-07
  */
 public interface TaskstatisticsService extends IService<TaskstatisticsVo> {
+
+    void saveOrUpdateForNoSpecial(long cbiid,long gbid,int num) throws HzzBizException;
+
+    TaskstatisticsVo getTaskInfo(long cbiid,long gbid);
 
 }

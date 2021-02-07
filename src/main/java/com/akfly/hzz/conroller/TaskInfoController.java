@@ -58,6 +58,7 @@ public class TaskInfoController {
     @Resource
     private GoodsbaseinfoService goodsbaseinfoService;
 
+
     @ApiOperation(value="我的任务列表",notes="要求用户登录")
     @PostMapping(value = "/myTask")
     @VerifyToken
@@ -73,8 +74,15 @@ public class TaskInfoController {
                 GoodsbaseinfoVo goodsbaseinfoVo = goodsbaseinfoService.getGoodsbaseinfoWithRedis(vo.getGbiId());
                 BeanUtils.copyProperties(goodsbaseinfoVo, taskGoodsDto);
                 int num = customerpickupinfoService.getPickUpNum(userInfo.getCbiId(), vo.getGbiId());
-                taskGoodsDto.setBuyNum(vo.getStock());
-                taskGoodsDto.setPickUpNum(num);
+                TaskstatisticsVo taskInfo = taskstatisticsService.getTaskInfo(userInfo.getCbiId(), vo.getGbiId());
+                if (taskInfo == null) {
+                    taskGoodsDto.setBuyNum(vo.getStock());
+                    taskGoodsDto.setPickUpNum(num);
+                } else {
+                    taskGoodsDto.setBuyNum(Math.max(vo.getStock() - taskInfo.getUsedBuyNum(), 0));
+                    int pickNum = num - taskInfo.getUsedPickupNum();
+                    taskGoodsDto.setPickUpNum(Math.max(pickNum, 0));
+                }
                 taskGoodsDtoList.add(taskGoodsDto);
             }
             rsp.setData(taskGoodsDtoList);
