@@ -1,12 +1,7 @@
 package com.akfly.hzz.dto;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 
@@ -74,6 +69,9 @@ public class TradeInfoDto{
      * 完成时间
      */
     private LocalDateTime finishtime;
+
+
+    private String gbiPicture;
 
 
 }

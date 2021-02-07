@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -73,13 +74,15 @@ public class TradeInfoController {
             @ApiImplicitParam(name="price",value="买入价格"),
             @ApiImplicitParam(name="gbid",value="商品id",required=true),
             @ApiImplicitParam(name="num",value="买入数量",required=true),
-            @ApiImplicitParam(name="type",value="买入类型(1: 委托买入 2: 正常买入)",required=true)
+            @ApiImplicitParam(name="type",value="买入类型(1: 委托买入 2: 正常买入)",required=true),
+            @ApiImplicitParam(name="isOnSale",value="是否特价商品",required=false)
 
     })
     @PostMapping(value = "/buy")
     @VerifyToken
     public BaseRspDto<String> buy(@RequestParam @Digits(integer = 6,fraction = 2) Double price,
-                                  @RequestParam @NotNull Long gbid,@RequestParam @NotNull Integer num, @RequestParam @NotNull Integer type,@RequestParam @AssertFalse boolean isOnSale){
+                                  @RequestParam @NotNull Long gbid,@RequestParam @NotNull Integer num,
+                                  @RequestParam @NotNull Integer type,@RequestParam(defaultValue = "false") boolean isOnSale){
         BaseRspDto<String> rsp = new BaseRspDto<String>();
         try {
             CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
@@ -304,6 +307,7 @@ public class TradeInfoController {
             tradeInfoDto.setGbiId(vo.getGbiId());
             GoodsbaseinfoVo goods = goodsbaseinfoService.getGoodsbaseinfoWithRedis(vo.getGbiId());
             tradeInfoDto.setGbiName(goods.getGbiName());
+            tradeInfoDto.setGbiPicture(goods.getGbiPicture());
             tradeInfoDto.setUserId(vo.getTpiBuyerid());
             tradeInfoDto.setPrice(vo.getTpiPrice());
             tradeInfoDto.setNum(vo.getTpiNum());
@@ -329,6 +333,7 @@ public class TradeInfoController {
             tradeInfoDto.setGbiId(vo.getGbiId());
             GoodsbaseinfoVo goods = goodsbaseinfoService.getGoodsbaseinfoWithRedis(vo.getGbiId());
             tradeInfoDto.setGbiName(goods.getGbiName());
+            tradeInfoDto.setGbiPicture(goods.getGbiPicture());
             tradeInfoDto.setUserId(vo.getTgsSellerid());
             tradeInfoDto.setPrice(vo.getTgsPrice());
             tradeInfoDto.setNum(1);

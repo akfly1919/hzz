@@ -1,5 +1,8 @@
 package com.akfly.hzz.service.impl;
 
+import com.akfly.hzz.constant.InOrOutTypeEnum;
+import com.akfly.hzz.exception.HzzBizException;
+import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.mapper.CustomerbillrelatedMapper;
 import com.akfly.hzz.service.CustomerbillrelatedService;
 import com.akfly.hzz.util.DateUtil;
@@ -9,9 +12,11 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -44,5 +49,24 @@ public class CustomerbillrelatedServiceImpl extends ServiceImpl<Customerbillrela
                     .last("limit " + pageNum * pageSize + "," + pageSize + " ").list();
         }
         return list;
+    }
+
+    @Override
+    public void saveBills(long userId, String orderId, double amount, InOrOutTypeEnum type) throws HzzBizException {
+
+        try {
+            CustomerbillrelatedVo vo = new CustomerbillrelatedVo();
+            vo.setCbiId(userId);
+            vo.setCbrorderid(orderId);
+            vo.setCbrMoney(amount);
+            vo.setCbrType(type.getStatus());
+            vo.setCbrCreatetime(LocalDateTime.now());
+            vo.setCbrUpdatetime(LocalDateTime.now());
+            save(vo);
+        } catch (Exception e) {
+            log.error("保存账单流水异常 orderId={}", orderId, e);
+            throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
+        }
+
     }
 }

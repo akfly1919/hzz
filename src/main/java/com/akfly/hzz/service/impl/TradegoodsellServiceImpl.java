@@ -67,7 +67,7 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
         BigDecimal feeB=priceB.multiply(new BigDecimal(tc.getTcRate()));
         lockStock(cbiid,gbid,num,price,feeB.doubleValue());
 
-        String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm:ss"));
+        String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         if(tradetimeService.isInTradeTime(nowTime)){
             dealSold(cbiid,gbid,num,price);
         }

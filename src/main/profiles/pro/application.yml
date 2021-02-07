@@ -25,6 +25,8 @@ spring:
       enabled: true
       max-file-size: 5MB
       max-request-size: 30MB
+  profiles:
+    active: pro
 
   #spring session使用存储类型，默认就是redis所以可以省略
 #  session:

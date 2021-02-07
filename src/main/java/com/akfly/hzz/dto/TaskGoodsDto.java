@@ -15,4 +15,9 @@ public class TaskGoodsDto extends UserGoodsDto {
     private int buyNum;
 
     private int pickUpNum;
+
+    /**
+     * 0 不够资格购买  1 够资格购买特价商品
+     */
+    private int canBuy;
 }

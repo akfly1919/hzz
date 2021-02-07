@@ -1,6 +1,8 @@
 package com.akfly.hzz.service;
 
 
+import com.akfly.hzz.constant.InOrOutTypeEnum;
+import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.vo.CustomerbillrelatedVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -25,4 +27,6 @@ public interface CustomerbillrelatedService extends IService<Customerbillrelated
      * @return
      */
     public List<CustomerbillrelatedVo> getCustomerbillrelatedById(Long id, int pageSize, int pageNum, int flag);
+
+    void saveBills(long userId, String orderId, double amount, InOrOutTypeEnum type) throws HzzBizException;
 }

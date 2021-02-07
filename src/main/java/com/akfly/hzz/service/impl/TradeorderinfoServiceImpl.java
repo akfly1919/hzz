@@ -1,5 +1,6 @@
 package com.akfly.hzz.service.impl;
 
+import com.akfly.hzz.constant.InOrOutTypeEnum;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.mapper.CustomerbaseinfoMapper;
@@ -65,6 +66,10 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
 
     @Resource
     private ReporttradedateService reporttradedateService;
+
+    @Resource
+    private CustomerbillrelatedService customerbillrelatedService;
+
     @Override
     public List<TradeorderinfoVo> getTradeorderinfoVo(int pageNum, int pageSize, long cbiid, Date beginTime, Date endTime) throws HzzBizException {
         List<TradeorderinfoVo> tradeorderinfoVos = lambdaQuery()
@@ -114,7 +119,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         tp.setTpiSucessnum(0);
         tp.setTpiStatus(TradepredictinfoVo.STATUS_ENTRUST);
         //判断是否在交易时间
-        String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm:ss"));
+        String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         if(tradetimeService.isInTradeTime(nowTime)){
             tp.setTpiType(type);
             //tradepredictinfoService.saveTradepredictinfoVo(tp);
@@ -259,19 +264,21 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
                 toi.setToiSellservicefee(tg.getTgsServicefee());
                 toi.setToiType(TradeorderinfoVo.TYPE_NOMAL);
                 saveTradeorderinfo(toi);
-            }
-            {
+
                 //卖家上账
                 CustomerbaseinfoVo customerbaseinfoVo = customerbaseinfoMapper.selectByIdForUpdate(tg.getTgsSellerid());
                 Double balance=customerbaseinfoVo.getCbiBalance();
                 Double total=customerbaseinfoVo.getCbiTotal();
                 BigDecimal balanceB=BigDecimal.valueOf(balance!=null?balance:0);
                 BigDecimal totalB=BigDecimal.valueOf(total!=null?total:0);
-                balanceB.add(BigDecimal.valueOf(tg.getTgsPrice())).subtract(BigDecimal.valueOf(tg.getTgsServicefee()));
-                totalB.add(BigDecimal.valueOf(tg.getTgsPrice())).subtract(BigDecimal.valueOf(tg.getTgsServicefee()));
+                BigDecimal cost = BigDecimal.valueOf(tg.getTgsPrice()).subtract(BigDecimal.valueOf(tg.getTgsServicefee()));
+                balanceB.add(cost);
+                totalB.add(cost);
                 customerbaseinfoVo.setCbiTotal(totalB.doubleValue());
                 customerbaseinfoVo.setCbiBalance(balanceB.doubleValue());
                 customerbaseinfoService.updateUserInfo(customerbaseinfoVo);
+
+                customerbillrelatedService.saveBills(tg.getTgsSellerid(), toi.getToiOrderid(), cost.doubleValue(), InOrOutTypeEnum.IN);
             }
 
 
@@ -329,6 +336,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
             customerbaseinfoVo.setCbiFrozen(fronzeB.doubleValue());
             customerbaseinfoVo.setCbiBalance(balanceB.doubleValue());
             customerbaseinfoService.updateUserInfo(customerbaseinfoVo);
+            customerbillrelatedService.saveBills(tp.getTpiBuyerid(), tp.getTpiId(), priceB.add(feeB).doubleValue(), InOrOutTypeEnum.OUT);
         }
 
     }
@@ -353,6 +361,8 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
             throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
         }
     }
+
+
 
 
 }

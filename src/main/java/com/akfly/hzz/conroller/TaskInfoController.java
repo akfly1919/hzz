@@ -83,6 +83,8 @@ public class TaskInfoController {
                     int pickNum = num - taskInfo.getUsedPickupNum();
                     taskGoodsDto.setPickUpNum(Math.max(pickNum, 0));
                 }
+                int canBuy = (taskGoodsDto.getPickUpNum() > 0 && taskGoodsDto.getBuyNum() > 0) ? 1 : 0; // TODO 后续买入需要改成10
+                taskGoodsDto.setCanBuy(canBuy);
                 taskGoodsDtoList.add(taskGoodsDto);
             }
             rsp.setData(taskGoodsDtoList);
