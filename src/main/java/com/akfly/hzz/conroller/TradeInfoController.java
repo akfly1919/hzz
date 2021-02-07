@@ -79,11 +79,11 @@ public class TradeInfoController {
     @PostMapping(value = "/buy")
     @VerifyToken
     public BaseRspDto<String> buy(@RequestParam @Digits(integer = 6,fraction = 2) Double price,
-                                  @RequestParam @NotNull Long gbid,@RequestParam @NotNull Integer num, @RequestParam @NotNull Integer type){
+                                  @RequestParam @NotNull Long gbid,@RequestParam @NotNull Integer num, @RequestParam @NotNull Integer type,@RequestParam @AssertFalse boolean isOnSale){
         BaseRspDto<String> rsp = new BaseRspDto<String>();
         try {
             CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
-            tradeorderinfoService.nomalBuy(userInfo.getCbiId(), gbid, num, price);
+            tradeorderinfoService.nomalBuy(userInfo.getCbiId(), gbid, num, price,isOnSale);
 
         } catch (HzzBizException e) {
             log.error("购买业务错误 msg={}", e.getErrorMsg(), e);

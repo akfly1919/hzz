@@ -82,14 +82,14 @@ public class TradepredictinfoServiceImpl extends ServiceImpl<TradepredictinfoMap
         releaseOne(tpiid,2);
     }
     @Transactional(rollbackFor = Exception.class)
-    public void releaseOne(String tpiid,int status) throws HzzBizException {
+    public boolean releaseOne(String tpiid,int status) throws HzzBizException {
         TradepredictinfoVo tpi= lambdaQuery().eq(TradepredictinfoVo::getTpiId,tpiid).one();
         if (tpi==null){
             throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
         }
         if(tpi.getTpiStatus().intValue()!=1){
             //状态已变，无需处理
-            return;
+            return false;
         }
         CustomerbaseinfoVo customerbaseinfoVo = customerbaseinfoMapper.selectByIdForUpdate(tpi.getTpiBuyerid());
         Double balance=customerbaseinfoVo.getCbiBalance();
@@ -106,11 +106,16 @@ public class TradepredictinfoServiceImpl extends ServiceImpl<TradepredictinfoMap
         customerbaseinfoService.updateUserInfo(customerbaseinfoVo);
         if(leftnum==tpi.getTpiNum()){
             tpi.setTpiStatus(status);
-        }else{
-            tpi.setTpiStatus(3);
+        }else {
+            if(status==2){
+                tpi.setTpiStatus(6);
+            }else{
+                tpi.setTpiStatus(3);
+            }
         }
         tpi.setTpiFinishtime(LocalDateTime.now());
         saveTradepredictinfoVo(tpi);
+        return true;
     }
 
 }
