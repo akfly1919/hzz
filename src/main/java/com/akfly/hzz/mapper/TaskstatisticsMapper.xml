@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akfly.hzz.mapper.TaskstatisticsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.TaskstatisticsVo">
+        <id column="id" property="id" />
+        <result column="gbi_id" property="gbiId" />
+        <result column="cbi_id" property="cbiId" />
+        <result column="buy_num" property="buyNum" />
+        <result column="pickup_num" property="pickupNum" />
+        <result column="used_buy_num" property="usedBuyNum" />
+        <result column="used_pickup_num" property="usedPickupNum" />
+        <result column="toi_createtime" property="toiCreatetime" />
+        <result column="toi_updatetime" property="toiUpdatetime" />
+    </resultMap>
+
+</mapper>
