@@ -22,4 +22,5 @@ public interface TradegoodsellService extends IService<TradegoodsellVo> {
     List<TradegoodsellVo> getSellTrade(long userId, int pageSize, int pageNum) throws HzzBizException;
 
     int getSellVolume(long gbid);
+    public void cancel(String orderId) throws HzzBizException;
 }

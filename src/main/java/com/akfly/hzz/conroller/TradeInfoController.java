@@ -22,8 +22,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -85,6 +84,29 @@ public class TradeInfoController {
         try {
             CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
             tradeorderinfoService.nomalBuy(userInfo.getCbiId(), gbid, num, price);
+
+        } catch (HzzBizException e) {
+            log.error("购买业务错误 msg={}", e.getErrorMsg(), e);
+            rsp.setCode(e.getErrorCode());
+            rsp.setMsg(e.getErrorMsg());
+        } catch (Exception e) {
+            log.error("购买系统异常", e);
+            rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+            rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+        }
+        return rsp;
+    }
+    @PostMapping(value = "/cancel")
+    @VerifyToken
+    public BaseRspDto<String> cancel(
+            @RequestParam @NotNull String orderid, @RequestParam @Min(1)@Max(2) int tradeType){
+        BaseRspDto<String> rsp = new BaseRspDto<String>();
+        try {
+            if(tradeType==1){
+                tradepredictinfoService.cancel(orderid);
+            }else if(tradeType==2){
+                tradegoodsellService.cancel(orderid);
+            }
 
         } catch (HzzBizException e) {
             log.error("购买业务错误 msg={}", e.getErrorMsg(), e);

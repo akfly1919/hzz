@@ -19,4 +19,5 @@ public interface TradepredictinfoService extends IService<TradepredictinfoVo> {
 
     List<TradepredictinfoVo> getBuyTrade(long userId, int pageSize, int pageNum) throws HzzBizException;
     public int releas(int num) throws HzzBizException;
+    public  void cancel(String orderid) throws HzzBizException;
 }
