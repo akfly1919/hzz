@@ -156,5 +156,20 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
             throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
         }
     }
+    @Transactional(rollbackFor = Exception.class)
+    public void cancel(String orderId) throws HzzBizException {
+        TradegoodsellVo tgs = lambdaQuery().eq(TradegoodsellVo::getTgsId, orderId).one();
+        if(tgs==null){
+            throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
+        }
+        if(tgs.getTgsStatus()!=0){
+            //不满足取消状态
+            return;
+        }
+        tgs.setTgsStatus(3);
+        tgs.setTgsFinshitime(LocalDateTime.now());
+        tgs.setTgsUpdatetime(LocalDateTime.now());
+        saveTradegoodsell(tgs);
+    }
 
 }

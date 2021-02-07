@@ -80,7 +80,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
     public void updateTradeOrder(TradeorderinfoVo vo) throws HzzBizException {
 
     }
-    public void nomalBuy(long cbiid,long gbid,int num,double price) throws HzzBizException {
+    public void nomalBuy(long cbiid,long gbid,int num,double price,boolean isOnSale) throws HzzBizException {
         GoodsbaseinfoVo gi = goodsbaseinfoService.getGoodsbaseinfoVo(gbid);
         //if (gi.getGbiPrice() != price){
         //    //TODO 价格不正确
@@ -115,7 +115,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         if(tradetimeService.isInTradeTime(nowTime)){
             tp.setTpiType(TradepredictinfoVo.TYPE_NOMAL);
             //tradepredictinfoService.saveTradepredictinfoVo(tp);
-            dealSold(tp,tc);
+            dealSold(tp,tc,isOnSale);
         }else{
             tp.setTpiType(TradepredictinfoVo.TYPE_ENTRUST);
             int need=tp.getTpiNum()-tp.getTpiSucessnum();
@@ -131,10 +131,23 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
             }
             tradepredictinfoService.saveTradepredictinfoVo(tp);
         }
+        if(isOnSale){
+            //特价品
+            boolean release=tradepredictinfoService.releaseOne(tp.getTpiId(),5);
+            if(release){
+                //释放成功说明没有买入成功
+                throw new HzzBizException(HzzExceptionEnum.STOCK_ERROR);
+            }
+        }
+    }
+
+    @Override
+    public void dealSold(TradepredictinfoVo tp, TradeconfigVo tc) throws HzzBizException {
+        dealSold(tp,tc,false);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void dealSold(TradepredictinfoVo tp,TradeconfigVo tc) throws HzzBizException {
+    public void dealSold(TradepredictinfoVo tp,TradeconfigVo tc,boolean isOnSale) throws HzzBizException {
         if(tp.getId()!=null){
             //这里是已存在而非新创建的
             tp= tradepredictinfoService.getById(tp.getId());
@@ -163,6 +176,11 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         wrapper.eq("tgs_status","0");
         wrapper.eq("tgs_saleable","1");
         wrapper.le("tgs_price",tp.getTpiPrice());
+        if(isOnSale){
+            wrapper.eq("tgs_type",3);
+        }else{
+            wrapper.eq("tgs_type",1);
+        }
         wrapper.orderByAsc("tgs_price");
         wrapper.orderByAsc("tgs_owntype");//价格相同，系统用户在前
         wrapper.orderByAsc("tgs_tradetime");
@@ -170,6 +188,11 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         List<TradegoodsellVo> list = tradegoodsellMapper.selectList(wrapper);
         if(list==null||list.size()==0){
             return;
+        }
+        if(isOnSale){
+            if(list.size()<need){
+                return;
+            }
         }
         BigDecimal goodsprice=new BigDecimal("0");
         BigDecimal feeprice=new BigDecimal("0");

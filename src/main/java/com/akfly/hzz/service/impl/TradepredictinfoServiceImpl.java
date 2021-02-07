@@ -53,7 +53,7 @@ public class TradepredictinfoServiceImpl extends ServiceImpl<TradepredictinfoMap
                 .last("limit " + pageNum * pageSize + "," + pageSize + " ").list();
         return list;
     }
-    @Transactional(rollbackFor = Exception.class)
+    //@Transactional(rollbackFor = Exception.class)
     public int releas(int num) throws HzzBizException {
         TradetimeVo tt = tradetimeService.getTradeTime();
         String date=DateUtil.getCurrentDate(DateUtil.FORMAT_DATE);
@@ -69,27 +69,53 @@ public class TradepredictinfoServiceImpl extends ServiceImpl<TradepredictinfoMap
             return 0;
         }
         for(TradepredictinfoVo tpi:list){
-            CustomerbaseinfoVo customerbaseinfoVo = customerbaseinfoMapper.selectByIdForUpdate(tpi.getTpiBuyerid());
-            Double balance=customerbaseinfoVo.getCbiBalance();
-            Double fronze=customerbaseinfoVo.getCbiFrozen();
-            BigDecimal balanceB=BigDecimal.valueOf(balance!=null?balance:0);
-            BigDecimal fronzeB=BigDecimal.valueOf(fronze!=null?fronze:0);
-            int leftnum=tpi.getTpiNum()-tpi.getTpiSucessnum();
-            BigDecimal priceB=BigDecimal.valueOf(tpi.getTpiPrice()).multiply(BigDecimal.valueOf(leftnum));
-            BigDecimal feeB=BigDecimal.valueOf(tpi.getTpiServicefee()).multiply(BigDecimal.valueOf(leftnum));
-            balanceB.add(feeB).add(priceB);
-            fronzeB.subtract(feeB).subtract(priceB);
-            customerbaseinfoVo.setCbiFrozen(fronzeB.doubleValue());
-            customerbaseinfoVo.setCbiBalance(balanceB.doubleValue());
-            customerbaseinfoService.updateUserInfo(customerbaseinfoVo);
-            if(leftnum==tpi.getTpiNum()){
-                tpi.setTpiStatus(5);
-            }else{
-                tpi.setTpiStatus(3);
+            try{
+            releaseOne(tpi.getTpiId(),5);
+            }catch (Exception e){
+                e.printStackTrace();
             }
-            tpi.setTpiFinishtime(LocalDateTime.now());
-            saveTradepredictinfoVo(tpi);
         }
         return list.size();
     }
+
+    public  void cancel(String tpiid) throws HzzBizException {
+        releaseOne(tpiid,2);
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public boolean releaseOne(String tpiid,int status) throws HzzBizException {
+        TradepredictinfoVo tpi= lambdaQuery().eq(TradepredictinfoVo::getTpiId,tpiid).one();
+        if (tpi==null){
+            throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
+        }
+        if(tpi.getTpiStatus().intValue()!=1){
+            //状态已变，无需处理
+            return false;
+        }
+        CustomerbaseinfoVo customerbaseinfoVo = customerbaseinfoMapper.selectByIdForUpdate(tpi.getTpiBuyerid());
+        Double balance=customerbaseinfoVo.getCbiBalance();
+        Double fronze=customerbaseinfoVo.getCbiFrozen();
+        BigDecimal balanceB=BigDecimal.valueOf(balance!=null?balance:0);
+        BigDecimal fronzeB=BigDecimal.valueOf(fronze!=null?fronze:0);
+        int leftnum=tpi.getTpiNum()-tpi.getTpiSucessnum();
+        BigDecimal priceB=BigDecimal.valueOf(tpi.getTpiPrice()).multiply(BigDecimal.valueOf(leftnum));
+        BigDecimal feeB=BigDecimal.valueOf(tpi.getTpiServicefee()).multiply(BigDecimal.valueOf(leftnum));
+        balanceB.add(feeB).add(priceB);
+        fronzeB.subtract(feeB).subtract(priceB);
+        customerbaseinfoVo.setCbiFrozen(fronzeB.doubleValue());
+        customerbaseinfoVo.setCbiBalance(balanceB.doubleValue());
+        customerbaseinfoService.updateUserInfo(customerbaseinfoVo);
+        if(leftnum==tpi.getTpiNum()){
+            tpi.setTpiStatus(status);
+        }else {
+            if(status==2){
+                tpi.setTpiStatus(6);
+            }else{
+                tpi.setTpiStatus(3);
+            }
+        }
+        tpi.setTpiFinishtime(LocalDateTime.now());
+        saveTradepredictinfoVo(tpi);
+        return true;
+    }
+
 }
