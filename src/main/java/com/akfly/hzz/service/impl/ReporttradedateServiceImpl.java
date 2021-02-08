@@ -59,25 +59,25 @@ public class ReporttradedateServiceImpl extends ServiceImpl<ReporttradedateMappe
         queryWrapper.eq("rti_gbid",gbid);
 
         if("YEAR".equalsIgnoreCase(queryType)){
-            queryWrapper.select(" rti_gbid,rti_year as time, sum(rti_num) as rti_num,sum(rti_money) as rti_money ");
+            queryWrapper.select(" rti_gbid,rti_year, sum(rti_num) as rti_num,sum(rti_money) as rti_money ");
             queryWrapper.groupBy("rti_year");
         }else if("MONTH".equalsIgnoreCase(queryType)){
-            queryWrapper.select(" rti_gbid,rti_month as time,sum(rti_num) as rti_num,sum(rti_money) as rti_money ");
+            queryWrapper.select(" rti_gbid,rti_month,sum(rti_num) as rti_num,sum(rti_money) as rti_money ");
             queryWrapper.groupBy("rti_year,rti_month");
             queryWrapper.orderByDesc("rti_year,rti_month");
             queryWrapper.last("limit 12");
         }else if("DAY".equalsIgnoreCase(queryType)){
-            queryWrapper.select(" rti_gbid,rti_date  as time,sum(rti_num) as rti_num,sum(rti_money) as rti_money ");
+            queryWrapper.select(" rti_gbid,rti_date,sum(rti_num) as rti_num,sum(rti_money) as rti_money ");
             queryWrapper.groupBy("rti_year,rti_month,rti_date");
             queryWrapper.orderByDesc("rti_year,rti_month,rti_date");
             queryWrapper.last("limit 30");
         }else if("WEEK".equalsIgnoreCase(queryType)){
-            queryWrapper.select(" rti_gbid, rti_week as time,sum(rti_num) as rti_num,sum(rti_money) as rti_money ");
+            queryWrapper.select(" rti_gbid, rti_week,sum(rti_num) as rti_num,sum(rti_money) as rti_money ");
             queryWrapper.groupBy("rti_year,rti_week");
             queryWrapper.orderByDesc("rti_year,rti_week");
             queryWrapper.last("limit 52");
         }else if("HOUR".equalsIgnoreCase(queryType)){
-            queryWrapper.select(" rti_gbid,rti_hour as time,sum(rti_num) as rti_num,sum(rti_money) as rti_money ");
+            queryWrapper.select(" rti_gbid,rti_hour,sum(rti_num) as rti_num,sum(rti_money) as rti_money ");
             queryWrapper.groupBy("rti_year,rti_month,rti_date,rti_hour");
             queryWrapper.orderByDesc("rti_year,rti_month,rti_date,rti_hour");
             queryWrapper.last("limit 24");

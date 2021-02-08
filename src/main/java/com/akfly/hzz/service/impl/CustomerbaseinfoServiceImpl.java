@@ -18,6 +18,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -172,14 +173,17 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
     }
     @Transactional(rollbackFor = Exception.class)
     public void frozenAccount(long cbiid,Double total) throws HzzBizException {
+
+        log.info("冻结用户余额cbiid={} total={}", cbiid, total);
         CustomerbaseinfoVo customerbaseinfoVo = customerbaseinfoMapper.selectByIdForUpdate(cbiid);
         Double balance=customerbaseinfoVo.getCbiBalance();
         Double fronze=customerbaseinfoVo.getCbiFrozen();
         BigDecimal balanceB=BigDecimal.valueOf(balance!=null?balance:0);
         BigDecimal fronzeB=BigDecimal.valueOf(fronze!=null?fronze:0);
         BigDecimal totalB=BigDecimal.valueOf(total);
-        balanceB.subtract(totalB);
-        fronzeB.add(totalB);
+        customerbaseinfoVo.setCbiBalance(balanceB.subtract(totalB).doubleValue());
+        customerbaseinfoVo.setCbiFrozen(fronzeB.add(totalB).doubleValue());
+        customerbaseinfoVo.setCbiUpdatetime(LocalDateTime.now());
         if(balanceB.compareTo(new BigDecimal("0.0"))<0){
             throw new HzzBizException(HzzExceptionEnum.ACCOUNT_BALACE_ERROR);
         }

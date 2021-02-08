@@ -92,12 +92,15 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
     public void updateTradeOrder(TradeorderinfoVo vo) throws HzzBizException {
 
     }
-    public void nomalBuy(long cbiid,long gbid,int num,double price,boolean isOnSale,int type) throws HzzBizException {
+    public void nomalBuy(long cbiid,long gbid,int num,double price,boolean isOnSale,int type, int isNew) throws HzzBizException {
         GoodsbaseinfoVo gi = goodsbaseinfoService.getGoodsbaseinfoVo(gbid);
         //if (gi.getGbiPrice() != price){
         //    //TODO 价格不正确
         //    price = gi.getGbiPrice();
         //}
+        if (isNew == 0 && gi.getGbiType() == 2) {
+            throw new HzzBizException(HzzExceptionEnum.CANNOT_BUY_NEWMAN_ERROR);
+        }
         price = gi.getGbiPrice();
         TradeconfigVo tc = tradeconfigService.getTradeconfig(TradeconfigVo.TCTYPE_BUY);
         BigDecimal priceB=new BigDecimal(price);
@@ -344,6 +347,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
             customerbaseinfoVo.setCbiTotal(totalB.doubleValue());
             customerbaseinfoVo.setCbiFrozen(fronzeB.doubleValue());
             customerbaseinfoVo.setCbiBalance(balanceB.doubleValue());
+            customerbaseinfoVo.setCbiUpdatetime(LocalDateTime.now());
             customerbaseinfoService.updateUserInfo(customerbaseinfoVo);
             customerbillrelatedService.saveBills(tp.getTpiBuyerid(), tp.getTpiId(), priceB.add(feeB).doubleValue(), InOrOutTypeEnum.OUT);
         }
