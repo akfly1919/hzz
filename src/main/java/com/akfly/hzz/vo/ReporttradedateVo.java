@@ -1,6 +1,8 @@
 package com.akfly.hzz.vo;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,6 +24,13 @@ import java.time.LocalDateTime;
 public class ReporttradedateVo implements Serializable {
 
     private static final long serialVersionUID=1L;
+
+    /**
+     * ID
+     */
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
+
 
     /**
      * 年

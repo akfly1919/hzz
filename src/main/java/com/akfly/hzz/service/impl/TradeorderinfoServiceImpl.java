@@ -8,12 +8,15 @@ import com.akfly.hzz.mapper.CustomergoodsrelatedMapper;
 import com.akfly.hzz.mapper.TradegoodsellMapper;
 import com.akfly.hzz.mapper.TradeorderinfoMapper;
 import com.akfly.hzz.service.*;
+import com.akfly.hzz.util.JsonUtils;
 import com.akfly.hzz.util.RandomGenUtils;
 import com.akfly.hzz.vo.*;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import springfox.documentation.spring.web.json.Json;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -32,6 +35,7 @@ import java.util.*;
  * @since 2021-01-18
  */
 @Service
+@Slf4j
 public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper, TradeorderinfoVo> implements TradeorderinfoService {
 
     @Resource
@@ -122,7 +126,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         if(tradetimeService.isInTradeTime(nowTime)){
             tp.setTpiType(type);
-            //tradepredictinfoService.saveTradepredictinfoVo(tp);
+            tradepredictinfoService.saveTradepredictinfoVo(tp);
             dealSold(tp,tc,isOnSale);
         }else{
             if(type!=TradepredictinfoVo.TYPE_ENTRUST){
@@ -192,7 +196,8 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         if(isOnSale){
             wrapper.eq("tgs_type",3);
         }else{
-            wrapper.eq("tgs_type",1);
+            //wrapper.eq("tgs_type",1);
+            wrapper.in("tgs_type", Arrays.asList(1, 2));
         }
         wrapper.orderByAsc("tgs_price");
         wrapper.orderByAsc("tgs_owntype");//价格相同，系统用户在前
@@ -299,6 +304,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
             rt.setRtiMoney(goodsprice.doubleValue());
             rt.setRtiCreatetime(LocalDateTime.now());
             rt.setRtiUpdatetime(LocalDateTime.now());
+            log.info("数据统计={}", JsonUtils.toJson(rt));
             reporttradedateService.saveReporttradedateVo(rt);
         }
         {
