@@ -23,7 +23,7 @@ public class RandomGenUtils {
 
 	public static String genFlowNo(String prefix) {
 		String dateInfo = DateUtil.getCurrentDate(DateUtil.FORMAT_FULLTIME);
-		return "TOI"+dateInfo+ getRandomNumberInRange(100000,999999);
+		return prefix+dateInfo+ getRandomNumberInRange(100000,999999);
 	}
 	public static void main(String[] args) {
 		int x = RandomGenUtils.getRandomNumberInRange(100000, 999999);

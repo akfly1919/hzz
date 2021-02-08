@@ -204,13 +204,13 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         wrapper.orderByAsc("tgs_tradetime");
         wrapper.last("limit "+need+" for update");
         List<TradegoodsellVo> list = tradegoodsellMapper.selectList(wrapper);
+        if(isOnSale){
+            if(list==null||list.size()<need){
+                throw new HzzBizException(HzzExceptionEnum.STOCK_ERROR);
+            }
+        }
         if(list==null||list.size()==0){
             return;
-        }
-        if(isOnSale){
-            if(list.size()<need){
-                return;
-            }
         }
         BigDecimal goodsprice=new BigDecimal("0");
         BigDecimal feeprice=new BigDecimal("0");
