@@ -192,6 +192,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         wrapper.eq("gbi_id",tp.getGbiId());
         wrapper.eq("tgs_status","0");
         wrapper.eq("tgs_saleable","1");
+        wrapper.ne("tgs_sellerid",tp.getTpiBuyerid());
         wrapper.le("tgs_price",tp.getTpiPrice());
         if(isOnSale){
             wrapper.eq("tgs_type",3);
@@ -209,7 +210,19 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
                 throw new HzzBizException(HzzExceptionEnum.STOCK_ERROR);
             }
         }
-        if(list==null||list.size()==0){
+        {
+            //更新预购信息
+            if(list.size()<need){
+                tp.setTpiSucessnum(tp.getTpiSucessnum()+list.size());
+                //tp.setTpiStatus(TradepredictinfoVo.STATUS_PARTIAL_SUCCESS);
+            }else{
+                tp.setTpiSucessnum(tp.getTpiSucessnum()+need);
+                tp.setTpiStatus(TradepredictinfoVo.STATUS_SUCCESS);
+            }
+            tp.setTpiUpdatetime(LocalDateTime.now());
+            tradepredictinfoService.saveTradepredictinfoVo(tp);
+        }
+        if(list.size()==0){
             return;
         }
         BigDecimal goodsprice=new BigDecimal("0");
@@ -307,18 +320,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
             log.info("数据统计={}", JsonUtils.toJson(rt));
             reporttradedateService.saveReporttradedateVo(rt);
         }
-        {
-            //更新预购信息
-            if(list.size()<need){
-                tp.setTpiSucessnum(tp.getTpiSucessnum()+list.size());
-                //tp.setTpiStatus(TradepredictinfoVo.STATUS_PARTIAL_SUCCESS);
-            }else{
-                tp.setTpiSucessnum(tp.getTpiSucessnum()+need);
-                tp.setTpiStatus(TradepredictinfoVo.STATUS_SUCCESS);
-            }
-            tp.setTpiUpdatetime(LocalDateTime.now());
-            tradepredictinfoService.saveTradepredictinfoVo(tp);
-        }
+
         {
             //买家解冻记账
             CustomerbaseinfoVo customerbaseinfoVo = customerbaseinfoMapper.selectByIdForUpdate(tp.getTpiBuyerid());
