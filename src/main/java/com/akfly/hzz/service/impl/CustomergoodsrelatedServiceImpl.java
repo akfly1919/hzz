@@ -188,4 +188,45 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
         return userGoodsDto;
 
     }
+
+    @Override
+    public Map<String, Long> getStockForMyself(Long userId, StockEnum stockEnum, PickUpEnum pickUpEnum) {
+
+        QueryWrapper<CustomergoodsrelatedVo> queryWrapper = new QueryWrapper<CustomergoodsrelatedVo>();
+        queryWrapper.eq("cbi_id", userId).eq("cgr_isown", 1);
+        if (StockEnum.UNLOCKED.equals(stockEnum)) {
+            queryWrapper.eq("cgr_islock", 0);
+        } else if (StockEnum.LOCKED.equals(stockEnum)) {
+            queryWrapper.eq("cgr_islock", 1);
+        } else if (StockEnum.FROZEN.equals(stockEnum)) {
+            queryWrapper.eq("cgr_islock", 2);
+        } else if (StockEnum.XIANHUO.equals(stockEnum)) {
+            queryWrapper.in("cgr_islock", Arrays.asList(0, 1));
+        }
+        if (PickUpEnum.PICK.equals(pickUpEnum)) {
+            queryWrapper.eq("cgr_ispickup", 1);
+        } else {
+            queryWrapper.eq("cgr_ispickup", 0);
+        }
+        queryWrapper.select(" cgr_islock, count(id) as stock");
+        queryWrapper.groupBy("cgr_islock");
+
+        List<Map<String, Object>> list = baseMapper.selectMaps(queryWrapper);
+        Map<String, Long> result = new HashMap<>();
+        long stock = 0;
+        long frozenStock = 0;
+        for (Map<String, Object> temp : list) {
+            int cgr_isLock = (int) temp.get("cgr_islock");
+            if (cgr_isLock == 0) {
+                long unFrozenStock =  (long) temp.get("stock");
+                stock = stock + unFrozenStock;
+            } else if (cgr_isLock == 1) {
+                frozenStock =  (long) temp.get("stock");
+                stock = stock + frozenStock;
+            }
+        }
+        result.put("frozenStock", frozenStock);
+        result.put("stock", stock);
+        return result;
+    }
 }

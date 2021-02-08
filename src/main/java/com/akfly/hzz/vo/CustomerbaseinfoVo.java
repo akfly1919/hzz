@@ -1,5 +1,6 @@
 package com.akfly.hzz.vo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -98,6 +99,12 @@ public class CustomerbaseinfoVo implements Serializable {
     private Integer cbiGoodsnum;
 
     private String cbiShareurl;
+
+    @TableField(exist = false)
+    private Integer stock;
+
+    @TableField(exist = false)
+    private Integer frozenStock;
 
 
 }

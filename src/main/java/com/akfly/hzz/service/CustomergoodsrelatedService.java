@@ -51,4 +51,6 @@ public interface CustomergoodsrelatedService extends IService<Customergoodsrelat
 
     UserGoodsDto getCanSellOfGbi(long cbiid, long gbiid) throws HzzBizException;
 
+    Map<String, Long> getStockForMyself(Long userId, StockEnum stockEnum, PickUpEnum pickUpEnum);
+
 }

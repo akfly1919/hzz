@@ -3,12 +3,15 @@ package com.akfly.hzz.conroller;
 
 import com.akfly.hzz.annotation.VerifyToken;
 import com.akfly.hzz.constant.CommonConstant;
+import com.akfly.hzz.constant.PickUpEnum;
+import com.akfly.hzz.constant.StockEnum;
 import com.akfly.hzz.dto.*;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.facade.IDFacade;
 import com.akfly.hzz.interceptor.AuthInterceptor;
 import com.akfly.hzz.service.CustomerbaseinfoService;
+import com.akfly.hzz.service.CustomergoodsrelatedService;
 import com.akfly.hzz.service.CustomeridcardinfoService;
 import com.akfly.hzz.util.*;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 
 @Slf4j
@@ -40,6 +44,10 @@ public class UserController {
 
 	@Resource
 	private CustomeridcardinfoService customeridcardinfoService;
+
+	@Resource
+	private CustomergoodsrelatedService customergoodsrelatedService;
+
 	@Resource
 	private IDFacade idFacade;
 
@@ -173,6 +181,9 @@ public class UserController {
 				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
 			}
 			CustomerbaseinfoVo customerbaseinfoVo = customerbaseinfoService.getUserInfoByIdInDb(String.valueOf(userInfo.getCbiId()));
+			Map<String, Long> stockMap = customergoodsrelatedService.getStockForMyself(userInfo.getCbiId(), StockEnum.XIANHUO, PickUpEnum.UNPICK);
+			customerbaseinfoVo.setStock(stockMap.get("stock").intValue());
+			customerbaseinfoVo.setFrozenStock(stockMap.get("frozenStock").intValue());
 			rsp.setData(customerbaseinfoVo);
 		} catch (HzzBizException e) {
 			log.error("获取用户信息业务错误 msg={}", e.getErrorMsg(), e);
