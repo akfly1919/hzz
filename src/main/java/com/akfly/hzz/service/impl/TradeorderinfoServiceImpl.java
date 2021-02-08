@@ -208,6 +208,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         {
             //更新预购信息
             if(list.size()<need){
+                tp.setTpiType(TradepredictinfoVo.TYPE_ENTRUST);
                 tp.setTpiSucessnum(tp.getTpiSucessnum()+list.size());
                 //tp.setTpiStatus(TradepredictinfoVo.STATUS_PARTIAL_SUCCESS);
             }else{
