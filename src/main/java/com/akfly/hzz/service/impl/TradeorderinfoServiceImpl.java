@@ -126,7 +126,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         if(tradetimeService.isInTradeTime(nowTime)){
             tp.setTpiType(type);
-            tradepredictinfoService.saveTradepredictinfoVo(tp);
+            //tradepredictinfoService.saveTradepredictinfoVo(tp);
             dealSold(tp,tc,isOnSale);
         }else{
             if(type!=TradepredictinfoVo.TYPE_ENTRUST){
