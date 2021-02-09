@@ -125,6 +125,11 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         tp.setTpiServicefee(feeB.doubleValue());
         tp.setTpiSucessnum(num);
         tp.setTpiSucessnum(0);
+        tp.setTpiGoodstype(1);
+        if(isOnSale){
+            tp.setTpiGoodstype(3);
+        }
+
         tp.setTpiStatus(TradepredictinfoVo.STATUS_ENTRUST);
         //判断是否在交易时间
         String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
@@ -263,6 +268,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
                 cgrnew.setCgrBuytime(LocalDateTime.now());
                 cgrnew.setCgrSelltime(LocalDateTime.now());
                 cgrnew.setCgrUpdatetime(LocalDateTime.now());
+                cgrnew.setCgrForzentime(LocalDateTime.now().plusDays(Long.parseLong(gi.getGbiFrozendays()!=null?gi.getGbiFrozendays().toString():"0")));
                 customergoodsrelatedService.saveCustomergoodsrelated(cgrnew);
 
             }

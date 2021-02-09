@@ -19,6 +19,7 @@
         <result column="tpi_tradetime" property="tpiTradetime" />
         <result column="tpi_updatetime" property="tpiUpdatetime" />
         <result column="tpi_servicefee" property="tpiServicefee" />
+        <result column="tpi_goodstype" property="tpiGoodstype" />
     </resultMap>
 
 </mapper>
