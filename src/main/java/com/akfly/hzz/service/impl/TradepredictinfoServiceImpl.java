@@ -99,8 +99,8 @@ public class TradepredictinfoServiceImpl extends ServiceImpl<TradepredictinfoMap
         int leftnum=tpi.getTpiNum()-tpi.getTpiSucessnum();
         BigDecimal priceB=BigDecimal.valueOf(tpi.getTpiPrice()).multiply(BigDecimal.valueOf(leftnum));
         BigDecimal feeB=BigDecimal.valueOf(tpi.getTpiServicefee()).multiply(BigDecimal.valueOf(leftnum));
-        balanceB.add(feeB).add(priceB);
-        fronzeB.subtract(feeB).subtract(priceB);
+        balanceB=balanceB.add(feeB).add(priceB);
+        fronzeB=fronzeB.subtract(feeB).subtract(priceB);
         customerbaseinfoVo.setCbiFrozen(fronzeB.doubleValue());
         customerbaseinfoVo.setCbiBalance(balanceB.doubleValue());
         customerbaseinfoService.updateUserInfo(customerbaseinfoVo);
