@@ -1,13 +1,12 @@
 package com.akfly.hzz.vo;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import java.time.LocalDateTime;
+import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -15,7 +14,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author wangfei
- * @since 2021-01-23
+ * @since 2021-02-09
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -36,7 +35,7 @@ public class GoodsbaseinfoVo implements Serializable {
     private String gbiName;
 
     /**
-     * 1酒类
+     * 1酒类2茶水 3电子设备
      */
     private Integer gbiCid;
 
@@ -135,6 +134,11 @@ public class GoodsbaseinfoVo implements Serializable {
      * 提货最低限制
      */
     private Integer gbiLimitpickup;
+
+    /**
+     * 售卖冻结天数
+     */
+    private Integer gbiFrozendays;
 
 
 }

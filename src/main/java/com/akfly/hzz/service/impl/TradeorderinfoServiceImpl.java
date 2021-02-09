@@ -8,6 +8,7 @@ import com.akfly.hzz.mapper.CustomergoodsrelatedMapper;
 import com.akfly.hzz.mapper.TradegoodsellMapper;
 import com.akfly.hzz.mapper.TradeorderinfoMapper;
 import com.akfly.hzz.service.*;
+import com.akfly.hzz.util.DateUtil;
 import com.akfly.hzz.util.JsonUtils;
 import com.akfly.hzz.util.RandomGenUtils;
 import com.akfly.hzz.vo.*;
@@ -124,6 +125,11 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         tp.setTpiServicefee(feeB.doubleValue());
         tp.setTpiSucessnum(num);
         tp.setTpiSucessnum(0);
+        tp.setTpiGoodstype(1);
+        if(isOnSale){
+            tp.setTpiGoodstype(3);
+        }
+
         tp.setTpiStatus(TradepredictinfoVo.STATUS_ENTRUST);
         //判断是否在交易时间
         String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
@@ -262,6 +268,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
                 cgrnew.setCgrBuytime(LocalDateTime.now());
                 cgrnew.setCgrSelltime(LocalDateTime.now());
                 cgrnew.setCgrUpdatetime(LocalDateTime.now());
+                cgrnew.setCgrForzentime(LocalDateTime.now().plusDays(Long.parseLong(gi.getGbiFrozendays()!=null?gi.getGbiFrozendays().toString():"0")));
                 customergoodsrelatedService.saveCustomergoodsrelated(cgrnew);
 
             }
@@ -309,10 +316,10 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
             //更新交易数据
             LocalDateTime now=LocalDateTime.now();
             ReporttradedateVo rt=new ReporttradedateVo();
-            rt.setRtiYear(now.getYear());
-            rt.setRtiMonth(now.getMonthValue());
-            rt.setRtiWeek(now.get(WeekFields.of(DayOfWeek.MONDAY,1).weekOfYear()));
-            rt.setRtiDate(now.getDayOfMonth());
+            rt.setRtiYear(Integer.parseInt(now.format(DateTimeFormatter.ofPattern("yyyy"))));
+            rt.setRtiMonth(Integer.parseInt(now.format(DateTimeFormatter.ofPattern("yyyyMM"))));
+            rt.setRtiWeek(Integer.parseInt(now.format(DateTimeFormatter.ofPattern("yyyy"))+String.format("%2d", now.get(WeekFields.of(DayOfWeek.MONDAY,1).weekOfYear())).replace(" ", "0")));
+            rt.setRtiDate(Integer.parseInt(now.format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
             rt.setRtiHour(now.getHour());
             rt.setRtiGbid(tp.getGbiId());
             GoodsbaseinfoVo gbi = goodsbaseinfoService.getGoodsbaseinfoVo(tp.getGbiId());

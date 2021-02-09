@@ -104,5 +104,5 @@ public class TradepredictinfoVo implements Serializable {
      */
     private Double tpiServicefee;
 
-
+    private Integer tpiGoodstype;
 }
