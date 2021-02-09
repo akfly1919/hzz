@@ -1,9 +1,12 @@
 package com.akfly.hzz.vo;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -11,7 +14,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author wangfei
- * @since 2021-02-06
+ * @since 2021-02-09
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -21,9 +24,15 @@ public class CustomerpickupdetailVo implements Serializable {
     private static final long serialVersionUID=1L;
 
     /**
+     * 自增id
+     */
+      @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
+
+    /**
      * 提货单号
      */
-      private Long cpuiOrderid;
+    private Long cpuiOrderid;
 
     /**
      * 物料id

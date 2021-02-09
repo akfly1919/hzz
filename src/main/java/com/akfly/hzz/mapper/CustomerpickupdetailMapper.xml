@@ -3,8 +3,9 @@
 <mapper namespace="com.akfly.hzz.mapper.CustomerpickupdetailMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.CustomerpickupdetailVo">
-        <id column="cpui_orderid" property="cpuiOrderid" />
+    <resultMap id="BaseResultMap" type="com.qianxian.api.vo.CustomerpickupdetailVo">
+        <id column="id" property="id" />
+        <result column="cpui_orderid" property="cpuiOrderid" />
         <result column="gii_id" property="giiId" />
     </resultMap>
 

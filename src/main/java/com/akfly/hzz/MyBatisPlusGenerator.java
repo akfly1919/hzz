@@ -79,7 +79,7 @@ public class MyBatisPlusGenerator {
         strategy.setNaming(NamingStrategy.underline_to_camel);
 
         // 需要生成的表
-        strategy.setInclude(new String[]{"taskstatistics"});
+        strategy.setInclude(new String[]{"customerpickupdetail"});
         //strategy.setSuperServiceClass(null);
         //strategy.setSuperServiceImplClass(null);
         //strategy.setSuperMapperClass(null);

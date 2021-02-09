@@ -219,11 +219,16 @@ public class UserController {
 				msg_prefix = CommonConstant.MSG_CODE_LOGIN;
 			} else if ("1".equals(msgType)) {
 				msg_prefix = CommonConstant.MSG_CODE_REGISTER;
+				CustomerbaseinfoVo existUser = customerbaseinfoService.getUserInfo(phoneNum);
+				if (existUser != null) {
+					throw new HzzBizException(HzzExceptionEnum.PHONENUM_EXIST);
+				}
 			} else if ("2".equals(msgType)) {
 				msg_prefix = CommonConstant.MSG_CODE_FORGET_PSW;
 			} else {
 				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
 			}
+
 			redisUtils.set(msg_prefix + phoneNum, code, 300); // 有效期5分钟
 
 			if (SmsUtils.smsSend(phoneNum,code)) {

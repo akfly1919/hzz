@@ -47,19 +47,13 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
     @Override
     public int getStock(long gbiId) {
 
-        String key = CommonConstant.GOODS_STOCK_PREFIX + gbiId;
-        Object o = redisUtils.get(key);
+        //String key = CommonConstant.GOODS_STOCK_PREFIX + gbiId;
+        //Object o = redisUtils.get(key);
 
-        int stock;
-        if (o == null) {
-            stock = lambdaQuery().eq(CustomergoodsrelatedVo::getGbiId, gbiId)
-                    .eq(CustomergoodsrelatedVo::getCgrIsown, 1).eq(CustomergoodsrelatedVo::getCgrIslock, 0)
+        int stock = lambdaQuery().eq(CustomergoodsrelatedVo::getGbiId, gbiId)
+                    .eq(CustomergoodsrelatedVo::getCgrIsown, 1).eq(CustomergoodsrelatedVo::getCgrIslock, 2)
                     .eq(CustomergoodsrelatedVo::getCgrIspickup, 0).count();
-            redisUtils.set(key, stock, 60 *60);
-        } else {
-            stock = (int) o;
-            log.warn("从redis获取商品销量stock={}", stock);
-        }
+            //redisUtils.set(key, stock, 60 *60);
         return stock;
 
     }
@@ -85,9 +79,9 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
         if (StockEnum.UNLOCKED.equals(stockEnum)) {
             queryWrapper.eq("cgr_islock", 0);
         } else if (StockEnum.LOCKED.equals(stockEnum)) {
-            queryWrapper.eq("cgr_islock", 1);
-        } else if (StockEnum.FROZEN.equals(stockEnum)) {
             queryWrapper.eq("cgr_islock", 2);
+        } else if (StockEnum.FROZEN.equals(stockEnum)) {
+            queryWrapper.eq("cgr_islock", 1);
         } else if (StockEnum.XIANHUO.equals(stockEnum)) {
             queryWrapper.in("cgr_islock", Arrays.asList(0, 1));
         }
