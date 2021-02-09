@@ -21,6 +21,7 @@
         <result column="tgs_servicefee" property="tgsServicefee" />
         <result column="tgs_tradetime" property="tgsTradetime" />
         <result column="tgs_selltype" property="tgsSelltype" />
+        <result column="tpi_id" property="tpiId" />
     </resultMap>
 
 </mapper>
