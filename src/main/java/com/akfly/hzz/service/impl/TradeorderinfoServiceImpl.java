@@ -302,8 +302,8 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
                 BigDecimal balanceB=BigDecimal.valueOf(balance!=null?balance:0);
                 BigDecimal totalB=BigDecimal.valueOf(total!=null?total:0);
                 BigDecimal cost = BigDecimal.valueOf(tg.getTgsPrice()).subtract(BigDecimal.valueOf(tg.getTgsServicefee()));
-                balanceB.add(cost);
-                totalB.add(cost);
+                balanceB=balanceB.add(cost);
+                totalB=totalB.add(cost);
                 customerbaseinfoVo.setCbiTotal(totalB.doubleValue());
                 customerbaseinfoVo.setCbiBalance(balanceB.doubleValue());
                 customerbaseinfoService.updateUserInfo(customerbaseinfoVo);
@@ -345,10 +345,10 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
             int leftnum=list.size();
             BigDecimal priceB=BigDecimal.valueOf(tp.getTpiPrice()).multiply(BigDecimal.valueOf(leftnum));
             BigDecimal feeB=BigDecimal.valueOf(tp.getTpiServicefee()).multiply(BigDecimal.valueOf(leftnum));
-            balanceB.add(feeB).add(priceB);
-            fronzeB.subtract(feeB).subtract(priceB);
-            totalB.subtract(goodsprice).subtract(feeprice);
-            balanceB.subtract(goodsprice).subtract(feeprice);
+            balanceB=balanceB.add(feeB).add(priceB);
+            fronzeB=fronzeB.subtract(feeB).subtract(priceB);
+            totalB=totalB.subtract(goodsprice).subtract(feeprice);
+            balanceB=balanceB.subtract(goodsprice).subtract(feeprice);
             if(balanceB.compareTo(new BigDecimal("0.0"))<0){
                 throw new HzzBizException(HzzExceptionEnum.ACCOUNT_BALACE_ERROR);
             }
