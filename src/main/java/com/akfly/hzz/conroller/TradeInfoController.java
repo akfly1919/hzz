@@ -354,7 +354,6 @@ public class TradeInfoController {
             } else if (vo.getTgsStatus() == 1) {
                 tradeInfoDto.setTradeStatus(6);
             }
-            tradeInfoDto.setTradeStatus(vo.getTgsStatus());
             tradeInfoDto.setCreatetime(vo.getTgsCreatetime());
             tradeInfoDto.setTradeTime(vo.getTgsTradetime());
             tradeInfoDto.setFinishtime(vo.getTgsFinshitime());
