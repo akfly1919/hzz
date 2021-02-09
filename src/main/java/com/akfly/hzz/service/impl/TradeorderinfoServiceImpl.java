@@ -292,6 +292,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
                 toi.setToiBuyservicefee(fee.doubleValue());
                 toi.setToiSellservicefee(tg.getTgsServicefee());
                 toi.setToiType(TradeorderinfoVo.TYPE_NOMAL);
+                toi.setTpiId(tp.getTpiId());
                 saveTradeorderinfo(toi);
 
                 //卖家上账

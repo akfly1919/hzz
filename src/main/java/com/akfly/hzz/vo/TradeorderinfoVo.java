@@ -97,5 +97,6 @@ public class TradeorderinfoVo implements Serializable {
     @TableField(exist = false)
     private Integer stock;
 
+    private String tpiId;
 
 }
