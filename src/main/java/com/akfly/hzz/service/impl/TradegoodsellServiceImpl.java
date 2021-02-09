@@ -96,7 +96,7 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
         wrapper_c.eq("gbi_id",gbid);
         wrapper_c.eq("tpi_status",1);
         wrapper_c.ge("tpi_price",price);
-        wrapper_c.ne("toi_sellerid",cbiid);
+        wrapper_c.ne("tpi_buyerid",cbiid);
         wrapper_c.orderByAsc("tpi_createtime");
         wrapper_c.last("for update");
         List<TradepredictinfoVo> list = tradepredictinfoMapper.selectList(wrapper_c);
