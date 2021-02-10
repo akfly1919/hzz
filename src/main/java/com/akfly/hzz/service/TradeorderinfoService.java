@@ -1,6 +1,7 @@
 package com.akfly.hzz.service;
 
 import com.akfly.hzz.exception.HzzBizException;
+import com.akfly.hzz.vo.CustomerbaseinfoVo;
 import com.akfly.hzz.vo.TradeconfigVo;
 import com.akfly.hzz.vo.TradeorderinfoVo;
 import com.akfly.hzz.vo.TradepredictinfoVo;
@@ -25,7 +26,8 @@ public interface TradeorderinfoService extends IService<TradeorderinfoVo> {
 
     void updateTradeOrder(TradeorderinfoVo vo) throws HzzBizException;
 
-    public void nomalBuy(long cbiid,long gbid,int num,double price,boolean isOnSale,int type, int isNew) throws HzzBizException;
+    public void nomalBuy(CustomerbaseinfoVo userInfo, long gbid, int num, double price, boolean isOnSale, int type) throws HzzBizException;
+
     public void dealSold(TradepredictinfoVo tp, TradeconfigVo tc) throws HzzBizException;
 
 

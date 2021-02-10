@@ -39,6 +39,8 @@ public class TradepredictinfoServiceImpl extends ServiceImpl<TradepredictinfoMap
     private CustomerbaseinfoMapper customerbaseinfoMapper;
     @Resource
     private CustomerbaseinfoService customerbaseinfoService;
+
+
     public void saveTradepredictinfoVo(TradepredictinfoVo tradepredictinfoVo) throws HzzBizException {
        if(!saveOrUpdate(tradepredictinfoVo)) {
            throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
@@ -87,7 +89,7 @@ public class TradepredictinfoServiceImpl extends ServiceImpl<TradepredictinfoMap
         if (tpi==null){
             throw new HzzBizException(HzzExceptionEnum.ORDER_NOTEXIST_ERROR);
         }
-        if(tpi.getTpiStatus().intValue()!=1){
+        if(tpi.getTpiStatus() != 1){
             //状态已变，无需处理
             return false;
         }

@@ -106,6 +106,10 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
 
         if (!updateById(customerbaseinfoVo)) {
             throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
+        } else {
+            String key = CommonConstant.USER_PREFIX + customerbaseinfoVo.getCbiId();
+            CustomerbaseinfoVo userInDB = getUserInfoByIdInDb(customerbaseinfoVo.getCbiId().toString());
+            redisUtils.set(key, JsonUtils.toJson(userInDB), 30 *60);
         }
 
     }
@@ -135,7 +139,7 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
             }
 
             CustomerbaseinfoVo vo = users.get(0);
-            redisUtils.set(key, JsonUtils.toJson(vo), 2 * 60 *60);
+            redisUtils.set(key, JsonUtils.toJson(vo), 30 *60);
             return vo;
         } else {
             log.warn("从redis获取用户信息vo={}", JsonUtils.toJson(o));

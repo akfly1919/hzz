@@ -87,7 +87,7 @@ public class TradeInfoController {
         BaseRspDto<String> rsp = new BaseRspDto<String>();
         try {
             CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
-            tradeorderinfoService.nomalBuy(userInfo.getCbiId(), gbid, num, price,isOnSale,type, userInfo.getCbiIsnew());
+            tradeorderinfoService.nomalBuy(userInfo, gbid, num, price,isOnSale,type);
 
         } catch (HzzBizException e) {
             log.error("购买业务错误 msg={}", e.getErrorMsg(), e);

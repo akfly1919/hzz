@@ -42,6 +42,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
 
     @Resource
     GoodsbaseinfoService goodsbaseinfoService;
+
     @Resource
     private CustomerbaseinfoMapper customerbaseinfoMapper;
 
@@ -95,13 +96,14 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
     public void updateTradeOrder(TradeorderinfoVo vo) throws HzzBizException {
 
     }
-    public void nomalBuy(long cbiid,long gbid,int num,double price,boolean isOnSale,int type, int isNew) throws HzzBizException {
+    public void nomalBuy(CustomerbaseinfoVo userInfo, long gbid,int num,double price,boolean isOnSale,int type) throws HzzBizException {
         GoodsbaseinfoVo gi = goodsbaseinfoService.getGoodsbaseinfoVo(gbid);
         //if (gi.getGbiPrice() != price){
         //    //TODO 价格不正确
         //    price = gi.getGbiPrice();
         //}
-        if (isNew == 0 && gi.getGbiType() == 2) {
+        long cbiid = userInfo.getCbiId();
+        if (userInfo.getCbiIsnew() == 0 && gi.getGbiType() == 2) {
             throw new HzzBizException(HzzExceptionEnum.CANNOT_BUY_NEWMAN_ERROR);
         }
         HashMap<String, LocalDateTime> timeMap = tradetimeService.getRealTradeStarttime();
@@ -156,9 +158,10 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
                 throw new HzzBizException(HzzExceptionEnum.STOCK_ERROR);
             } else {
                 taskstatisticsService.saveOrUpdateForNoSpecial(cbiid, gbid, num);
-                // TODO 更新用户新手状态
-                if () {
-
+                // 特价商品购买成功后，更新用户为非新手用户
+                if (userInfo.getCbiIsnew() == 1) {
+                    userInfo.setCbiIsnew(0);
+                    customerbaseinfoService.updateUserInfo(userInfo);
                 }
             }
         }
