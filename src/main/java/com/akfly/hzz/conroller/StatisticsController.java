@@ -8,10 +8,7 @@ import com.akfly.hzz.dto.UserGoodsDto;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.interceptor.AuthInterceptor;
-import com.akfly.hzz.service.CustomergoodsrelatedService;
-import com.akfly.hzz.service.GoodsbaseinfoService;
-import com.akfly.hzz.service.ReporttradedateService;
-import com.akfly.hzz.service.TradegoodsellService;
+import com.akfly.hzz.service.*;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
 import com.akfly.hzz.vo.GoodsbaseinfoVo;
 import com.akfly.hzz.vo.PictureinfoVo;
@@ -50,6 +47,9 @@ public class StatisticsController {
 
     @Resource
     private TradegoodsellService tradegoodsellService;
+
+    @Resource
+    private GoodsiteminfoService goodsiteminfoService;
 
     @ApiOperation(value="交易行情",notes="交易行情查询")
     @PostMapping
@@ -91,9 +91,10 @@ public class StatisticsController {
                         .eq(GoodsbaseinfoVo::getGbiId, goodId).one();
                 userGoodsDto = new UserGoodsDto();
                 BeanUtils.copyProperties(goodsbaseinfoVo, userGoodsDto);
-                //int stock = tradegoodsellService.getSellVolume(goodId);
-                int stock =customergoodsrelatedService.getStock(goodId);
-                userGoodsDto.setStock((long)stock);
+                //int stock = tradegoodsellService.getSellVolume(goodId);  可买入的库存
+                //int stock = customergoodsrelatedService.getStock(goodId);  可买入的物料个数，理论上要跟可买入的库存一致
+                int stock = goodsiteminfoService.getPlatFormStock(goodId);
+                userGoodsDto.setStock(stock);
                 userGoodsDto.setCbiid(userInfo.getCbiId());
             } else if (type == 2) {
                 userGoodsDto = customergoodsrelatedService.getCanSellOfGbi(userInfo.getCbiId(), goodId);

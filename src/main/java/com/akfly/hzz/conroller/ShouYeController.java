@@ -54,6 +54,9 @@ public class ShouYeController {
     @Resource
     private ReporttradedateService reporttradedateService;
 
+    @Resource
+    private GoodsiteminfoService goodsiteminfoService;
+
     @GetMapping(value = "/hello")
     public String hello(){
         return redisTemplate.opsForValue().get("a")+"";
@@ -101,7 +104,8 @@ public class ShouYeController {
             for (GoodsbaseinfoVo vo : zcgoods) {
                 GoodsbaseinfoDto dto = new GoodsbaseinfoDto();
                 BeanUtils.copyProperties(vo, dto);
-                int stock = customergoodsrelatedService.getStock(vo.getGbiId());
+                //int stock = customergoodsrelatedService.getStock(vo.getGbiId());
+                int stock = goodsiteminfoService.getPlatFormStock(vo.getGbiId());
                 dto.setStock(stock);
                 dtos.add(dto);
             }
@@ -139,7 +143,8 @@ public class ShouYeController {
                     .eq(PictureinfoVo::getPiValid, 1).list();
             goodInfoDto.setPivs(pictureinfoVos);
 
-            int stock = customergoodsrelatedService.getStock(goodsbaseinfoVo.getGbiId()); // TODO 需要加上状态，只获取未锁定的单子
+            //int stock = customergoodsrelatedService.getStock(goodsbaseinfoVo.getGbiId());
+            int stock = goodsiteminfoService.getPlatFormStock(goodsbaseinfoVo.getGbiId());
             goodInfoDto.setStock(stock);
 
             int salesVolume = reporttradedateService.getRtiNum(goodsbaseinfoVo.getGbiId());

@@ -111,6 +111,6 @@ public class UserGoodsDto {
     /**
      * 库存
      */
-    private Long stock;
+    private Integer stock;
 
 }

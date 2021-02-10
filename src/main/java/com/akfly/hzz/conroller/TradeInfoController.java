@@ -4,7 +4,6 @@ import com.akfly.hzz.annotation.VerifyToken;
 import com.akfly.hzz.constant.PickUpEnum;
 import com.akfly.hzz.constant.StockEnum;
 import com.akfly.hzz.dto.BaseRspDto;
-import com.akfly.hzz.dto.GoodsbaseinfoDto;
 import com.akfly.hzz.dto.TradeInfoDto;
 import com.akfly.hzz.dto.UserGoodsDto;
 import com.akfly.hzz.exception.HzzBizException;
@@ -15,16 +14,18 @@ import com.akfly.hzz.vo.*;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import javax.validation.constraints.*;
-import java.time.LocalDateTime;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -99,6 +100,14 @@ public class TradeInfoController {
         }
         return rsp;
     }
+
+    @ApiOperation(value="取消",notes="用户登录")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="orderid",value="订单号",required=true),
+            @ApiImplicitParam(name="tradeType",value="交易类型(1: 买入 2: 卖出)",required=true),
+            @ApiImplicitParam(name="num",value="卖出数量",required=true),
+            @ApiImplicitParam(name="type",value="卖出类型(1: 委托卖出 2: 正常卖出)",required=true)
+    })
     @PostMapping(value = "/cancel")
     @VerifyToken
     public BaseRspDto<String> cancel(

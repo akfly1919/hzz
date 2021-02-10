@@ -135,8 +135,7 @@ public class DateUtil extends Object {
     public static Calendar getCalendar(String dateString) {
         Calendar calendar = Calendar.getInstance();
         String[] items = dateString.split("-");
-        calendar
-                .set(Integer.parseInt(items[0]), Integer.parseInt(items[1]) - 1, Integer.parseInt(items[2]));
+        calendar.set(Integer.parseInt(items[0]), Integer.parseInt(items[1]) - 1, Integer.parseInt(items[2]));
         return calendar;
     }
 

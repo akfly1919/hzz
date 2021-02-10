@@ -155,6 +155,10 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
                 throw new HzzBizException(HzzExceptionEnum.STOCK_ERROR);
             } else {
                 taskstatisticsService.saveOrUpdateForNoSpecial(cbiid, gbid, num);
+                // TODO 更新用户新手状态
+                if () {
+
+                }
             }
         }
     }

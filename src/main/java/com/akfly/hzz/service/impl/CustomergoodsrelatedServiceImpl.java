@@ -50,8 +50,9 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
         //String key = CommonConstant.GOODS_STOCK_PREFIX + gbiId;
         //Object o = redisUtils.get(key);
 
+        // 获取已锁定的库存，说明正在卖的单子，是市场上可以买入的库存量
         int stock = lambdaQuery().eq(CustomergoodsrelatedVo::getGbiId, gbiId)
-                    .eq(CustomergoodsrelatedVo::getCgrIsown, 1).eq(CustomergoodsrelatedVo::getCgrIslock, 2)
+                    .eq(CustomergoodsrelatedVo::getCgrIsown, 1).in(CustomergoodsrelatedVo::getCgrIslock, 2)
                     .eq(CustomergoodsrelatedVo::getCgrIspickup, 0).count();
             //redisUtils.set(key, stock, 60 *60);
         return stock;
@@ -101,7 +102,7 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
             GoodsbaseinfoVo vo = goodsbaseinfoService.getGoodsbaseinfoWithRedis(Long.parseLong(String.valueOf(temp.get("gbi_id"))));
             UserGoodsDto userGoodsDto = new UserGoodsDto();
             userGoodsDto.setCbiid(userId);
-            userGoodsDto.setStock((long) temp.get("stock"));
+            userGoodsDto.setStock((int) temp.get("stock"));
             BeanUtils.copyProperties(vo, userGoodsDto);
             userGoodsDtoList.add(userGoodsDto);
         }
@@ -148,7 +149,7 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
                 userGoodsDto.setCgrForzentime(temp.getCgrForzentime());
                 userGoodsDto.setCgrSelltime(temp.getCgrSelltime());
             }
-            userGoodsDto.setStock(Long.parseLong(String.valueOf(stock)));
+            userGoodsDto.setStock(stock);
             BeanUtils.copyProperties(vo, userGoodsDto);
         } catch (HzzBizException e) {
             log.error("从redis获取商品信息异常 msg={}", e.getErrorMsg(), e);
@@ -171,7 +172,7 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
         try {
             GoodsbaseinfoVo vo = goodsbaseinfoService.getGoodsbaseinfoWithRedis(gbiid);
             userGoodsDto.setCbiid(cbiid);
-            userGoodsDto.setStock((long) stock);
+            userGoodsDto.setStock(stock);
             BeanUtils.copyProperties(vo, userGoodsDto);
         } catch (HzzBizException e) {
             log.error("从redis获取商品信息异常 msg={}", e.getErrorMsg(), e);
