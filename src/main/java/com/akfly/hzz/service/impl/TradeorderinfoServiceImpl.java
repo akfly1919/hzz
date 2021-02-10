@@ -15,6 +15,7 @@ import com.akfly.hzz.vo.*;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import springfox.documentation.spring.web.json.Json;
@@ -63,6 +64,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
 
     @Resource
     private CustomergoodsrelatedService customergoodsrelatedService;
+
     @Resource
     private CustomergoodsrelatedMapper customergoodsrelatedMapper;
 
@@ -142,17 +144,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
                 throw new HzzBizException(HzzExceptionEnum.TRADE_TIME_ERROR);
             }
             tp.setTpiType(TradepredictinfoVo.TYPE_ENTRUST);
-            int need=tp.getTpiNum()-tp.getTpiSucessnum();
-            {
-                QueryWrapper wrapper_c=new QueryWrapper();
-                wrapper_c.eq("cbi_id",tp.getTpiBuyerid());
-                wrapper_c.eq("gbi_id",tp.getGbiId());
-                wrapper_c.eq("cgr_isown",1);
-                List list = customergoodsrelatedService.list(wrapper_c);
-                if(gi.getGbiLimitperson()<list.size()+need){
-                    throw new HzzBizException(HzzExceptionEnum.LIMIT_PERSON_ERROR);
-                }
-            }
+            checkBuyNum(gi.getGbiLimitperson(), tp);
             tradepredictinfoService.saveTradepredictinfoVo(tp);
         }
         if(isOnSale){
@@ -186,17 +178,11 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
             tc=tradeconfigService.getTradeconfig(TradeconfigVo.TCTYPE_BUY);
         }
         GoodsbaseinfoVo gi = goodsbaseinfoService.getGoodsbaseinfoVo(tp.getGbiId());
-        int need=tp.getTpiNum()-tp.getTpiSucessnum();
-        {
-            QueryWrapper wrapper_c=new QueryWrapper();
-            wrapper_c.eq("cbi_id",tp.getTpiBuyerid());
-            wrapper_c.eq("gbi_id",tp.getGbiId());
-            wrapper_c.eq("cgr_isown",1);
-            List list = customergoodsrelatedService.list(wrapper_c);
-            if(gi.getGbiLimitperson()<list.size()+need){
-                throw new HzzBizException(HzzExceptionEnum.LIMIT_PERSON_ERROR);
-            }
-        }
+
+        // 校验当天购买量不能超出商品基本信息上面的当日限制购买量
+        checkBuyNum(gi.getGbiLimitperson(), tp);
+
+        int need = tp.getTpiNum() - tp.getTpiSucessnum();
         QueryWrapper<TradegoodsellVo> wrapper = new QueryWrapper<TradegoodsellVo>();
         wrapper.eq("gbi_id",tp.getGbiId());
         wrapper.eq("tgs_status","0");
@@ -212,7 +198,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         wrapper.orderByAsc("tgs_price");
         wrapper.orderByAsc("tgs_owntype");//价格相同，系统用户在前
         wrapper.orderByAsc("tgs_tradetime");
-        wrapper.last("limit "+need+" for update");
+        wrapper.last("limit " + need + " for update");
         List<TradegoodsellVo> list = tradegoodsellMapper.selectList(wrapper);
         if(isOnSale){
             if(list==null||list.size()<need){
@@ -381,6 +367,34 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         if(!saveOrUpdate(tradeorderinfoVo)) {
             throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
         }
+    }
+
+
+    public void checkBuyNum(Integer gbiLimitPerson, TradepredictinfoVo tp) throws HzzBizException {
+
+        int need = tp.getTpiNum() - tp.getTpiSucessnum();
+        //{  校验所有该产品的购买量
+        //    QueryWrapper wrapper_c=new QueryWrapper();
+        //    wrapper_c.eq("cbi_id",tp.getTpiBuyerid());
+        //    wrapper_c.eq("gbi_id",tp.getGbiId());
+        //    wrapper_c.eq("cgr_isown",1);
+        //    List list = customergoodsrelatedService.list(wrapper_c);
+        //    int gbiLimitPerson = gi.getGbiLimitperson() == null ? 0 : gi.getGbiLimitperson();
+        //    if(gbiLimitPerson < (list.size() + need)){
+        //        throw new HzzBizException(HzzExceptionEnum.LIMIT_PERSON_ERROR);
+        //    }
+        //}
+
+        // 校验用户该产品当天的购买量
+        Date now = new Date();
+        Date beginTime = DateUtil.getDateBegin(now);
+        int buyCount = lambdaQuery().eq(TradeorderinfoVo::getGbiId, tp.getGbiId()).eq(TradeorderinfoVo::getTgsBuyerid, tp.getTpiBuyerid())
+                .between(TradeorderinfoVo::getToiTradetime, beginTime, now).count();
+        int limit = gbiLimitPerson == null ? 0 : gbiLimitPerson;
+        if(limit < (buyCount + need)){
+            throw new HzzBizException(HzzExceptionEnum.LIMIT_PERSON_ERROR);
+        }
+
     }
 
 
