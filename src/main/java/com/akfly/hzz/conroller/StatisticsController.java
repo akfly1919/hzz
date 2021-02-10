@@ -91,7 +91,8 @@ public class StatisticsController {
                         .eq(GoodsbaseinfoVo::getGbiId, goodId).one();
                 userGoodsDto = new UserGoodsDto();
                 BeanUtils.copyProperties(goodsbaseinfoVo, userGoodsDto);
-                int stock = tradegoodsellService.getSellVolume(goodId);
+                //int stock = tradegoodsellService.getSellVolume(goodId);
+                int stock =customergoodsrelatedService.getStock(goodId);
                 userGoodsDto.setStock((long)stock);
                 userGoodsDto.setCbiid(userInfo.getCbiId());
             } else if (type == 2) {

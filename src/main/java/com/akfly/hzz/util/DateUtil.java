@@ -980,7 +980,6 @@ public class DateUtil extends Object {
     public static Date getDateBegin(Date date) {
 
         Calendar calendar = Calendar.getInstance();
-        System.out.println(date);
         calendar.setTime(date);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
