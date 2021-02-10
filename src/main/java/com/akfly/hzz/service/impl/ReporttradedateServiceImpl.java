@@ -91,6 +91,8 @@ public class ReporttradedateServiceImpl extends ServiceImpl<ReporttradedateMappe
             queryWrapper.select(" rti_gbid,rti_hour,sum(rti_num) as rti_num,sum(rti_money) as rti_money ");
             queryWrapper.ge("rti_date",Integer.parseInt(now.format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
             queryWrapper.ge("rti_hour",now.getHour());
+            queryWrapper.or();
+            queryWrapper.ge("rti_date",Integer.parseInt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
             queryWrapper.groupBy("rti_year,rti_month,rti_date,rti_hour");
             queryWrapper.orderByDesc("rti_year,rti_month,rti_date,rti_hour");
         }
