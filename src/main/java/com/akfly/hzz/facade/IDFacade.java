@@ -5,6 +5,7 @@ import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.util.HttpUtils;
 import com.akfly.hzz.util.ImageUtil;
 import com.akfly.hzz.util.JsonUtils;
+import com.akfly.hzz.util.RandomGenUtils;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -52,7 +53,7 @@ public class IDFacade {
         Map<String,String> map=new HashMap<String,String>();
         map.put("idcard",idcard);
         map.put("realname",realname);
-        map.put("orderid","1");
+        map.put("orderid", RandomGenUtils.genFlowNo("RM"));
         map.put("key","6de4cec9e373c07804591c4b3d980d3a");
         String result = HttpUtils.postForm("http://op.juhe.cn/idcard/query", map);
         System.out.println(result);

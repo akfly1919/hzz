@@ -81,7 +81,7 @@ public class ImgUploadController {
                     imageStream.read(data);
                     outputStream1 = new FileOutputStream(image);
                     outputStream1.write(data);
-                    JSONObject object =idFacade.idImageProcess(image,IDFacade.IDSIDE_FRONT);
+                    JSONObject object =idFacade.idImageProcess(image, IDFacade.IDSIDE_FRONT);
                     //TODO
                     //object.put("fileName",fileName);
                     rsp.setData(object);
@@ -234,7 +234,7 @@ public class ImgUploadController {
         if (fileSize <= 0) {
             log.info("文件为空");
             throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
-        } else if (fileSize > (2 * 1024 * 1024)) {
+        } else if (fileSize > (20 * 1024 * 1024)) {
             log.error( "文件大小超出规格 fileName={}", fileName);
             throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
 

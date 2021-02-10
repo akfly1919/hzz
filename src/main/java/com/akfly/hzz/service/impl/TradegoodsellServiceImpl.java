@@ -128,7 +128,7 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
         if(cgrlist==null||cgrlist.size()<num){
             throw new HzzBizException(HzzExceptionEnum.STOCK_ERROR);
         }
-        HashMap<String, LocalDateTime> timeMap = tradetimeService.getRealTradeStarttime();
+        HashMap<String, LocalDateTime> timeMap = tradetimeService.getRealTradeStartTime();
         for(CustomergoodsrelatedVo cgr:cgrlist){
             cgr.setCgrIslock(2);
             customergoodsrelatedService.saveCustomergoodsrelated(cgr);

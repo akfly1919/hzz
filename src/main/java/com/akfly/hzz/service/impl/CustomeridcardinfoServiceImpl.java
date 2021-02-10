@@ -9,6 +9,7 @@ import com.akfly.hzz.service.CustomeridcardinfoService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.checkerframework.checker.units.qual.C;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class CustomeridcardinfoServiceImpl extends ServiceImpl<Customeridcardinf
 
         List<CustomeridcardinfoVo> idCard = lambdaQuery()
                 .eq(CustomeridcardinfoVo::getCbiId, userId).list();
-        if (idCard.isEmpty()) {
+        if (CollectionUtils.isEmpty(idCard)) {
             throw new HzzBizException(HzzExceptionEnum.USER_NOT_REALNAME);
         }
         return idCard.get(0);

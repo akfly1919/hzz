@@ -3,6 +3,7 @@ package com.akfly.hzz.service.impl;
 import com.akfly.hzz.constant.CommonConstant;
 import com.akfly.hzz.constant.PickUpEnum;
 import com.akfly.hzz.constant.StockEnum;
+import com.akfly.hzz.dto.UserAllAssetDto;
 import com.akfly.hzz.dto.UserGoodsDto;
 import com.akfly.hzz.dto.UserGoodsWithPickUpDto;
 import com.akfly.hzz.exception.HzzBizException;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -102,7 +104,7 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
             GoodsbaseinfoVo vo = goodsbaseinfoService.getGoodsbaseinfoWithRedis(Long.parseLong(String.valueOf(temp.get("gbi_id"))));
             UserGoodsDto userGoodsDto = new UserGoodsDto();
             userGoodsDto.setCbiid(userId);
-            userGoodsDto.setStock((int) temp.get("stock"));
+            userGoodsDto.setStock(Long.valueOf(String.valueOf(temp.get("stock"))).intValue());
             BeanUtils.copyProperties(vo, userGoodsDto);
             userGoodsDtoList.add(userGoodsDto);
         }
@@ -223,5 +225,44 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
         result.put("frozenStock", frozenStock);
         result.put("stock", stock);
         return result;
+    }
+
+    @Override
+    public int getMyStock(Long userId) {
+
+        int stock = lambdaQuery().eq(CustomergoodsrelatedVo::getCbiId, userId).eq(CustomergoodsrelatedVo::getCgrIsown, 1)
+                .eq(CustomergoodsrelatedVo::getCgrIspickup, 0).count();
+        return stock;
+    }
+
+    @Override
+    public UserAllAssetDto getMyAsset(Long userId) throws HzzBizException {
+
+        QueryWrapper<CustomergoodsrelatedVo> queryWrapper = new QueryWrapper<CustomergoodsrelatedVo>();
+        queryWrapper.eq("cbi_id", userId).eq("cgr_isown", 1);
+        queryWrapper.eq("cgr_ispickup", 0);
+        queryWrapper.select("cbi_id, gbi_id, count(id) as stock");
+        queryWrapper.groupBy("gbi_id");
+
+        try {
+            List<Map<String, Object>> list = baseMapper.selectMaps(queryWrapper);
+            int stock = 0;
+            BigDecimal asset = BigDecimal.ZERO;
+            for (Map<String, Object> temp : list) {
+                String gbiId = String.valueOf(temp.get("gbi_id"));
+                if (StringUtils.isEmpty(gbiId)) continue;
+                GoodsbaseinfoVo vo = goodsbaseinfoService.getGoodsbaseinfoWithRedis(Long.parseLong(gbiId));
+                stock = stock + Long.valueOf(String.valueOf(temp.get("stock"))).intValue();
+                asset = asset.add(BigDecimal.valueOf(vo.getGbiPrice()).multiply(BigDecimal.valueOf(stock)));
+            }
+            UserAllAssetDto userAllAssetDto = new UserAllAssetDto();
+            userAllAssetDto.setAsset(asset);
+            userAllAssetDto.setStock(stock);
+            log.info("获取用户总资产 userId={}, stock={}, asset={}", userId, userAllAssetDto.getStock(), userAllAssetDto.getAsset());
+            return userAllAssetDto;
+        } catch (Exception e) {
+            log.error("获取用户总资产异常 userId={}", userId, e);
+            throw new HzzBizException(HzzExceptionEnum.SYSTEM_ERROR);
+        }
     }
 }

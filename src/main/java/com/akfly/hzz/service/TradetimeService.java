@@ -18,5 +18,5 @@ import java.util.HashMap;
 public interface TradetimeService extends IService<TradetimeVo> {
     public TradetimeVo getTradeTime() throws HzzBizException;
     public boolean isInTradeTime(String time) throws HzzBizException;
-    public HashMap<String , LocalDateTime> getRealTradeStarttime() throws HzzBizException;
+    public HashMap<String , LocalDateTime> getRealTradeStartTime() throws HzzBizException;
 }

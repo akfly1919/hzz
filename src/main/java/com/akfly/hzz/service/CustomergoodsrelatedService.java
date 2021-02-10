@@ -2,6 +2,7 @@ package com.akfly.hzz.service;
 
 import com.akfly.hzz.constant.PickUpEnum;
 import com.akfly.hzz.constant.StockEnum;
+import com.akfly.hzz.dto.UserAllAssetDto;
 import com.akfly.hzz.dto.UserGoodsDto;
 import com.akfly.hzz.dto.UserGoodsWithPickUpDto;
 import com.akfly.hzz.exception.HzzBizException;
@@ -52,5 +53,14 @@ public interface CustomergoodsrelatedService extends IService<Customergoodsrelat
     UserGoodsDto getCanSellOfGbi(long cbiid, long gbiid) throws HzzBizException;
 
     Map<String, Long> getStockForMyself(Long userId, StockEnum stockEnum, PickUpEnum pickUpEnum);
+
+    /**
+     * 获取我的库存
+     * @param userId
+     * @return
+     */
+    int getMyStock(Long userId);
+
+    UserAllAssetDto getMyAsset(Long userId) throws HzzBizException;
 
 }

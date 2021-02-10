@@ -33,6 +33,6 @@ public interface CustomerbaseinfoService extends IService<CustomerbaseinfoVo> {
     CustomerbaseinfoVo getUserInfoByIdForUpdate(String cbiId) throws HzzBizException;
     public void frozenAccount(long cbiid,Double total) throws HzzBizException;
 
-    CustomerbaseinfoVo getUserInfoByIdInDb(String cbiId) throws HzzBizException;
+    CustomerbaseinfoVo getUserInfoByIdInDb(long cbiId) throws HzzBizException;
 
 }

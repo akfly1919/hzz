@@ -16,6 +16,7 @@ import com.akfly.hzz.interceptor.AuthInterceptor;
 import com.akfly.hzz.service.CustomerbillrelatedService;
 import com.akfly.hzz.service.CustomercashoutinfoService;
 import com.akfly.hzz.service.CustomerpayinfoService;
+import com.akfly.hzz.service.ReceiveinfoService;
 import com.akfly.hzz.vo.*;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.time.Instant;
@@ -52,6 +54,9 @@ public class AccountInfoController {
 
     @Resource(name = "aliPayH5SubmitPayService")
     private SubmitPayService aliPayH5SubmitPayService;
+
+    @Resource
+    private ReceiveinfoService receiveinfoService;
 
 
     @ApiOperation(value="用户充值",notes="用户登录就可以")
@@ -177,6 +182,29 @@ public class AccountInfoController {
             rsp.setData(list);
         }  catch (Exception e) {
             log.error("获取用户资金流水系统异常", e);
+            rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+            rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+        }
+        return rsp;
+    }
+
+    @ApiOperation(value="线下充值",notes="获取线下充值的二维码图片")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="type",value="支付渠道(1：支付宝 2：微信 3:银行卡)",required=true)
+    })
+    @PostMapping(value = "/offlineRecharge")
+    public BaseRspDto<ReceiveinfoVo> offlineRecharge(@RequestParam @NotNull Integer type){
+
+        BaseRspDto<ReceiveinfoVo> rsp = new BaseRspDto<ReceiveinfoVo>();
+        try {
+            ReceiveinfoVo vo = receiveinfoService.getReceiveinfoVo(type);
+            rsp.setData(vo);
+        //} catch (HzzBizException e) {
+        //    log.error("用户提现业务错误 msg={}", e.getErrorMsg(), e);
+        //    rsp.setCode(e.getErrorCode());
+        //    rsp.setMsg(e.getErrorMsg());
+        } catch (Exception e) {
+            log.error("获取线下充值二维码系统异常", e);
             rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
             rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
         }

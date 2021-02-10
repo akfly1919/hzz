@@ -103,6 +103,8 @@ public class UserGoodsDto {
      */
     private Integer gbiLimitpickup;
 
+    private Integer gbiFrozendays;
+
     /**
      * 用户id
      */

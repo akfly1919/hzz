@@ -125,6 +125,8 @@ public class GoodsbaseinfoDto {
      */
     private Integer gbiLimitpickup;
 
+    private Integer gbiFrozendays;
+
     // 库存量
     private int stock;
 

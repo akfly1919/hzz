@@ -106,7 +106,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         if (userInfo.getCbiIsnew() == 0 && gi.getGbiType() == 2) {
             throw new HzzBizException(HzzExceptionEnum.CANNOT_BUY_NEWMAN_ERROR);
         }
-        HashMap<String, LocalDateTime> timeMap = tradetimeService.getRealTradeStarttime();
+        HashMap<String, LocalDateTime> timeMap = tradetimeService.getRealTradeStartTime();
         price = gi.getGbiPrice();
         TradeconfigVo tc = tradeconfigService.getTradeconfig(TradeconfigVo.TCTYPE_BUY);
         BigDecimal priceB=new BigDecimal(price);
@@ -260,7 +260,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
                 cgrnew.setCgrIslock(1);
                 cgrnew.setCgrIspickup(0);
                 cgrnew.setCgrBuytime(LocalDateTime.now());
-                cgrnew.setCgrSelltime(LocalDateTime.now());
+                //cgrnew.setCgrSelltime(LocalDateTime.now());
                 cgrnew.setCgrUpdatetime(LocalDateTime.now());
                 cgrnew.setCgrForzentime(LocalDateTime.now().plusDays(Long.parseLong(gi.getGbiFrozendays()!=null?gi.getGbiFrozendays().toString():"0")));
                 customergoodsrelatedService.saveCustomergoodsrelated(cgrnew);

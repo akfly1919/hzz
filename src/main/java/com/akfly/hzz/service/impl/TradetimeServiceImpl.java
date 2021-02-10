@@ -46,7 +46,7 @@ public class TradetimeServiceImpl extends ServiceImpl<TradetimeMapper, Tradetime
         return false;
     }
 
-    public HashMap<String ,LocalDateTime> getRealTradeStarttime() throws HzzBizException {
+    public HashMap<String ,LocalDateTime> getRealTradeStartTime() throws HzzBizException {
         HashMap<String ,LocalDateTime> timemap=new HashMap<>();
         LocalDateTime now =LocalDateTime.now();
         TradetimeVo tt=this.getTradeTime();
@@ -56,14 +56,15 @@ public class TradetimeServiceImpl extends ServiceImpl<TradetimeMapper, Tradetime
             now=now.plusDays(1);
 
         }
-        String date=now.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String date=now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         String starttime=date+" "+tt.getTtTimeAmStart();
         String finishtime=date+" "+tt.getTtTimePmEnd();
-        DateTimeFormatter df =DateTimeFormatter.ofPattern("yyyyMMdd HH:mm:ss");
+        DateTimeFormatter df =DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         LocalDateTime start = LocalDateTime.parse(starttime,df);
         LocalDateTime finish = LocalDateTime.parse(finishtime,df);
         timemap.put("startTime",start);
         timemap.put("finishTime",finish);
         return timemap;
     }
+
 }

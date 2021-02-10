@@ -20,10 +20,11 @@ import org.springframework.stereotype.Service;
 public class GoodsiteminfoServiceImpl extends ServiceImpl<GoodsiteminfoMapper, GoodsiteminfoVo> implements GoodsiteminfoService {
 
     @Override
-    public int getPlatFormStock(long cbiId) {
+    public int getPlatFormStock(long gbiId) {
 
-        log.info("GoodsiteminfoServiceImpl 获取商品大盘库存数量 cbiId={}", cbiId);
-        int stock = lambdaQuery().eq(GoodsiteminfoVo::getGiiIspickup, 0).eq(GoodsiteminfoVo::getGiiStatus, 1).count();
+        log.info("GoodsiteminfoServiceImpl 获取商品大盘库存数量 gbiId={}", gbiId);
+        int stock = lambdaQuery().eq(GoodsiteminfoVo::getGiiIspickup, 0).eq(GoodsiteminfoVo::getGiiStatus, 1)
+                .eq(GoodsiteminfoVo::getGbiId, gbiId).count();
         return stock;
     }
 

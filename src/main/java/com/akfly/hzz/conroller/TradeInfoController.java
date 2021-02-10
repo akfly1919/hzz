@@ -271,7 +271,7 @@ public class TradeInfoController {
         BaseRspDto<List<UserGoodsDto>> rsp = new BaseRspDto<List<UserGoodsDto>>();
         try {
             CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
-            List<UserGoodsDto> userGoodsDtoList = customergoodsrelatedService.getStockForUser(userInfo.getCbiId(), StockEnum.XIANHUO, PickUpEnum.UNPICK);
+            List<UserGoodsDto> userGoodsDtoList = customergoodsrelatedService.getStockForUser(userInfo.getCbiId(), StockEnum.UNLOCKED, PickUpEnum.UNPICK);
             rsp.setData(userGoodsDtoList);
         } catch (HzzBizException e) {
             log.error("获取用户现货商品信息业务错误 msg={}", e.getErrorMsg(), e);

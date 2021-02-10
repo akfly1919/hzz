@@ -57,7 +57,7 @@ public class ShouYeController {
     @Resource
     private GoodsiteminfoService goodsiteminfoService;
 
-    @GetMapping(value = "/hello")
+    //@GetMapping(value = "/hello")
     public String hello(){
         return redisTemplate.opsForValue().get("a")+"";
     }
@@ -181,11 +181,11 @@ public class ShouYeController {
             //正常商品
             List<GoodsbaseinfoVo> zcgoods = goodsbaseinfoService.lambdaQuery()
                     .eq(GoodsbaseinfoVo::getGbiType, CommonConstant.GOODSTYPE_ZC).eq(GoodsbaseinfoVo::getGbiValid, 1)
-                    .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit 3").list();
+                    .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit 10").list();
             //新手商品
             List<GoodsbaseinfoVo> xsgoods = goodsbaseinfoService.lambdaQuery()
                     .eq(GoodsbaseinfoVo::getGbiType, CommonConstant.GOODSTYPE_XS).eq(GoodsbaseinfoVo::getGbiValid, 1)
-                    .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit 3").list();
+                    .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit 10").list();
             //首页轮播图
             List<BroadcastnoteinfoVo> sys = broadcastnoteinfoService.lambdaQuery()
                     .eq(BroadcastnoteinfoVo::getBniPostion, CommonConstant.LUNBO_SY).eq(BroadcastnoteinfoVo::getBniValid, 1)

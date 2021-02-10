@@ -32,14 +32,15 @@ public class AuthConfig implements WebMvcConfigurer {
         registration.excludePathPatterns(                         //添加不拦截路径
                 "/hzz/user/login",
                 "/hzz/user/sendMsgCode",
-                "/hzz/sy/hello",
+                "/hzz/user/contactUs",
                 "/hzz/user/register",
                 "/hzz/user/forgetPsw",
                 "/swagger-ui.html",
                 "/swagger-resources/**",
                 "/hzz/sy/**",
                 "/hzz/statistics",
-                "/hzz/notify/aliPayNotify"
+                "/hzz/notify/aliPayNotify",
+                "/hzz/account/offlineRecharge"
         );
     }
 
