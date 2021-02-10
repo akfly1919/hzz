@@ -104,6 +104,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         if (isNew == 0 && gi.getGbiType() == 2) {
             throw new HzzBizException(HzzExceptionEnum.CANNOT_BUY_NEWMAN_ERROR);
         }
+        HashMap<String, LocalDateTime> timeMap = tradetimeService.getRealTradeStarttime();
         price = gi.getGbiPrice();
         TradeconfigVo tc = tradeconfigService.getTradeconfig(TradeconfigVo.TCTYPE_BUY);
         BigDecimal priceB=new BigDecimal(price);
@@ -120,8 +121,8 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         tp.setTpiNum(num);
         tp.setTpiStatus(0);
         tp.setTpiCreatetime(LocalDateTime.now());
-        tp.setTpiBuytime(LocalDateTime.now());
-        tp.setTpiFinishtime(LocalDateTime.now());
+        tp.setTpiBuytime(timeMap.get("startTime"));
+        tp.setTpiFinishtime(timeMap.get("finishTime"));
         tp.setTpiTradetime(LocalDateTime.now());
         tp.setTpiUpdatetime(LocalDateTime.now());
         tp.setTpiServicefee(feeB.doubleValue());
@@ -400,8 +401,5 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         }
 
     }
-
-
-
 
 }
