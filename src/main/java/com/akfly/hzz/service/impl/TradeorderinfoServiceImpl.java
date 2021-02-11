@@ -113,7 +113,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         BigDecimal feeB=priceB.multiply(new BigDecimal(tc.getTcRate()));
         BigDecimal totalB=priceB.multiply(BigDecimal.valueOf(num)).add(feeB.multiply(BigDecimal.valueOf(num)));
         //冻账
-        customerbaseinfoService.frozenAccount(cbiid,totalB.doubleValue());
+        customerbaseinfoService.frozenAccount(cbiid,totalB.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
         //创建一条预购记录
         TradepredictinfoVo tp=new TradepredictinfoVo();
         tp.setTpiId(RandomGenUtils.genFlowNo("TPI"));
@@ -127,7 +127,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         tp.setTpiFinishtime(timeMap.get("finishTime"));
         tp.setTpiTradetime(LocalDateTime.now());
         tp.setTpiUpdatetime(LocalDateTime.now());
-        tp.setTpiServicefee(feeB.doubleValue());
+        tp.setTpiServicefee(feeB.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
         tp.setTpiSucessnum(num);
         tp.setTpiSucessnum(0);
         tp.setTpiGoodstype(1);
@@ -283,7 +283,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
                 toi.setToiStatus(TradeorderinfoVo.STATUS_SUCCESS);
                 toi.setToiTradetime(LocalDateTime.now());
                 toi.setToiUpdatetime(LocalDateTime.now());
-                toi.setToiBuyservicefee(fee.doubleValue());
+                toi.setToiBuyservicefee(fee.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
                 toi.setToiSellservicefee(tg.getTgsServicefee());
                 toi.setToiType(TradeorderinfoVo.TYPE_NOMAL);
                 toi.setTpiId(tp.getTpiId());
@@ -298,11 +298,11 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
                 BigDecimal cost = BigDecimal.valueOf(tg.getTgsPrice()).subtract(BigDecimal.valueOf(tg.getTgsServicefee()));
                 balanceB=balanceB.add(cost);
                 totalB=totalB.add(cost);
-                customerbaseinfoVo.setCbiTotal(totalB.doubleValue());
-                customerbaseinfoVo.setCbiBalance(balanceB.doubleValue());
+                customerbaseinfoVo.setCbiTotal(totalB.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+                customerbaseinfoVo.setCbiBalance(balanceB.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
                 customerbaseinfoService.updateUserInfo(customerbaseinfoVo);
 
-                customerbillrelatedService.saveBills(tg.getTgsSellerid(), toi.getToiOrderid(), cost.doubleValue(), InOrOutTypeEnum.IN);
+                customerbillrelatedService.saveBills(tg.getTgsSellerid(), toi.getToiOrderid(), cost.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue(), InOrOutTypeEnum.IN);
             }
 
 
@@ -320,7 +320,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
             GoodsbaseinfoVo gbi = goodsbaseinfoService.getGoodsbaseinfoVo(tp.getGbiId());
             rt.setRitGbiname(gbi.getGbiName());
             rt.setRtiNum(list.size());
-            rt.setRtiMoney(goodsprice.doubleValue());
+            rt.setRtiMoney(goodsprice.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
             rt.setRtiCreatetime(LocalDateTime.now());
             rt.setRtiUpdatetime(LocalDateTime.now());
             log.info("数据统计={}", JsonUtils.toJson(rt));
@@ -346,12 +346,12 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
             if(balanceB.compareTo(new BigDecimal("0.0"))<0){
                 throw new HzzBizException(HzzExceptionEnum.ACCOUNT_BALACE_ERROR);
             }
-            customerbaseinfoVo.setCbiTotal(totalB.doubleValue());
-            customerbaseinfoVo.setCbiFrozen(fronzeB.doubleValue());
-            customerbaseinfoVo.setCbiBalance(balanceB.doubleValue());
+            customerbaseinfoVo.setCbiTotal(totalB.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+            customerbaseinfoVo.setCbiFrozen(fronzeB.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+            customerbaseinfoVo.setCbiBalance(balanceB.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
             customerbaseinfoVo.setCbiUpdatetime(LocalDateTime.now());
             customerbaseinfoService.updateUserInfo(customerbaseinfoVo);
-            customerbillrelatedService.saveBills(tp.getTpiBuyerid(), tp.getTpiId(), priceB.add(feeB).doubleValue(), InOrOutTypeEnum.OUT);
+            customerbillrelatedService.saveBills(tp.getTpiBuyerid(), tp.getTpiId(), priceB.add(feeB).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue(), InOrOutTypeEnum.OUT);
         }
 
     }
