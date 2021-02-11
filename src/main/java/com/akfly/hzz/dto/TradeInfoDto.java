@@ -1,5 +1,6 @@
 package com.akfly.hzz.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -58,6 +59,7 @@ public class TradeInfoDto{
     /**
      * 创建时间
      */
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime createtime;
 
     /**
