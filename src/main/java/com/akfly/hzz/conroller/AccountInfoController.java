@@ -189,15 +189,15 @@ public class AccountInfoController {
     }
 
     @ApiOperation(value="线下充值",notes="获取线下充值的二维码图片")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name="type",value="支付渠道(1：支付宝 2：微信 3:银行卡)",required=true)
-    })
+    //@ApiImplicitParams({
+    //        @ApiImplicitParam(name="type",value="支付渠道(1：支付宝 2：微信 3:银行卡)",required=true)
+    //})
     @PostMapping(value = "/offlineRecharge")
-    public BaseRspDto<ReceiveinfoVo> offlineRecharge(@RequestParam @NotNull Integer type){
+    public BaseRspDto<List<ReceiveinfoVo>> offlineRecharge(){
 
-        BaseRspDto<ReceiveinfoVo> rsp = new BaseRspDto<ReceiveinfoVo>();
+        BaseRspDto<List<ReceiveinfoVo>> rsp = new BaseRspDto<List<ReceiveinfoVo>>();
         try {
-            ReceiveinfoVo vo = receiveinfoService.getReceiveinfoVo(type);
+            List<ReceiveinfoVo> vo = receiveinfoService.getReceiveinfoVo();
             rsp.setData(vo);
         //} catch (HzzBizException e) {
         //    log.error("用户提现业务错误 msg={}", e.getErrorMsg(), e);

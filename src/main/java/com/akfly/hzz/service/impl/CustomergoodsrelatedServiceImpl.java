@@ -26,6 +26,8 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -116,19 +118,27 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void unlock() throws HzzBizException {
-        Map<String,Object> map=new HashMap<>();
-        map.put("cgr_isown",1);
-        map.put("cgr_islock",1);
-        QueryWrapper wrapper_c=new QueryWrapper();
-        wrapper_c.allEq(map);
-        //wrapper_c.lt("cgr_buytime", LocalDate.now());
-        wrapper_c.last("for update");
-        List<CustomergoodsrelatedVo> cgrlist = getBaseMapper().selectList(wrapper_c);
+    public void  unlock() throws HzzBizException {
 
-        for(CustomergoodsrelatedVo cgr:cgrlist){
-            cgr.setCgrIslock(0);
-            saveCustomergoodsrelated(cgr);
+        LocalDate end = LocalDate.now();
+        LocalDate start = end.plusDays(-14);
+        log.info("解锁用户库存信息定时启动......start={}, end={}", start, end);
+        List<CustomergoodsrelatedVo> voList = lambdaQuery().eq(CustomergoodsrelatedVo::getCgrIslock, 1)
+                .eq(CustomergoodsrelatedVo::getCgrIsown, 1).eq(CustomergoodsrelatedVo::getCgrIspickup, 0)
+                .between(CustomergoodsrelatedVo::getCgrBuytime, start, end).list();
+
+        for(CustomergoodsrelatedVo cgr : voList){
+            GoodsbaseinfoVo vo = goodsbaseinfoService.getGoodsbaseinfoWithRedis(cgr.getGbiId());
+            //int frozenDays = (vo.getGbiFrozendays() == null ? 1 : vo.getGbiFrozendays());
+
+            if (vo.getGbiFrozendays() == null) {
+                log.error("商品信息中的售卖冻结天数为空 gbiId={}", cgr.getGbiId());
+            } else {
+                if (cgr.getCgrBuytime().plusDays(vo.getGbiFrozendays()).compareTo(LocalDateTime.now()) <= 0) {
+                    cgr.setCgrIslock(0);
+                    saveCustomergoodsrelated(cgr);
+                }
+            }
         }
     }
 

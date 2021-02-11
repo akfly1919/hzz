@@ -23,14 +23,9 @@ import java.util.List;
 public class ReceiveinfoServiceImpl extends ServiceImpl<ReceiveinfoMapper, ReceiveinfoVo> implements ReceiveinfoService {
 
     @Override
-    public ReceiveinfoVo getReceiveinfoVo(int type) {
+    public List<ReceiveinfoVo> getReceiveinfoVo() {
 
-        log.info("获取收款二维码信息入参 type={}", type);
-        List<ReceiveinfoVo> list = lambdaQuery().eq(ReceiveinfoVo::getRiType, type).eq(ReceiveinfoVo::getRiStatus, 1).list();
-        if (CollectionUtils.isEmpty(list)) {
-            return null;
-        } else {
-            return list.get(0);
-        }
+        List<ReceiveinfoVo> list = lambdaQuery().eq(ReceiveinfoVo::getRiStatus, 1).list();
+        return list;
     }
 }

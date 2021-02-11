@@ -98,7 +98,7 @@ public class ScheduleTask implements SchedulingConfigurer {
         return new Runnable() {
             @Override
             public void run() {
-                releasTradepredictinfo();
+                unlockCustomergoodsrelated();
             }
         };
     }
