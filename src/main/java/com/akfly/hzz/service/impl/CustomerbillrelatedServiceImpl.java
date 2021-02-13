@@ -1,5 +1,6 @@
 package com.akfly.hzz.service.impl;
 
+import com.akfly.hzz.constant.CbrClassEnum;
 import com.akfly.hzz.constant.InOrOutTypeEnum;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
@@ -52,7 +53,7 @@ public class CustomerbillrelatedServiceImpl extends ServiceImpl<Customerbillrela
     }
 
     @Override
-    public void saveBills(long userId, String orderId, double amount, InOrOutTypeEnum type) throws HzzBizException {
+    public void saveBills(long userId, String orderId, double amount, InOrOutTypeEnum type, CbrClassEnum cbrClass) throws HzzBizException {
 
         try {
             CustomerbillrelatedVo vo = new CustomerbillrelatedVo();
@@ -62,6 +63,7 @@ public class CustomerbillrelatedServiceImpl extends ServiceImpl<Customerbillrela
             vo.setCbrType(type.getStatus());
             vo.setCbrCreatetime(LocalDateTime.now());
             vo.setCbrUpdatetime(LocalDateTime.now());
+            vo.setCbrClass(cbrClass.getStatus());
             save(vo);
         } catch (Exception e) {
             log.error("保存账单流水异常 orderId={}", orderId, e);

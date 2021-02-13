@@ -120,8 +120,8 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
     @Transactional(rollbackFor = Exception.class)
     public void  unlock() throws HzzBizException {
 
-        LocalDate end = LocalDate.now();
-        LocalDate start = end.plusDays(-14);
+        LocalDateTime end = LocalDateTime.now();
+        LocalDateTime start = end.plusDays(-14);
         log.info("解锁用户库存信息定时启动......start={}, end={}", start, end);
         List<CustomergoodsrelatedVo> voList = lambdaQuery().eq(CustomergoodsrelatedVo::getCgrIslock, 1)
                 .eq(CustomergoodsrelatedVo::getCgrIsown, 1).eq(CustomergoodsrelatedVo::getCgrIspickup, 0)

@@ -1,6 +1,7 @@
 package com.akfly.hzz.service;
 
 
+import com.akfly.hzz.constant.CbrClassEnum;
 import com.akfly.hzz.constant.InOrOutTypeEnum;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.vo.CustomerbillrelatedVo;
@@ -28,5 +29,5 @@ public interface CustomerbillrelatedService extends IService<Customerbillrelated
      */
     public List<CustomerbillrelatedVo> getCustomerbillrelatedById(Long id, int pageSize, int pageNum, int flag);
 
-    void saveBills(long userId, String orderId, double amount, InOrOutTypeEnum type) throws HzzBizException;
+    void saveBills(long userId, String orderId, double amount, InOrOutTypeEnum type, CbrClassEnum cbrClass) throws HzzBizException;
 }

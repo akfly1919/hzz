@@ -24,7 +24,7 @@ public class TokenUtils {
             key = key + psw;
         }
         // TODO 正式测试时候需要加上过期时间
-        //return JWT.create().withAudience(userId).withExpiresAt(new Date(System.currentTimeMillis() + 2 * 24 * 3600 * 1000)).sign(Algorithm.HMAC256(key));
-        return JWT.create().withAudience(userId).sign(Algorithm.HMAC256(key));
+        return JWT.create().withAudience(userId).withExpiresAt(new Date(System.currentTimeMillis() + 2 * 24 * 3600 * 1000)).sign(Algorithm.HMAC256(key));
+        //return JWT.create().withAudience(userId).sign(Algorithm.HMAC256(key));
     }
 }

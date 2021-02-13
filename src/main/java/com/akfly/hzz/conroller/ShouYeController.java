@@ -185,7 +185,7 @@ public class ShouYeController {
             //新手商品
             List<GoodsbaseinfoVo> xsgoods = goodsbaseinfoService.lambdaQuery()
                     .eq(GoodsbaseinfoVo::getGbiType, CommonConstant.GOODSTYPE_XS).eq(GoodsbaseinfoVo::getGbiValid, 1)
-                    .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit 10").list();
+                    .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit 3").list();
             //首页轮播图
             List<BroadcastnoteinfoVo> sys = broadcastnoteinfoService.lambdaQuery()
                     .eq(BroadcastnoteinfoVo::getBniPostion, CommonConstant.LUNBO_SY).eq(BroadcastnoteinfoVo::getBniValid, 1)

@@ -13,6 +13,7 @@ import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.interceptor.AuthInterceptor;
 import com.akfly.hzz.service.*;
+import com.akfly.hzz.util.JsonUtils;
 import com.akfly.hzz.vo.*;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -58,6 +59,9 @@ public class TaskInfoController {
     @Resource
     private GoodsbaseinfoService goodsbaseinfoService;
 
+    @Resource
+    private GoodstaskinfoService goodstaskinfoService;
+
 
     @ApiOperation(value="我的任务列表",notes="要求用户登录")
     @PostMapping(value = "/myTask")
@@ -78,12 +82,43 @@ public class TaskInfoController {
                 if (taskInfo == null) {
                     taskGoodsDto.setBuyNum(vo.getStock());
                     taskGoodsDto.setPickUpNum(num);
+                    TaskstatisticsVo taskVo = new TaskstatisticsVo();
+                    taskVo.setCbiId(userInfo.getCbiId());
+                    taskVo.setGbiId(vo.getGbiId());
+                    taskVo.setBuyNum(vo.getStock());
+                    taskVo.setUsedBuyNum(0);
+                    taskVo.setUsedPickupNum(0);
+                    taskVo.setPickupNum(num);
+                    taskVo.setToiCreatetime(LocalDateTime.now());
+                    taskVo.setToiUpdatetime(LocalDateTime.now());
+                    taskstatisticsService.saveOrUpdate(taskVo);
                 } else {
                     taskGoodsDto.setBuyNum(Math.max(vo.getStock() - taskInfo.getUsedBuyNum(), 0));
                     int pickNum = num - taskInfo.getUsedPickupNum();
                     taskGoodsDto.setPickUpNum(Math.max(pickNum, 0));
+                    taskInfo.setBuyNum(vo.getStock());
+                    taskInfo.setPickupNum(num);
+                    taskInfo.setToiUpdatetime(LocalDateTime.now());
+                    taskstatisticsService.saveOrUpdate(taskInfo);
                 }
-                int canBuy = (taskGoodsDto.getPickUpNum() > 0 && taskGoodsDto.getBuyNum() > 0) ? 1 : 0; // TODO 后续买入需要改成10
+                GoodstaskinfoVo goodstaskinfoVo = goodstaskinfoService.getGoodstaskinfoVo(vo.getGbiId());
+                log.info("获取商品配置任务信息返回 gbiid={} goodstaskinfoVo={}", vo.getGbiId(), JsonUtils.toJson(goodstaskinfoVo));
+                int buyConfig = goodstaskinfoVo.getGtiBuynum();
+                int pickUpConfig = goodstaskinfoVo.getGtiPickupnum();
+                boolean flag = taskGoodsDto.getPickUpNum() > pickUpConfig && taskGoodsDto.getBuyNum() > buyConfig;
+                int canBuy = (flag ? 1 : 0);
+                taskGoodsDto.setDiscountNumConfig(goodstaskinfoVo.getGtiDiscountnum());
+                taskGoodsDto.setBuyConfig(buyConfig);
+                taskGoodsDto.setPickUpConfig(pickUpConfig);
+                try {
+                    int buy = taskGoodsDto.getBuyNum()/buyConfig;
+                    int pickUp = taskGoodsDto.getPickUpNum()/pickUpConfig;
+                    taskGoodsDto.setCanBuyNum(Math.min(buy, pickUp));
+                } catch (Exception e) {
+                    log.error("计算可以购买特价商品数量异常--商品任务信息配置错误", e);
+                    taskGoodsDto.setCanBuyNum(0);
+                }
+
                 taskGoodsDto.setCanBuy(canBuy);
                 taskGoodsDtoList.add(taskGoodsDto);
             }

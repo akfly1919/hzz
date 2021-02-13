@@ -20,4 +20,6 @@ public interface TaskstatisticsService extends IService<TaskstatisticsVo> {
 
     TaskstatisticsVo getTaskInfo(long cbiid,long gbid);
 
+    void saveOrUpdateWithStatics(TaskstatisticsVo vo) throws HzzBizException;
+
 }

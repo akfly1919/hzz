@@ -28,6 +28,7 @@ public enum HzzExceptionEnum {
     NOT_SUPPORT_TYPE_ERROR("1019", "不支持的类型"),
     ORDER_NOTEXIST_ERROR("1020", "交易不存在"),
     CANNOT_BUY_NEWMAN_ERROR("1021", "不能购买新手产品"),
+    TASK_NOT_CONFIG_ERROR("1022", "未配置商品任务信息"),
 
     /* 业务异常定义以2-8开头，顺序往下排号 */
     PARAM_INVALID("2000","参数不合法"),

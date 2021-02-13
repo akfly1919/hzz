@@ -89,8 +89,8 @@ public class AuthInterceptor implements HandlerInterceptor {
                     return false;
                 } catch (Exception e) {
                     log.error("用户token验证失败", e);
-                    //return false; // TODO 后面需要放开
-                    return true;
+                    return false;
+                    //return true;
                 }
             }
         }
