@@ -105,7 +105,7 @@ public class TaskInfoController {
                 log.info("获取商品配置任务信息返回 gbiid={} goodstaskinfoVo={}", vo.getGbiId(), JsonUtils.toJson(goodstaskinfoVo));
                 int buyConfig = goodstaskinfoVo.getGtiBuynum();
                 int pickUpConfig = goodstaskinfoVo.getGtiPickupnum();
-                boolean flag = taskGoodsDto.getPickUpNum() > pickUpConfig && taskGoodsDto.getBuyNum() > buyConfig;
+                boolean flag = taskGoodsDto.getPickUpNum() >= pickUpConfig && taskGoodsDto.getBuyNum() >= buyConfig;
                 int canBuy = (flag ? 1 : 0);
                 taskGoodsDto.setDiscountNumConfig(goodstaskinfoVo.getGtiDiscountnum());
                 taskGoodsDto.setBuyConfig(buyConfig);

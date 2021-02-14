@@ -17,4 +17,8 @@ public interface CustomeridcardinfoService extends IService<CustomeridcardinfoVo
     void saveCardInfo(long userId, String idCardFront, String idCardBack) throws HzzBizException;
 
     CustomeridcardinfoVo getCardInfo(long userId) throws HzzBizException;
+
+    void saveOrUpdateIdCard(CustomeridcardinfoVo vo) throws HzzBizException;
+
+    void updateByUserId(long userId) throws HzzBizException;
 }

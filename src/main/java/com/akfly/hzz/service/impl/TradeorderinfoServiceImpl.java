@@ -108,7 +108,11 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
             throw new HzzBizException(HzzExceptionEnum.CANNOT_BUY_NEWMAN_ERROR);
         }
         HashMap<String, LocalDateTime> timeMap = tradetimeService.getRealTradeStartTime();
-        price = gi.getGbiPrice();
+        if (isOnSale) {
+            price = gi.getGbiDiscountprice();
+        } else {
+            price = gi.getGbiPrice();
+        }
         TradeconfigVo tc = tradeconfigService.getTradeconfig(TradeconfigVo.TCTYPE_BUY);
         BigDecimal priceB=new BigDecimal(price);
         BigDecimal totalFeeInit = priceB.multiply(BigDecimal.valueOf(tc.getTcRate())).multiply(BigDecimal.valueOf(num));
@@ -130,7 +134,6 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         tp.setTpiTradetime(LocalDateTime.now());
         tp.setTpiUpdatetime(LocalDateTime.now());
         tp.setTpiServicefee(totalFeeInit.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-        tp.setTpiSucessnum(num);
         tp.setTpiSucessnum(0);
         tp.setTpiGoodstype(1);
         if(isOnSale){
@@ -210,6 +213,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         wrapper.orderByAsc("tgs_tradetime");
         wrapper.last("limit " + need + " for update");
         List<TradegoodsellVo> list = tradegoodsellMapper.selectList(wrapper);
+        log.info("tpiId={}, tpiNum={}, successNum={}, need={}", tp.getTpiId(), tp.getTpiNum(), tp.getTpiSucessnum(), need);
         if(isOnSale){
             if(list==null||list.size()<need){
                 throw new HzzBizException(HzzExceptionEnum.STOCK_ERROR);
@@ -258,6 +262,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
                 wrapper_c.allEq(map);
                 wrapper_c.last("for update");
                 CustomergoodsrelatedVo cgr = customergoodsrelatedMapper.selectOne(wrapper_c);
+                if (cgr == null) throw new HzzBizException(HzzExceptionEnum.WULIAO_CANNOT_BUY_ERROR);
                 cgr.setCgrIslock(0);
                 cgr.setCgrSelltime(LocalDateTime.now());
                 cgr.setCgrIsown(0);

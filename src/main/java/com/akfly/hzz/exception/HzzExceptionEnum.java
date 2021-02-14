@@ -29,6 +29,7 @@ public enum HzzExceptionEnum {
     ORDER_NOTEXIST_ERROR("1020", "交易不存在"),
     CANNOT_BUY_NEWMAN_ERROR("1021", "不能购买新手产品"),
     TASK_NOT_CONFIG_ERROR("1022", "未配置商品任务信息"),
+    WULIAO_CANNOT_BUY_ERROR("1023", "商品库存不足"),
 
     /* 业务异常定义以2-8开头，顺序往下排号 */
     PARAM_INVALID("2000","参数不合法"),

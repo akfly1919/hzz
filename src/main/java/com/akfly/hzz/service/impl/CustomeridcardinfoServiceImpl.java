@@ -6,11 +6,14 @@ import com.akfly.hzz.vo.CustomerbaseinfoVo;
 import com.akfly.hzz.vo.CustomeridcardinfoVo;
 import com.akfly.hzz.mapper.CustomeridcardinfoMapper;
 import com.akfly.hzz.service.CustomeridcardinfoService;
+import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.C;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -22,7 +25,11 @@ import java.util.List;
  * @since 2021-01-18
  */
 @Service
+@Slf4j
 public class CustomeridcardinfoServiceImpl extends ServiceImpl<CustomeridcardinfoMapper, CustomeridcardinfoVo> implements CustomeridcardinfoService {
+
+    @Resource
+    private CustomeridcardinfoMapper customeridcardinfoMapper;
 
     @Override
     public void saveCardInfo(long userId, String idCardFront, String idCardBack) throws HzzBizException {
@@ -49,4 +56,26 @@ public class CustomeridcardinfoServiceImpl extends ServiceImpl<Customeridcardinf
         return idCard.get(0);
 
     }
+
+    @Override
+    public void saveOrUpdateIdCard(CustomeridcardinfoVo vo) throws HzzBizException {
+
+        if (!saveOrUpdate(vo)) {
+            throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
+        }
+
+    }
+
+    @Override
+    public void updateByUserId(long userId) throws HzzBizException {
+
+        try {
+            LambdaUpdateChainWrapper<CustomeridcardinfoVo> lambdaUpdateChainWrapper = new LambdaUpdateChainWrapper<>(customeridcardinfoMapper);
+            lambdaUpdateChainWrapper.eq(CustomeridcardinfoVo::getCbiId, userId).set(CustomeridcardinfoVo::getCiiStatus, 2).update();
+        } catch (Exception e) {
+            log.error("更新用户实名信息数据库异常 userId={}", userId, e);
+            throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
+        }
+    }
+
 }

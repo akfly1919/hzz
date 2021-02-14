@@ -17,6 +17,7 @@ import com.akfly.hzz.service.CustomeridcardinfoService;
 import com.akfly.hzz.util.*;
 import com.akfly.hzz.vo.ContactusVo;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
+import com.akfly.hzz.vo.CustomeridcardinfoVo;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -282,10 +283,10 @@ public class UserController {
 			vo.setCbiId(userInfo.getCbiId());
 			vo.setCbiName(realNameReqDto.getName());
 			vo.setCbiIdcard(realNameReqDto.getIdentityCode());
-			// TODO 需要放到一个事务
 			idFacade.idRealAuth(realNameReqDto.getIdentityCode(),realNameReqDto.getName());
 			customerbaseinfoService.updateUserInfo(vo);
-			customeridcardinfoService.saveCardInfo(userInfo.getCbiId(), realNameReqDto.getIdFrontImgName(), realNameReqDto.getIdBackImgName());
+			customeridcardinfoService.updateByUserId(userInfo.getCbiId());
+			//customeridcardinfoService.saveCardInfo(userInfo.getCbiId(), realNameReqDto.getIdFrontImgName(), realNameReqDto.getIdBackImgName());
 		} catch (HzzBizException e) {
 			log.error("用户实名认证业务错误 msg={}", e.getErrorMsg(), e);
 			rsp.setCode(e.getErrorCode());
@@ -308,11 +309,18 @@ public class UserController {
 		try {
 			CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
 
-			CustomerbaseinfoVo userInfoDb = customerbaseinfoService.getUserInfoById(String.valueOf(userInfo.getCbiId()));
+			//CustomerbaseinfoVo userInfoDb = customerbaseinfoService.getUserInfoById(String.valueOf(userInfo.getCbiId()));
 			RealNameRspDto rnDto = new RealNameRspDto();
+			CustomeridcardinfoVo vo = null;
 			try {
-				customeridcardinfoService.getCardInfo(userInfo.getCbiId()); // 获取不到抛出了异常
-				rnDto.setIsRealName(1);
+				vo = customeridcardinfoService.getCardInfo(userInfo.getCbiId()); // 获取不到抛出了异常
+				if (vo.getCiiStatus() == 2) {
+					rnDto.setIsRealName(1);
+				} else { // 未审核
+					rnDto.setIsRealName(0);
+				}
+				rnDto.setIdCardBack(vo.getCiiIdcardback());
+				rnDto.setIdCardFront(vo.getCiiIdcardfront());
 			} catch (HzzBizException e) {
 				rnDto.setIsRealName(0);
 				log.error("获取实名信息异常 msg={}", e.getErrorMsg());
