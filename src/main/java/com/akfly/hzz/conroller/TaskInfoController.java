@@ -1,12 +1,6 @@
 package com.akfly.hzz.conroller;
 
 import com.akfly.hzz.annotation.VerifyToken;
-import com.akfly.hzz.channel.SubmitPayModel;
-import com.akfly.hzz.channel.SubmitPayResultModel;
-import com.akfly.hzz.channel.SubmitPayService;
-import com.akfly.hzz.constant.CreditCardLimitEnum;
-import com.akfly.hzz.constant.PayStatus;
-import com.akfly.hzz.constant.ValidEnum;
 import com.akfly.hzz.dto.BaseRspDto;
 import com.akfly.hzz.dto.TaskGoodsDto;
 import com.akfly.hzz.exception.HzzBizException;
@@ -15,24 +9,16 @@ import com.akfly.hzz.interceptor.AuthInterceptor;
 import com.akfly.hzz.service.*;
 import com.akfly.hzz.util.JsonUtils;
 import com.akfly.hzz.vo.*;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.util.Assert;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import javax.validation.constraints.Digits;
-import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -49,9 +35,6 @@ public class TaskInfoController {
 
     @Resource
     private TradeorderinfoService tradeorderinfoService;
-
-    @Resource
-    private TradepredictinfoService tradepredictinfoService;
 
     @Resource
     private CustomerpickupinfoService customerpickupinfoService;
@@ -113,10 +96,11 @@ public class TaskInfoController {
                 try {
                     int buy = taskGoodsDto.getBuyNum()/buyConfig;
                     int pickUp = taskGoodsDto.getPickUpNum()/pickUpConfig;
-                    taskGoodsDto.setCanBuyNum(Math.min(buy, pickUp));
+                    taskGoodsDto.setCanBuyNum(Math.min(buy, pickUp) * goodstaskinfoVo.getGtiDiscountnum());
                 } catch (Exception e) {
                     log.error("计算可以购买特价商品数量异常--商品任务信息配置错误", e);
                     taskGoodsDto.setCanBuyNum(0);
+                    taskGoodsDto.setCanBuy(0);
                 }
 
                 taskGoodsDto.setCanBuy(canBuy);

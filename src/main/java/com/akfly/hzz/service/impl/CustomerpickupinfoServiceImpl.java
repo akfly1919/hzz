@@ -133,7 +133,7 @@ public class CustomerpickupinfoServiceImpl extends ServiceImpl<Customerpickupinf
 
         queryWrapper.eq("cbi_id", cbiid);
         queryWrapper.eq("gbi_id", gbid);
-        queryWrapper.eq("cpui_status", 1); // 已审核
+        queryWrapper.in("cpui_status", 0, 1); // 已审核
 
         queryWrapper.select("ifnull(sum(cpui_num),0) as total_num ");
         Map<String, Object> map = getMap(queryWrapper);

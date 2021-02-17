@@ -88,7 +88,7 @@ public class ImgUploadController {
             outputStream1.write(data);
 
             String suffix = isFront ? "front" : "back";
-            String fileNameRemote = "SF/" + userId + "/IDPic_" + System.currentTimeMillis() + suffix + type;
+            String fileNameRemote = "CF/" + userId + "/IDPic_" + System.currentTimeMillis() + suffix + type;
             BucketUtil.uploadFile(fileNameRemote, image);
             CustomeridcardinfoVo vo = null;
             try {
@@ -118,9 +118,9 @@ public class ImgUploadController {
             } catch (HzzBizException e) {
                 rsp.setCode(e.getErrorCode());
                 rsp.setMsg(e.getErrorMsg());
-                log.error("身份证鉴权失败,userId={}" + userId, e);
+                log.error("身份证鉴权失败,userId={}", userId, e);
             } catch (Exception e) {
-                log.error("上传原图异常,userId={}" + userId, e);
+                log.error("上传原图异常,userId={}", userId, e);
                 rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
                 rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
             } finally {

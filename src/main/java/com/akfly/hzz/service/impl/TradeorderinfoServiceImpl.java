@@ -79,6 +79,9 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
     @Resource
     private CustomerbillrelatedService customerbillrelatedService;
 
+    @Resource
+    private GoodstaskinfoService goodstaskinfoService;
+
     @Override
     public List<TradeorderinfoVo> getTradeorderinfoVo(int pageNum, int pageSize, long cbiid, Date beginTime, Date endTime) throws HzzBizException {
         List<TradeorderinfoVo> tradeorderinfoVos = lambdaQuery()
@@ -97,6 +100,8 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
     public void updateTradeOrder(TradeorderinfoVo vo) throws HzzBizException {
 
     }
+
+    @Transactional(rollbackFor = Exception.class)
     public void nomalBuy(CustomerbaseinfoVo userInfo, long gbid,int num,double price,boolean isOnSale,int type) throws HzzBizException {
         GoodsbaseinfoVo gi = goodsbaseinfoService.getGoodsbaseinfoVo(gbid);
         //if (gi.getGbiPrice() != price){
@@ -110,6 +115,13 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         HashMap<String, LocalDateTime> timeMap = tradetimeService.getRealTradeStartTime();
         if (isOnSale) {
             price = gi.getGbiDiscountprice();
+            TaskstatisticsVo task = taskstatisticsService.getTaskInfo(cbiid, gbid);
+            GoodstaskinfoVo goodstaskinfoVo = goodstaskinfoService.getGoodstaskinfoVo(gbid);
+            int buyLeft = task.getBuyNum() - task.getUsedBuyNum() - (num/goodstaskinfoVo.getGtiDiscountnum()) * goodstaskinfoVo.getGtiBuynum();
+            int pickUpLeft = task.getPickupNum() - task.getUsedPickupNum() - (num/goodstaskinfoVo.getGtiDiscountnum()) * goodstaskinfoVo.getGtiPickupnum();
+            if (buyLeft < 0 || pickUpLeft < 0) {
+                throw new HzzBizException(HzzExceptionEnum.SPECIAL_BUY_MORE_ERROR);
+            }
         } else {
             price = gi.getGbiPrice();
         }
