@@ -1,13 +1,12 @@
 package com.akfly.hzz.vo;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import java.time.LocalDateTime;
+import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -15,7 +14,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author wangfei
- * @since 2021-01-24
+ * @since 2021-02-10
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -27,7 +26,7 @@ public class CustomerbillrelatedVo implements Serializable {
     /**
      * 自增id
      */
-      @TableId(value = "cbr_id", type = IdType.AUTO)
+    @TableId(value = "cbr_id", type = IdType.AUTO)
     private Long cbrId;
 
     /**
@@ -46,7 +45,7 @@ public class CustomerbillrelatedVo implements Serializable {
     private Double cbrMoney;
 
     /**
-     * 1收入  2支出
+     * 1.收入 2 支持
      */
     private Integer cbrType;
 
@@ -56,6 +55,11 @@ public class CustomerbillrelatedVo implements Serializable {
     private LocalDateTime cbrCreatetime;
 
     private LocalDateTime cbrUpdatetime;
+
+    /**
+     * 1.充值收入，2.商品收入,3.提现支出,4.卖货服务费,5.买货服务费,6提现手续费,7.买货支出
+     */
+    private Integer cbrClass;
 
 
 }

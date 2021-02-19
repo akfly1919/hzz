@@ -54,7 +54,10 @@ public class ShouYeController {
     @Resource
     private ReporttradedateService reporttradedateService;
 
-    @GetMapping(value = "/hello")
+    @Resource
+    private GoodsiteminfoService goodsiteminfoService;
+
+    //@GetMapping(value = "/hello")
     public String hello(){
         return redisTemplate.opsForValue().get("a")+"";
     }
@@ -101,7 +104,8 @@ public class ShouYeController {
             for (GoodsbaseinfoVo vo : zcgoods) {
                 GoodsbaseinfoDto dto = new GoodsbaseinfoDto();
                 BeanUtils.copyProperties(vo, dto);
-                int stock = customergoodsrelatedService.getStock(vo.getGbiId());
+                //int stock = customergoodsrelatedService.getStock(vo.getGbiId());
+                int stock = goodsiteminfoService.getPlatFormStock(vo.getGbiId());
                 dto.setStock(stock);
                 dtos.add(dto);
             }
@@ -139,7 +143,8 @@ public class ShouYeController {
                     .eq(PictureinfoVo::getPiValid, 1).list();
             goodInfoDto.setPivs(pictureinfoVos);
 
-            int stock = customergoodsrelatedService.getStock(goodsbaseinfoVo.getGbiId()); // TODO 需要加上状态，只获取未锁定的单子
+            //int stock = customergoodsrelatedService.getStock(goodsbaseinfoVo.getGbiId());
+            int stock = goodsiteminfoService.getPlatFormStock(goodsbaseinfoVo.getGbiId());
             goodInfoDto.setStock(stock);
 
             int salesVolume = reporttradedateService.getRtiNum(goodsbaseinfoVo.getGbiId());
@@ -176,7 +181,7 @@ public class ShouYeController {
             //正常商品
             List<GoodsbaseinfoVo> zcgoods = goodsbaseinfoService.lambdaQuery()
                     .eq(GoodsbaseinfoVo::getGbiType, CommonConstant.GOODSTYPE_ZC).eq(GoodsbaseinfoVo::getGbiValid, 1)
-                    .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit 3").list();
+                    .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit 10").list();
             //新手商品
             List<GoodsbaseinfoVo> xsgoods = goodsbaseinfoService.lambdaQuery()
                     .eq(GoodsbaseinfoVo::getGbiType, CommonConstant.GOODSTYPE_XS).eq(GoodsbaseinfoVo::getGbiValid, 1)

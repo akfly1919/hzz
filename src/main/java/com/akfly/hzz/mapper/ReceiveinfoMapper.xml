@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akfly.hzz.mapper.ReceiveinfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.ReceiveinfoVo">
+        <id column="id" property="id" />
+        <result column="ri_picture" property="riPicture" />
+        <result column="ri_type" property="riType" />
+        <result column="ri_des" property="riDes" />
+        <result column="ri_status" property="riStatus" />
+        <result column="ri_createtime" property="riCreatetime" />
+        <result column="ri_updatetime" property="riUpdatetime" />
+        <result column="ri_operator" property="riOperator" />
+    </resultMap>
+
+</mapper>

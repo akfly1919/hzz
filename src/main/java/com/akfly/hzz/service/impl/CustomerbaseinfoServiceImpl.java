@@ -1,16 +1,25 @@
 package com.akfly.hzz.service.impl;
 
 import com.akfly.hzz.constant.CommonConstant;
+import com.akfly.hzz.constant.PickUpEnum;
+import com.akfly.hzz.constant.StockEnum;
+import com.akfly.hzz.dto.UserAllAssetDto;
+import com.akfly.hzz.dto.UserGoodsDto;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.mapper.CustomerbaseinfoMapper;
 import com.akfly.hzz.service.CustomerbaseinfoService;
+import com.akfly.hzz.service.CustomergoodsrelatedService;
 import com.akfly.hzz.util.JsonUtils;
 import com.akfly.hzz.util.RedisUtils;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
+import com.akfly.hzz.vo.CustomergoodsrelatedVo;
+import com.akfly.hzz.vo.GoodsbaseinfoVo;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +28,10 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -37,6 +49,10 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
     private RedisUtils redisUtils;
     @Resource
     private CustomerbaseinfoMapper customerbaseinfoMapper;
+
+    @Resource
+    private CustomergoodsrelatedService customergoodsrelatedService;
+
     @Override
     public CustomerbaseinfoVo userLoginByPsw(String phoneNum, String psw) throws HzzBizException {
 
@@ -106,6 +122,10 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
 
         if (!updateById(customerbaseinfoVo)) {
             throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
+        } else {
+            String key = CommonConstant.USER_PREFIX + customerbaseinfoVo.getCbiId();
+            CustomerbaseinfoVo userInDB = getUserInfo(customerbaseinfoVo.getCbiPhonenum());
+            redisUtils.set(key, JsonUtils.toJson(userInDB), 30 *60);
         }
 
     }
@@ -135,7 +155,7 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
             }
 
             CustomerbaseinfoVo vo = users.get(0);
-            redisUtils.set(key, JsonUtils.toJson(vo), 2 * 60 *60);
+            redisUtils.set(key, JsonUtils.toJson(vo), 30 *60);
             return vo;
         } else {
             log.warn("从redis获取用户信息vo={}", JsonUtils.toJson(o));
@@ -191,15 +211,20 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
     }
 
     @Override
-    public CustomerbaseinfoVo getUserInfoByIdInDb(String cbiId) throws HzzBizException {
+    public CustomerbaseinfoVo getUserInfoByIdInDb(long cbiId) throws HzzBizException {
 
         List<CustomerbaseinfoVo> users = lambdaQuery()
                 .eq(CustomerbaseinfoVo::getCbiId, cbiId).list();
         if (CollectionUtils.isEmpty(users)) {
             throw new HzzBizException(HzzExceptionEnum.USER_NOTEXIST_ERROR);
         }
-
         CustomerbaseinfoVo vo = users.get(0);
+        UserAllAssetDto dto = customergoodsrelatedService.getMyAsset(cbiId);
+        vo.setStock(dto.getStock());
+        BigDecimal total = dto.getAsset().add(BigDecimal.valueOf(vo.getCbiTotal()));
+        BigDecimal balance = dto.getAsset().add(BigDecimal.valueOf(vo.getCbiBalance()));
+        vo.setCbiTotal(total.doubleValue());
+        vo.setCbiBalance(balance.doubleValue());
         return vo;
     }
 }

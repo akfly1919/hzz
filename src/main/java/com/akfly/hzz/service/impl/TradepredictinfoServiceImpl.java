@@ -39,6 +39,8 @@ public class TradepredictinfoServiceImpl extends ServiceImpl<TradepredictinfoMap
     private CustomerbaseinfoMapper customerbaseinfoMapper;
     @Resource
     private CustomerbaseinfoService customerbaseinfoService;
+
+
     public void saveTradepredictinfoVo(TradepredictinfoVo tradepredictinfoVo) throws HzzBizException {
        if(!saveOrUpdate(tradepredictinfoVo)) {
            throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
@@ -87,7 +89,7 @@ public class TradepredictinfoServiceImpl extends ServiceImpl<TradepredictinfoMap
         if (tpi==null){
             throw new HzzBizException(HzzExceptionEnum.ORDER_NOTEXIST_ERROR);
         }
-        if(tpi.getTpiStatus().intValue()!=1){
+        if(tpi.getTpiStatus() != 1){
             //状态已变，无需处理
             return false;
         }
@@ -99,10 +101,10 @@ public class TradepredictinfoServiceImpl extends ServiceImpl<TradepredictinfoMap
         int leftnum=tpi.getTpiNum()-tpi.getTpiSucessnum();
         BigDecimal priceB=BigDecimal.valueOf(tpi.getTpiPrice()).multiply(BigDecimal.valueOf(leftnum));
         BigDecimal feeB=BigDecimal.valueOf(tpi.getTpiServicefee()).multiply(BigDecimal.valueOf(leftnum));
-        balanceB.add(feeB).add(priceB);
-        fronzeB.subtract(feeB).subtract(priceB);
-        customerbaseinfoVo.setCbiFrozen(fronzeB.doubleValue());
-        customerbaseinfoVo.setCbiBalance(balanceB.doubleValue());
+        balanceB=balanceB.add(feeB).add(priceB);
+        fronzeB=fronzeB.subtract(feeB).subtract(priceB);
+        customerbaseinfoVo.setCbiFrozen(fronzeB.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+        customerbaseinfoVo.setCbiBalance(balanceB.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
         customerbaseinfoService.updateUserInfo(customerbaseinfoVo);
         if(leftnum==tpi.getTpiNum()){
             tpi.setTpiStatus(status);

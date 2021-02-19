@@ -24,4 +24,14 @@ public class RealNameRspDto {
      */
     private int isRealName;
 
+    /**
+     * 身份证正面照地址
+     */
+    private String idCardFront;
+
+    /**
+     * 身份证反照地址
+     */
+    private String idCardBack;
+
 }

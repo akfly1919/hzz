@@ -3,6 +3,7 @@ package com.akfly.hzz.service.impl;
 import com.akfly.hzz.constant.CommonConstant;
 import com.akfly.hzz.constant.PickUpEnum;
 import com.akfly.hzz.constant.StockEnum;
+import com.akfly.hzz.dto.UserAllAssetDto;
 import com.akfly.hzz.dto.UserGoodsDto;
 import com.akfly.hzz.dto.UserGoodsWithPickUpDto;
 import com.akfly.hzz.exception.HzzBizException;
@@ -24,6 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -47,19 +51,14 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
     @Override
     public int getStock(long gbiId) {
 
-        String key = CommonConstant.GOODS_STOCK_PREFIX + gbiId;
-        Object o = redisUtils.get(key);
+        //String key = CommonConstant.GOODS_STOCK_PREFIX + gbiId;
+        //Object o = redisUtils.get(key);
 
-        int stock;
-        if (o == null) {
-            stock = lambdaQuery().eq(CustomergoodsrelatedVo::getGbiId, gbiId)
-                    .eq(CustomergoodsrelatedVo::getCgrIsown, 1).eq(CustomergoodsrelatedVo::getCgrIslock, 0)
+        // 获取已锁定的库存，说明正在卖的单子，是市场上可以买入的库存量
+        int stock = lambdaQuery().eq(CustomergoodsrelatedVo::getGbiId, gbiId)
+                    .eq(CustomergoodsrelatedVo::getCgrIsown, 1).in(CustomergoodsrelatedVo::getCgrIslock, 2)
                     .eq(CustomergoodsrelatedVo::getCgrIspickup, 0).count();
-            redisUtils.set(key, stock, 60 *60);
-        } else {
-            stock = (int) o;
-            log.warn("从redis获取商品销量stock={}", stock);
-        }
+            //redisUtils.set(key, stock, 60 *60);
         return stock;
 
     }
@@ -85,9 +84,9 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
         if (StockEnum.UNLOCKED.equals(stockEnum)) {
             queryWrapper.eq("cgr_islock", 0);
         } else if (StockEnum.LOCKED.equals(stockEnum)) {
-            queryWrapper.eq("cgr_islock", 1);
-        } else if (StockEnum.FROZEN.equals(stockEnum)) {
             queryWrapper.eq("cgr_islock", 2);
+        } else if (StockEnum.FROZEN.equals(stockEnum)) {
+            queryWrapper.eq("cgr_islock", 1);
         } else if (StockEnum.XIANHUO.equals(stockEnum)) {
             queryWrapper.in("cgr_islock", Arrays.asList(0, 1));
         }
@@ -107,7 +106,7 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
             GoodsbaseinfoVo vo = goodsbaseinfoService.getGoodsbaseinfoWithRedis(Long.parseLong(String.valueOf(temp.get("gbi_id"))));
             UserGoodsDto userGoodsDto = new UserGoodsDto();
             userGoodsDto.setCbiid(userId);
-            userGoodsDto.setStock((long) temp.get("stock"));
+            userGoodsDto.setStock(Long.valueOf(String.valueOf(temp.get("stock"))).intValue());
             BeanUtils.copyProperties(vo, userGoodsDto);
             userGoodsDtoList.add(userGoodsDto);
         }
@@ -119,19 +118,27 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void unlock() throws HzzBizException {
-        Map<String,Object> map=new HashMap<>();
-        map.put("cgr_isown",1);
-        map.put("cgr_islock",1);
-        QueryWrapper wrapper_c=new QueryWrapper();
-        wrapper_c.allEq(map);
-        //wrapper_c.lt("cgr_buytime", LocalDate.now());
-        wrapper_c.last("for update");
-        List<CustomergoodsrelatedVo> cgrlist = getBaseMapper().selectList(wrapper_c);
+    public void  unlock() throws HzzBizException {
 
-        for(CustomergoodsrelatedVo cgr:cgrlist){
-            cgr.setCgrIslock(0);
-            saveCustomergoodsrelated(cgr);
+        LocalDateTime end = LocalDateTime.now();
+        LocalDateTime start = end.plusDays(-14);
+        log.info("解锁用户库存信息定时启动......start={}, end={}", start, end);
+        List<CustomergoodsrelatedVo> voList = lambdaQuery().eq(CustomergoodsrelatedVo::getCgrIslock, 1)
+                .eq(CustomergoodsrelatedVo::getCgrIsown, 1).eq(CustomergoodsrelatedVo::getCgrIspickup, 0)
+                .between(CustomergoodsrelatedVo::getCgrBuytime, start, end).list();
+
+        for(CustomergoodsrelatedVo cgr : voList){
+            GoodsbaseinfoVo vo = goodsbaseinfoService.getGoodsbaseinfoWithRedis(cgr.getGbiId());
+            //int frozenDays = (vo.getGbiFrozendays() == null ? 1 : vo.getGbiFrozendays());
+
+            if (vo.getGbiFrozendays() == null) {
+                log.error("商品信息中的售卖冻结天数为空 gbiId={}", cgr.getGbiId());
+            } else {
+                if (cgr.getCgrBuytime().plusDays(vo.getGbiFrozendays()).compareTo(LocalDateTime.now()) <= 0) {
+                    cgr.setCgrIslock(0);
+                    saveCustomergoodsrelated(cgr);
+                }
+            }
         }
     }
 
@@ -154,7 +161,7 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
                 userGoodsDto.setCgrForzentime(temp.getCgrForzentime());
                 userGoodsDto.setCgrSelltime(temp.getCgrSelltime());
             }
-            userGoodsDto.setStock(Long.parseLong(String.valueOf(stock)));
+            userGoodsDto.setStock(stock);
             BeanUtils.copyProperties(vo, userGoodsDto);
         } catch (HzzBizException e) {
             log.error("从redis获取商品信息异常 msg={}", e.getErrorMsg(), e);
@@ -177,7 +184,7 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
         try {
             GoodsbaseinfoVo vo = goodsbaseinfoService.getGoodsbaseinfoWithRedis(gbiid);
             userGoodsDto.setCbiid(cbiid);
-            userGoodsDto.setStock((long) stock);
+            userGoodsDto.setStock(stock);
             BeanUtils.copyProperties(vo, userGoodsDto);
         } catch (HzzBizException e) {
             log.error("从redis获取商品信息异常 msg={}", e.getErrorMsg(), e);
@@ -228,5 +235,44 @@ public class CustomergoodsrelatedServiceImpl extends ServiceImpl<Customergoodsre
         result.put("frozenStock", frozenStock);
         result.put("stock", stock);
         return result;
+    }
+
+    @Override
+    public int getMyStock(Long userId) {
+
+        int stock = lambdaQuery().eq(CustomergoodsrelatedVo::getCbiId, userId).eq(CustomergoodsrelatedVo::getCgrIsown, 1)
+                .eq(CustomergoodsrelatedVo::getCgrIspickup, 0).count();
+        return stock;
+    }
+
+    @Override
+    public UserAllAssetDto getMyAsset(Long userId) throws HzzBizException {
+
+        QueryWrapper<CustomergoodsrelatedVo> queryWrapper = new QueryWrapper<CustomergoodsrelatedVo>();
+        queryWrapper.eq("cbi_id", userId).eq("cgr_isown", 1);
+        queryWrapper.eq("cgr_ispickup", 0);
+        queryWrapper.select("cbi_id, gbi_id, count(id) as stock");
+        queryWrapper.groupBy("gbi_id");
+
+        try {
+            List<Map<String, Object>> list = baseMapper.selectMaps(queryWrapper);
+            int stock = 0;
+            BigDecimal asset = BigDecimal.ZERO;
+            for (Map<String, Object> temp : list) {
+                String gbiId = String.valueOf(temp.get("gbi_id"));
+                if (StringUtils.isEmpty(gbiId)) continue;
+                GoodsbaseinfoVo vo = goodsbaseinfoService.getGoodsbaseinfoWithRedis(Long.parseLong(gbiId));
+                stock = stock + Long.valueOf(String.valueOf(temp.get("stock"))).intValue();
+                asset = asset.add(BigDecimal.valueOf(vo.getGbiPrice()).multiply(BigDecimal.valueOf(stock)));
+            }
+            UserAllAssetDto userAllAssetDto = new UserAllAssetDto();
+            userAllAssetDto.setAsset(asset);
+            userAllAssetDto.setStock(stock);
+            log.info("获取用户总资产 userId={}, stock={}, asset={}", userId, userAllAssetDto.getStock(), userAllAssetDto.getAsset());
+            return userAllAssetDto;
+        } catch (Exception e) {
+            log.error("获取用户总资产异常 userId={}", userId, e);
+            throw new HzzBizException(HzzExceptionEnum.SYSTEM_ERROR);
+        }
     }
 }

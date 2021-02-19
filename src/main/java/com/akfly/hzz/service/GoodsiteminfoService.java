@@ -13,4 +13,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface GoodsiteminfoService extends IService<GoodsiteminfoVo> {
 
+    int getPlatFormStock(long gbiId);
+
 }

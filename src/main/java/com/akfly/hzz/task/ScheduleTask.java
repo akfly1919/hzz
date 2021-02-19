@@ -91,14 +91,14 @@ public class ScheduleTask implements SchedulingConfigurer {
     public void configureTasks(ScheduledTaskRegistrar scheduledTaskRegistrar) {
         getNewTradeTime();
         scheduledTaskRegistrar.addTriggerTask(getReleaseTask(),getReleaseTrigger());
-        scheduledTaskRegistrar.addTriggerTask(getUnlockCustomergoodsrelatedTask(),getReleaseTrigger());
+        scheduledTaskRegistrar.addCronTask(getUnlockCustomergoodsrelatedTask(),"0 */5 * * * ?");
     }
 
     private Runnable getUnlockCustomergoodsrelatedTask(){
         return new Runnable() {
             @Override
             public void run() {
-                releasTradepredictinfo();
+                unlockCustomergoodsrelated();
             }
         };
     }

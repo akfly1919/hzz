@@ -9,9 +9,14 @@ import com.akfly.hzz.facade.IDFacade;
 import com.akfly.hzz.interceptor.AuthInterceptor;
 import com.akfly.hzz.service.CustomercardinfoService;
 import com.akfly.hzz.service.CustomeridcardinfoService;
+import com.akfly.hzz.util.BucketUtil;
 import com.akfly.hzz.util.JsonUtils;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
+import com.akfly.hzz.vo.CustomeridcardinfoVo;
 import com.alibaba.fastjson.JSONObject;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +33,7 @@ import javax.validation.constraints.AssertFalse;
 import javax.validation.constraints.AssertTrue;
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Slf4j
@@ -51,67 +57,83 @@ public class ImgUploadController {
      * @param imageFile
      * @return
      */
+    @ApiOperation(value="上传身份证图片",notes="用户登录就可以")
+    //@ApiImplicitParams({
+    //        @ApiImplicitParam(name="file",value="图片流"),
+    //        @ApiImplicitParam(name="isFront",value="身份证正反类型(true: 正面(照片面) false: 反面(国徽面))",required=true)
+    //
+    //})
     @PostMapping(value = "/imgUp")
     @ResponseBody
     @VerifyToken
-    public BaseRspDto<JSONObject> imgUp(@RequestParam("file") MultipartFile imageFile, HttpServletResponse response) {
+    public BaseRspDto<JSONObject> imgUp(@RequestParam("file") MultipartFile imageFile,@AssertFalse @RequestParam Boolean isFront) {
 
         BaseRspDto rsp = new BaseRspDto();
-        ServletOutputStream outputStream = null;
         CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
-        String userId = String.valueOf(userInfo.getCbiId());
+        long userId = userInfo.getCbiId();
+        String fileName = imageFile.getOriginalFilename();
+        log.info("imgUp ------- fileName={}", fileName);
+        OutputStream outputStream1 = null;
         try {
-            String fileName = imageFile.getOriginalFilename();
-            log.info("imgUp ------- fileName={}", fileName);
-            String type=checkImgSuffixAndSize(imageFile, fileName);
+            String type = checkImgSuffixAndSize(imageFile, fileName);
             InputStream imageStream = imageFile.getInputStream();
-           // threadPool.submit(() -> {
-                OutputStream outputStream1 = null;
-                try {
-                    // TODO 此种方式需要数据库能存储文件名称
-                    //SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-                    //String dateStr = sdf.format(new Date());
-                    //fileName=dateStr+"."+type;
-                    File dir = new File(path + userId);
-                    if (!dir.isDirectory()) {
-                        dir.mkdir();
-                    }
-                    File image = new File(path + userId + File.separator + fileName);
-                    byte[] data = new byte[imageStream.available()];
-                    imageStream.read(data);
-                    outputStream1 = new FileOutputStream(image);
-                    outputStream1.write(data);
-                    JSONObject object =idFacade.idImageProcess(image,IDFacade.IDSIDE_FRONT);
-                    //TODO
-                    //object.put("fileName",fileName);
-                    rsp.setData(object);
-                    return rsp;
-                } catch (Exception e) {
-                    log.error("上传原图异常,userId={}" + userId, e);
-                } finally {
-                    if (outputStream1 != null) {
-                        try {
-                            outputStream1.flush();
-                            outputStream1.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+            File dir = new File(path + userId);
+            if (!dir.isDirectory()) {
+                dir.mkdir();
+            }
+            File image = new File(path + userId + File.separator + fileName);
+            byte[] data = new byte[imageStream.available()];
+            imageStream.read(data);
+            outputStream1 = new FileOutputStream(image);
+            outputStream1.write(data);
+
+            String suffix = isFront ? "front" : "back";
+            String fileNameRemote = "CF/" + userId + "/IDPic_" + System.currentTimeMillis() + suffix + type;
+            BucketUtil.uploadFile(fileNameRemote, image);
+            CustomeridcardinfoVo vo = null;
+            try {
+                vo = customeridcardinfoService.getCardInfo(userId);
+                vo.setCiiUpdatetime(LocalDateTime.now());
+            } catch (HzzBizException e) {
+                log.error("获取用户实名信息异常 userId={}", userId, e);
+                vo = new CustomeridcardinfoVo();
+                vo.setCbiId(userInfo.getCbiId());
+                vo.setCiiCreatetime(LocalDateTime.now());
+                vo.setCiiUpdatetime(LocalDateTime.now());
+                vo.setCiiStatus(1);
+            }
+
+            JSONObject object = null;
+            if(isFront) {
+                object = idFacade.idImageProcess(image,IDFacade.IDSIDE_FRONT);
+                vo.setCiiIdcardfront(fileNameRemote);
+            } else {
+                object = new JSONObject();
+                customeridcardinfoService.saveCardInfo(userInfo.getCbiId(), null, fileNameRemote);
+                vo.setCiiIdcardback(fileNameRemote);
+            }
+            customeridcardinfoService.saveOrUpdateIdCard(vo);
+            rsp.setData(object);
+            return rsp;
+            } catch (HzzBizException e) {
+                rsp.setCode(e.getErrorCode());
+                rsp.setMsg(e.getErrorMsg());
+                log.error("身份证鉴权失败,userId={}", userId, e);
+            } catch (Exception e) {
+                log.error("上传原图异常,userId={}", userId, e);
+                rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+                rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+            } finally {
+                if (outputStream1 != null) {
+                    try {
+                        outputStream1.flush();
+                        outputStream1.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
-           // });
-
-
-
-        } catch (HzzBizException e) {
-            rsp.setCode(e.getErrorCode());
-            rsp.setMsg(e.getErrorMsg());
-        } catch (Exception e) {
-            log.error("图片上传接口请求Exception,userId=" + userId, e);
-            rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
-            rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
-        } finally {
-
-        }
+            }
+       // });
         return rsp;
     }
 
@@ -234,12 +256,13 @@ public class ImgUploadController {
         if (fileSize <= 0) {
             log.info("文件为空");
             throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
-        } else if (fileSize > (2 * 1024 * 1024)) {
+        } else if (fileSize > (20 * 1024 * 1024)) {
             log.error( "文件大小超出规格 fileName={}", fileName);
             throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
 
         }
-        return contentTypes[1];
+        String suffix = fileName.substring(fileName.lastIndexOf("."));
+        return suffix;
     }
 
 

@@ -1,5 +1,7 @@
 package com.akfly.hzz.service.impl;
 
+import com.akfly.hzz.constant.CbrClassEnum;
+import com.akfly.hzz.constant.InOrOutTypeEnum;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.mapper.CustomerpayinfoMapper;
@@ -71,8 +73,9 @@ public class CustomerpayinfoServiceImpl extends ServiceImpl<CustomerpayinfoMappe
             bill.setCbiId(Long.valueOf(payInfo.getCbiId()));
             bill.setCbrorderid(String.valueOf(vo.getCpiOrderid()));
             bill.setCbrMoney(largeMoney);
-            bill.setCbrType(1); // 1收入  2支出
+            bill.setCbrType(InOrOutTypeEnum.IN.getStatus()); // 1收入  2支出
             bill.setCbrCreatetime(LocalDateTime.now());
+            bill.setCbrClass(CbrClassEnum.RECHARGE.getStatus());
             //bill.setCbrUpdatetime(copy.getCbrUpdatetime());
             customerbillrelatedService.save(bill);
             customerbaseinfoService.updateById(userInfo);

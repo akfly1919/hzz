@@ -10,11 +10,14 @@ import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.facade.IDFacade;
 import com.akfly.hzz.interceptor.AuthInterceptor;
+import com.akfly.hzz.service.ContactusService;
 import com.akfly.hzz.service.CustomerbaseinfoService;
 import com.akfly.hzz.service.CustomergoodsrelatedService;
 import com.akfly.hzz.service.CustomeridcardinfoService;
 import com.akfly.hzz.util.*;
+import com.akfly.hzz.vo.ContactusVo;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
+import com.akfly.hzz.vo.CustomeridcardinfoVo;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
 
 
@@ -50,6 +54,9 @@ public class UserController {
 
 	@Resource
 	private IDFacade idFacade;
+
+	@Resource
+	private ContactusService contactusService;
 
 
 	@ApiOperation(value="用户登录",notes="同时支持手机验证码或者密码登录")
@@ -180,10 +187,8 @@ public class UserController {
 			if (userInfo.getCbiId() == null) {
 				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
 			}
-			CustomerbaseinfoVo customerbaseinfoVo = customerbaseinfoService.getUserInfoByIdInDb(String.valueOf(userInfo.getCbiId()));
-			Map<String, Long> stockMap = customergoodsrelatedService.getStockForMyself(userInfo.getCbiId(), StockEnum.XIANHUO, PickUpEnum.UNPICK);
-			customerbaseinfoVo.setStock(stockMap.get("stock").intValue());
-			customerbaseinfoVo.setFrozenStock(stockMap.get("frozenStock").intValue());
+			CustomerbaseinfoVo customerbaseinfoVo = customerbaseinfoService.getUserInfoByIdInDb(userInfo.getCbiId());
+			//customerbaseinfoVo.setFrozenStock(stockMap.get("frozenStock").intValue());
 			rsp.setData(customerbaseinfoVo);
 		} catch (HzzBizException e) {
 			log.error("获取用户信息业务错误 msg={}", e.getErrorMsg(), e);
@@ -219,11 +224,16 @@ public class UserController {
 				msg_prefix = CommonConstant.MSG_CODE_LOGIN;
 			} else if ("1".equals(msgType)) {
 				msg_prefix = CommonConstant.MSG_CODE_REGISTER;
+				CustomerbaseinfoVo existUser = customerbaseinfoService.getUserInfo(phoneNum);
+				if (existUser != null) {
+					throw new HzzBizException(HzzExceptionEnum.PHONENUM_EXIST);
+				}
 			} else if ("2".equals(msgType)) {
 				msg_prefix = CommonConstant.MSG_CODE_FORGET_PSW;
 			} else {
 				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
 			}
+
 			redisUtils.set(msg_prefix + phoneNum, code, 300); // 有效期5分钟
 
 			if (SmsUtils.smsSend(phoneNum,code)) {
@@ -273,10 +283,10 @@ public class UserController {
 			vo.setCbiId(userInfo.getCbiId());
 			vo.setCbiName(realNameReqDto.getName());
 			vo.setCbiIdcard(realNameReqDto.getIdentityCode());
-			// TODO 需要放到一个事务
 			idFacade.idRealAuth(realNameReqDto.getIdentityCode(),realNameReqDto.getName());
 			customerbaseinfoService.updateUserInfo(vo);
-			customeridcardinfoService.saveCardInfo(userInfo.getCbiId(), realNameReqDto.getIdFrontImgName(), realNameReqDto.getIdBackImgName());
+			customeridcardinfoService.updateByUserId(userInfo.getCbiId());
+			//customeridcardinfoService.saveCardInfo(userInfo.getCbiId(), realNameReqDto.getIdFrontImgName(), realNameReqDto.getIdBackImgName());
 		} catch (HzzBizException e) {
 			log.error("用户实名认证业务错误 msg={}", e.getErrorMsg(), e);
 			rsp.setCode(e.getErrorCode());
@@ -293,24 +303,27 @@ public class UserController {
 	@PostMapping(value = "/getRealName")
 	@ResponseBody
 	@VerifyToken
-	public BaseRspDto getRealName() {
+	public BaseRspDto<RealNameRspDto> getRealName() {
 
 		BaseRspDto<RealNameRspDto> rsp = new BaseRspDto<RealNameRspDto>();
 		try {
 			CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
 
-			CustomerbaseinfoVo userInfoDb = customerbaseinfoService.getUserInfoById(String.valueOf(userInfo.getCbiId()));
+			//CustomerbaseinfoVo userInfoDb = customerbaseinfoService.getUserInfoById(String.valueOf(userInfo.getCbiId()));
 			RealNameRspDto rnDto = new RealNameRspDto();
-			if (StringUtils.isNoneBlank(userInfoDb.getCbiIdcard())) {
-				try {
-					customeridcardinfoService.getCardInfo(userInfo.getCbiId()); // 获取不到抛出了异常
+			CustomeridcardinfoVo vo = null;
+			try {
+				vo = customeridcardinfoService.getCardInfo(userInfo.getCbiId()); // 获取不到抛出了异常
+				if (vo.getCiiStatus() == 2) {
 					rnDto.setIsRealName(1);
-				} catch (HzzBizException e) {
+				} else { // 未审核
 					rnDto.setIsRealName(0);
-					log.error("获取实名信息异常 msg={}", e.getErrorMsg());
 				}
-			} else {
+				rnDto.setIdCardBack(vo.getCiiIdcardback());
+				rnDto.setIdCardFront(vo.getCiiIdcardfront());
+			} catch (HzzBizException e) {
 				rnDto.setIsRealName(0);
+				log.error("获取实名信息异常 msg={}", e.getErrorMsg());
 			}
 			rnDto.setName(userInfo.getCbiName());
 			rnDto.setIdentityCode(userInfo.getCbiIdcard());
@@ -436,6 +449,30 @@ public class UserController {
 		}
 		return rsp;
 	}
+
+
+	@ApiOperation(value="联系我们",notes="不要求登录")
+	@PostMapping(value = "/contactUs")
+	@ResponseBody
+	public BaseRspDto<ContactusVo> contactUs() {
+
+		BaseRspDto<ContactusVo> rsp = new BaseRspDto<ContactusVo>();
+		try {
+
+			ContactusVo vo = contactusService.getContactusVo();
+			rsp.setData(vo);
+		//} catch (HzzBizException e) {
+		//	log.error("联系我们业务错误 msg={}", e.getErrorMsg(), e);
+		//	rsp.setCode(e.getErrorCode());
+		//	rsp.setMsg(e.getErrorMsg());
+		} catch (Exception e) {
+			log.error("联系我们系统异常", e);
+			rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+			rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+		}
+		return rsp;
+	}
+
 
 
 

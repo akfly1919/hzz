@@ -9,10 +9,11 @@ package com.akfly.hzz.constant;  /**
 
 public enum StockEnum {
 
-    UNLOCKED(0, "未锁定"),
-    LOCKED(1, "锁定"),
-    FROZEN(2, "冻结"),
-    XIANHUO(0, "现货")
+    UNLOCKED(0, "未锁定"),  // 现货库存
+    LOCKED(2, "锁定"),
+    FROZEN(1, "冻结"),
+    XIANHUO(3, "现货"), // 可提货库存
+    ALL(4, "总库存")
     ;
 
     private int status;

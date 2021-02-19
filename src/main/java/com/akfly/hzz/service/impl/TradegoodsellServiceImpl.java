@@ -65,7 +65,7 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
         TradeconfigVo tc = tradeconfigService.getTradeconfig(TradeconfigVo.TCTYPE_SELL);
         BigDecimal priceB=new BigDecimal(price);
         BigDecimal feeB=priceB.multiply(new BigDecimal(tc.getTcRate()));
-        lockStock(cbiid,gbid,num,price,feeB.doubleValue());
+        lockStock(cbiid,gbid,num,price,feeB.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
 
         String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         if(tradetimeService.isInTradeTime(nowTime)){
@@ -128,6 +128,7 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
         if(cgrlist==null||cgrlist.size()<num){
             throw new HzzBizException(HzzExceptionEnum.STOCK_ERROR);
         }
+        HashMap<String, LocalDateTime> timeMap = tradetimeService.getRealTradeStartTime();
         for(CustomergoodsrelatedVo cgr:cgrlist){
             cgr.setCgrIslock(2);
             customergoodsrelatedService.saveCustomergoodsrelated(cgr);
@@ -140,9 +141,9 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
             tgs.setTgsStatus(0);
             tgs.setTgsSaleable(1);
             tgs.setTgsCreatetime(LocalDateTime.now());
-            tgs.setTgsPublishtime(LocalDateTime.now());
+            tgs.setTgsPublishtime(timeMap.get("startTime"));
             tgs.setTgsUpdatetime(LocalDateTime.now());
-            tgs.setTgsFinshitime(LocalDateTime.now());
+            tgs.setTgsFinshitime(timeMap.get("finishTime"));
             tgs.setTgsType(1);
             tgs.setTgsOwntype(2);
             tgs.setTgsServicefee(feeB);

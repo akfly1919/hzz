@@ -103,6 +103,8 @@ public class UserGoodsDto {
      */
     private Integer gbiLimitpickup;
 
+    private Integer gbiFrozendays;
+
     /**
      * 用户id
      */
@@ -111,6 +113,6 @@ public class UserGoodsDto {
     /**
      * 库存
      */
-    private Long stock;
+    private Integer stock;
 
 }

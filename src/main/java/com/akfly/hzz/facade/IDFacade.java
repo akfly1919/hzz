@@ -5,7 +5,9 @@ import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.util.HttpUtils;
 import com.akfly.hzz.util.ImageUtil;
 import com.akfly.hzz.util.JsonUtils;
+import com.akfly.hzz.util.RandomGenUtils;
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import sun.misc.BASE64Encoder;
@@ -15,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@Slf4j
 public class IDFacade {
     public static String IDSIDE_FRONT="front";
     public static String IDSIDE_BACK="back";
@@ -52,10 +55,10 @@ public class IDFacade {
         Map<String,String> map=new HashMap<String,String>();
         map.put("idcard",idcard);
         map.put("realname",realname);
-        map.put("orderid","1");
+        map.put("orderid", RandomGenUtils.genFlowNo("RM"));
         map.put("key","6de4cec9e373c07804591c4b3d980d3a");
         String result = HttpUtils.postForm("http://op.juhe.cn/idcard/query", map);
-        System.out.println(result);
+        log.info("实名认证结果result={}", result);
         JSONObject resultOb = (JSONObject)JSONObject.parse(result);
         if("0".equalsIgnoreCase(resultOb.getString("error_code"))){
             JSONObject rrob= (JSONObject)resultOb.get("result");
@@ -65,10 +68,10 @@ public class IDFacade {
                 throw new HzzBizException(HzzExceptionEnum.ID_REAL_AUTH);
             }
 
-        }else{
-
+        } else {
+            throw new HzzBizException(HzzExceptionEnum.ID_REAL_AUTH);
         }
-        return resultOb;
+        //return resultOb;
     }
 
     public static void main(String[] args) throws HzzBizException {

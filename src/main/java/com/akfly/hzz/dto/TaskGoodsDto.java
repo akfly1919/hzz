@@ -20,4 +20,25 @@ public class TaskGoodsDto extends UserGoodsDto {
      * 0 不够资格购买  1 够资格购买特价商品
      */
     private int canBuy;
+
+    /**
+     * 奖励任务个数
+     */
+    private int discountNumConfig;
+
+    /**
+     * 本次可购买个数
+     */
+    private int canBuyNum;
+
+    /**
+     * 买入个数配置
+     */
+    private int buyConfig;
+
+    /**
+     * 提货个数配置
+     */
+    private int pickUpConfig;
+
 }

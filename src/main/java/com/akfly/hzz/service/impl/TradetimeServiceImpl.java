@@ -12,6 +12,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 
 /**
  * <p>
@@ -42,4 +45,26 @@ public class TradetimeServiceImpl extends ServiceImpl<TradetimeMapper, Tradetime
         }
         return false;
     }
+
+    public HashMap<String ,LocalDateTime> getRealTradeStartTime() throws HzzBizException {
+        HashMap<String ,LocalDateTime> timemap=new HashMap<>();
+        LocalDateTime now =LocalDateTime.now();
+        TradetimeVo tt=this.getTradeTime();
+        String nowTime=now.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        if(!isInTradeTime(nowTime)){
+            //不在交易时间
+            now=now.plusDays(1);
+
+        }
+        String date=now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String starttime=date+" "+tt.getTtTimeAmStart();
+        String finishtime=date+" "+tt.getTtTimePmEnd();
+        DateTimeFormatter df =DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime start = LocalDateTime.parse(starttime,df);
+        LocalDateTime finish = LocalDateTime.parse(finishtime,df);
+        timemap.put("startTime",start);
+        timemap.put("finishTime",finish);
+        return timemap;
+    }
+
 }

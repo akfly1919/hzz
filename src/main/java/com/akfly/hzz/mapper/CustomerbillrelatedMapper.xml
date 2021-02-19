@@ -3,7 +3,7 @@
 <mapper namespace="com.akfly.hzz.mapper.CustomerbillrelatedMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.CustomerbillrelatedVo">
+    <resultMap id="BaseResultMap" type="com.qianxian.api.vo.CustomerbillrelatedVo">
         <id column="cbr_id" property="cbrId" />
         <result column="cbi_id" property="cbiId" />
         <result column="cbrorderid" property="cbrorderid" />
@@ -11,6 +11,7 @@
         <result column="cbr_type" property="cbrType" />
         <result column="cbr_createtime" property="cbrCreatetime" />
         <result column="cbr_updatetime" property="cbrUpdatetime" />
+        <result column="cbr_class" property="cbrClass" />
     </resultMap>
 
 </mapper>
