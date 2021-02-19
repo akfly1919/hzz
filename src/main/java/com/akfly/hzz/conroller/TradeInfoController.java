@@ -146,7 +146,7 @@ public class TradeInfoController {
         BaseRspDto<String> rsp = new BaseRspDto<String>();
         try {
             CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
-             tradegoodsellService.sell(userInfo.getCbiId(), gbid, num, price);
+             tradegoodsellService.sell(userInfo.getCbiId(), gbid, num, price, type);
 
         } catch (HzzBizException e) {
             log.error("卖出业务错误 msg={}", e.getErrorMsg(), e);

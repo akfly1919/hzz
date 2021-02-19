@@ -55,7 +55,7 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
         }
     }
 
-    public void sell(long cbiid,long gbid,int num,double price) throws HzzBizException {
+    public void sell(long cbiid,long gbid,int num,double price, int type) throws HzzBizException {
         GoodsbaseinfoVo gi = goodsbaseinfoService.getGoodsbaseinfoVo(gbid);
         //if (gi.getGbiPrice().doubleValue()!=price){
         //    //TODO 价格不正确
@@ -65,7 +65,7 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
         TradeconfigVo tc = tradeconfigService.getTradeconfig(TradeconfigVo.TCTYPE_SELL);
         BigDecimal priceB=new BigDecimal(price);
         BigDecimal feeB=priceB.multiply(new BigDecimal(tc.getTcRate()));
-        lockStock(cbiid,gbid,num,price,feeB.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+        lockStock(cbiid,gbid,num,price,feeB.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue(), type);
 
         String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         if(tradetimeService.isInTradeTime(nowTime)){
@@ -113,7 +113,7 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
 
     }
     @Transactional(rollbackFor = Exception.class)
-    public void lockStock(long cbiid,long gbid,int num,double price,double feeB) throws HzzBizException {
+    public void lockStock(long cbiid,long gbid,int num,double price,double feeB, int type) throws HzzBizException {
         Map<String,Object> map=new HashMap<>();
         map.put("cbi_id",cbiid);
         map.put("gbi_id",gbid);
@@ -123,7 +123,7 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
         QueryWrapper wrapper_c=new QueryWrapper();
         wrapper_c.allEq(map);
         //wrapper_c.lt("cgr_buytime", LocalDate.now());
-        wrapper_c.last("for update");
+        wrapper_c.last("limit " + num + " for update");
         List<CustomergoodsrelatedVo> cgrlist = customergoodsrelatedMapper.selectList(wrapper_c);
         if(cgrlist==null||cgrlist.size()<num){
             throw new HzzBizException(HzzExceptionEnum.STOCK_ERROR);
@@ -148,7 +148,7 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
             tgs.setTgsOwntype(2);
             tgs.setTgsServicefee(feeB);
             tgs.setTgsTradetime(LocalDateTime.now());
-            tgs.setTgsSelltype(2);
+            tgs.setTgsSelltype(type);
             saveTradeorderinfo(tgs);
 
         }
@@ -169,7 +169,7 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
             return;
         }
         tgs.setTgsStatus(3);
-        tgs.setTgsFinshitime(LocalDateTime.now());
+        //tgs.setTgsFinshitime(LocalDateTime.now());
         tgs.setTgsUpdatetime(LocalDateTime.now());
         saveTradegoodsell(tgs);
         Map<String,Object> map=new HashMap<>();

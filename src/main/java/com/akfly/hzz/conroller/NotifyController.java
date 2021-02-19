@@ -10,6 +10,7 @@ import com.akfly.hzz.util.DateUtil;
 import com.akfly.hzz.util.RSAUtil;
 import com.akfly.hzz.util.RequestUtil;
 import com.akfly.hzz.vo.CustomerpayinfoVo;
+import com.alipay.api.internal.util.AlipaySignature;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,12 +54,15 @@ public class NotifyController {
             log.info("NotifyController.aliPayNotify|通知内容："+notifyMap);
 
             //验签
-            String aliSign = notifyMap.get("sign");
-            notifyMap.remove("sign");
-            notifyMap.remove("sign_type");
-            String signStr = RequestUtil.postFormLinkReport(notifyMap);
-            boolean flag = RSAUtil.verify(signStr.getBytes("UTF-8"), publicKey, aliSign);
-            if (!flag) {
+            //String aliSign = notifyMap.get("sign");
+            //notifyMap.remove("sign");
+            //notifyMap.remove("sign_type");
+            //String signStr = RequestUtil.postFormLinkReport(notifyMap);
+            //boolean flag = RSAUtil.verify(signStr.getBytes("UTF-8"), publicKey, aliSign);
+
+            boolean signVerified = AlipaySignature.rsaCheckV1(notifyMap, publicKey, CommonConstant.CHARSET_UTF8, "RSA2");
+            //Factory.Payment.Common().verifyNotify(notifyMap);
+            if (!signVerified) {
                 log.error("aliPayNotify支付宝后台通知验签失败，transId={}", notifyMap.get("out_trade_no"));
                 //return CommonConstant.RESPTO_BANK_FAIL_MSG; // TODO 需要放开
             }

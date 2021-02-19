@@ -64,8 +64,8 @@ public class CustomerpayinfoServiceImpl extends ServiceImpl<CustomerpayinfoMappe
             CustomerpayinfoVo payInfo = lambdaQuery().eq(CustomerpayinfoVo::getCpiOrderid, vo.getCpiOrderid()).one();
             customerpayinfoMapper.updateById(vo);
             CustomerbaseinfoVo userInfo = customerbaseinfoService.lambdaQuery().eq(CustomerbaseinfoVo::getCbiId, Long.valueOf(payInfo.getCbiId())).one();
-            double largeMoney = Double.parseDouble(rechargeAmount) * 1000000;
-            userInfo.setCbiBalance(userInfo.getCbiBalance() + largeMoney); // TODO 金额乘以1000000，后续需要去掉
+            double largeMoney = Double.parseDouble(rechargeAmount);
+            userInfo.setCbiBalance(userInfo.getCbiBalance() + largeMoney);
             userInfo.setCbiTotal(userInfo.getCbiTotal() + largeMoney);
             userInfo.setCbiUpdatetime(LocalDateTime.now());
 

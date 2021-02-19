@@ -36,7 +36,7 @@ public class RSAUtil {
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
 
         // KEY_ALGORITHM 指定的加密算法
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA2");
 
         // 取公钥匙对象
         PublicKey pubKey = keyFactory.generatePublic(keySpec);
