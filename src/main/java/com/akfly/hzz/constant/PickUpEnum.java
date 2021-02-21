@@ -2,7 +2,7 @@ package com.akfly.hzz.constant;  /**
  * @title: PayStatus
  * @projectName hzz
  * @description 提货枚举类
- * @author MLL
+ * @author
  * @date 2021/1/24 21:13
  */
 

@@ -5,6 +5,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.net.URLDecoder;
+import java.time.LocalDate;
 
 @SpringBootTest
 class HzzApplicationTests {
@@ -41,6 +42,7 @@ class HzzApplicationTests {
 		System.out.println(buy + "====" + pickUp);
 		System.out.println(buy1 + "====" + pickUp1);
 		System.out.println(buy2 + "====" + pickUp2);
+		System.out.println(LocalDate.now());
 
 	}
 

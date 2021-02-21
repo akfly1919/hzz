@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -64,7 +65,8 @@ public class TaskstatisticsServiceImpl extends ServiceImpl<TaskstatisticsMapper,
     @Override
     public TaskstatisticsVo getTaskInfo(long cbiid, long gbid) {
 
-        TaskstatisticsVo vo = lambdaQuery().eq(TaskstatisticsVo::getCbiId, cbiid).eq(TaskstatisticsVo::getGbiId, gbid).one();
+        TaskstatisticsVo vo = lambdaQuery().eq(TaskstatisticsVo::getCbiId, cbiid).eq(TaskstatisticsVo::getGbiId, gbid)
+                .ge(TaskstatisticsVo::getToiCreatetime, LocalDate.now()).one();
         return vo;
     }
 

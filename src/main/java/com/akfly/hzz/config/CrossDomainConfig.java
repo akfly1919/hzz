@@ -10,7 +10,7 @@ import org.springframework.web.filter.CorsFilter;
  * @title: CrossDomainConfig
  * @projectName hzz
  * @description 跨域配置
- * @author MLL
+ * @author
  * @date 2021/1/24 18:10
  */
 

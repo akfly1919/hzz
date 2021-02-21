@@ -1,7 +1,7 @@
 package com.akfly.hzz.constant;
 
 /**
- * @author MLL
+ * @author
  * @title: CliDeviceTypeEnum
  * @projectName hzz
  * @description 客户端枚举类

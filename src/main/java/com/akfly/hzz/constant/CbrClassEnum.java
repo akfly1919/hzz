@@ -2,7 +2,7 @@ package com.akfly.hzz.constant;  /**
  * @title: CbrClassEnum
  * @projectName hzz
  * @description 账户流水表的类型枚举
- * @author MLL
+ * @author
  * @date 2021/1/24 21:13
  */
 

@@ -6,7 +6,7 @@ import lombok.Data;
  * @title: RealNameReqDto
  * @projectName hzz
  * @description 实名请求dto
- * @author MLL
+ * @author
  * @date 2021/1/23 9:44
  */
 

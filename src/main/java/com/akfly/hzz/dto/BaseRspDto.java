@@ -9,7 +9,7 @@ import java.io.Serializable;
  * @title: BaseRspDto
  * @projectName hzz
  * @description 响应消息顶级类，定义报文格式
- * @author MLL
+ * @author
  * @date 2021/1/20 22:18
  */
 @Data

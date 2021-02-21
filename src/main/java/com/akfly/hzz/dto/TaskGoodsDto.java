@@ -3,7 +3,7 @@ package com.akfly.hzz.dto;
 import lombok.Data;
 
 /**
- * @author MLL
+ * @author
  * @title: TaskGoodsDto
  * @projectName hzz
  * @description

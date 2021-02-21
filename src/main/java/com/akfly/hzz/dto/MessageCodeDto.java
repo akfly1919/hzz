@@ -3,7 +3,7 @@ package com.akfly.hzz.dto;
 import lombok.Data;
 
 /**
- * @author MLL
+ * @author
  * @title: MessageCodeDto
  * @projectName hzz
  * @description 短信验证码Dto

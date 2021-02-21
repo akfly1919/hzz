@@ -21,4 +21,14 @@ public interface TradepredictinfoService extends IService<TradepredictinfoVo> {
     public int releas(int num) throws HzzBizException;
     public  void cancel(String orderid) throws HzzBizException;
     public boolean releaseOne(String tpiid,int status) throws HzzBizException;
+
+    /**
+     * 获取正在挂单预购买的交易明细
+     * @param gbiId
+     * @param pageSize
+     * @param pageNum
+     * @return
+     * @throws HzzBizException
+     */
+    List<TradepredictinfoVo> getBuyDetails(long gbiId, int pageSize, int pageNum) throws HzzBizException;
 }

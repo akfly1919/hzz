@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * @author MLL
+ * @author
  * @title: AuthConfig
  * @projectName hzz
  * @description 登录校验拦截器配置类
@@ -40,7 +40,8 @@ public class AuthConfig implements WebMvcConfigurer {
                 "/hzz/sy/**",
                 "/hzz/statistics",
                 "/hzz/notify/aliPayNotify",
-                "/hzz/account/offlineRecharge"
+                "/hzz/account/offlineRecharge",
+                "/hzz/tradeDetail"
         );
     }
 

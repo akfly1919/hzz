@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * @title: UserGoodsWithPickUpDto
  * @projectName hzz
  * @description
- * @author MLL
+ * @author
  * @date 2021/2/5 23:33
  */
 

@@ -185,4 +185,26 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
         customergoodsrelatedService.saveCustomergoodsrelated(cgr);
     }
 
+    @Override
+    public int hadSystemSell(long gbid) {
+
+        int num = lambdaQuery().eq(TradegoodsellVo::getGbiId, gbid).eq(TradegoodsellVo::getTgsStatus, 0)
+                .eq(TradegoodsellVo::getTgsSaleable, 1).eq(TradegoodsellVo::getTgsOwntype, 1)
+                .in(TradegoodsellVo::getTgsSelltype, 1, 2).count();
+        if (num > 0) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
+    public List<TradegoodsellVo> getSellDetail(long gbiid, int pageSize, int pageNum) throws HzzBizException {
+
+        List<TradegoodsellVo> list = lambdaQuery().eq(TradegoodsellVo::getGiiId, gbiid)
+                .orderByDesc(TradegoodsellVo::getTgsCreatetime)
+                .last("limit " + pageNum * pageSize + "," + pageSize + " ").list();
+        return list;
+    }
+
 }

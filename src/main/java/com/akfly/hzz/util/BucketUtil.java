@@ -2,7 +2,7 @@ package com.akfly.hzz.util;  /**
  * @title: BucketUtil
  * @projectName hzz
  * @description 腾讯图片服务器工具类
- * @author MLL
+ * @author
  * @date 2021/2/14 13:25
  */
 

@@ -24,6 +24,7 @@ import springfox.documentation.spring.web.json.Json;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
@@ -116,6 +117,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         if (isOnSale) {
             price = gi.getGbiDiscountprice();
             TaskstatisticsVo task = taskstatisticsService.getTaskInfo(cbiid, gbid);
+            if (task == null) throw new HzzBizException(HzzExceptionEnum.SPECIAL_BUY_MORE_ERROR);
             GoodstaskinfoVo goodstaskinfoVo = goodstaskinfoService.getGoodstaskinfoVo(gbid);
             int buyLeft = task.getBuyNum() - task.getUsedBuyNum() - (num/goodstaskinfoVo.getGtiDiscountnum()) * goodstaskinfoVo.getGtiBuynum();
             int pickUpLeft = task.getPickupNum() - task.getUsedPickupNum() - (num/goodstaskinfoVo.getGtiDiscountnum()) * goodstaskinfoVo.getGtiPickupnum();
@@ -405,6 +407,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         wrapper_c.eq("tgs_buyerid", userid);
         wrapper_c.eq("toi_status", 3);
         wrapper_c.in("toi_type", Arrays.asList(1, 2));
+        wrapper_c.ge("toi_tradetime", LocalDate.now());
         wrapper_c.groupBy("gbi_id");
 
         List<TradeorderinfoVo> list = getBaseMapper().selectList(wrapper_c);

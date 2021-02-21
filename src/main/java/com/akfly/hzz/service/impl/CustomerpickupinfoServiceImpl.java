@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -133,7 +134,8 @@ public class CustomerpickupinfoServiceImpl extends ServiceImpl<Customerpickupinf
 
         queryWrapper.eq("cbi_id", cbiid);
         queryWrapper.eq("gbi_id", gbid);
-        queryWrapper.in("cpui_status", 0, 1); // 已审核
+        queryWrapper.in("cpui_status", 0, 1);
+        queryWrapper.ge("cpui_createtime", LocalDate.now()); // 只查当天的提货个数
 
         queryWrapper.select("ifnull(sum(cpui_num),0) as total_num ");
         Map<String, Object> map = getMap(queryWrapper);
