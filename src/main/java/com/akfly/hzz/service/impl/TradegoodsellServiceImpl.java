@@ -13,12 +13,15 @@ import com.akfly.hzz.vo.*;
 import com.akfly.hzz.mapper.TradegoodsellMapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +35,7 @@ import java.util.Map;
  * @since 2021-01-18
  */
 @Service
+@Slf4j
 public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, TradegoodsellVo> implements TradegoodsellService {
 
     @Resource
@@ -104,10 +108,10 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
             return;
         }
         for(TradepredictinfoVo tp:list){
-            try{
-            tradeorderinfoService.dealSold(tp,null);
-            }catch (Exception e){
-
+            try {
+                tradeorderinfoService.dealSold(tp,null);
+            } catch(Exception e) {
+                log.error("卖出商品交易异常 cbiid={}", cbiid, e);
             }
         }
 
@@ -205,6 +209,34 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
                 .orderByDesc(TradegoodsellVo::getTgsCreatetime)
                 .last("limit " + pageNum * pageSize + "," + pageSize + " ").list();
         return list;
+    }
+
+    @Override
+    public void tradeTask(Date beginTime, Date endTime) {
+
+        String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        try {
+            if(!tradetimeService.isInTradeTime(nowTime)){
+                log.info("不在交易时间内，不触发定时");
+                return;
+            }
+            List<TradegoodsellVo> list = lambdaQuery().eq(TradegoodsellVo::getTgsStatus, 0)
+                    .eq(TradegoodsellVo::getTgsSaleable, 1)
+                    //.in(TradegoodsellVo::getTgsSelltype, 1, 2) 1.委托卖出2正常卖出
+                    .between(TradegoodsellVo::getTgsCreatetime, beginTime, endTime)
+                    .orderByAsc(TradegoodsellVo::getTgsCreatetime)
+                    .last("limit 1 ").list();
+
+            if (CollectionUtils.isEmpty(list)) {
+                log.info("没有卖出挂单，不触发定时");
+                return;
+            }
+            TradegoodsellVo vo = list.get(0);
+            sell(vo.getTgsSellerid(), vo.getGbiId(), 1, vo.getTgsPrice(), vo.getTgsSelltype());
+        } catch (HzzBizException e) {
+            log.error("交易撮合定时任务异常 msg={}", e.getErrorMsg(), e);
+        }
+
     }
 
 }
