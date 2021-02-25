@@ -19,6 +19,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -184,12 +185,19 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
         if (StringUtils.isBlank(invitationCode)) {
             return null;
         }
-        List<CustomerbaseinfoVo> users = lambdaQuery()
-                .eq(CustomerbaseinfoVo::getCbiShareurl, invitationCode).list();
-        if (CollectionUtils.isEmpty(users)) {
+        try {
+            long code = Long.parseLong(invitationCode);
+            long userId = (code - 1) >> 1;
+            List<CustomerbaseinfoVo> users = lambdaQuery()
+                    .eq(CustomerbaseinfoVo::getCbiId, userId).list();
+            if (CollectionUtils.isEmpty(users)) {
+                return null;
+            }
+            return users.get(0);
+        } catch (Exception e) {
+            log.error("根据邀请码获取用户信息异常 invitationCode={}", invitationCode, e);
             return null;
         }
-        return users.get(0);
     }
     @Transactional(rollbackFor = Exception.class)
     public void frozenAccount(long cbiid,Double total) throws HzzBizException {
@@ -226,5 +234,26 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
         vo.setCbiTotal(total.doubleValue());
         vo.setCbiBalance(balance.doubleValue());
         return vo;
+    }
+
+    @Override
+    public void addInvitationCode(String invitationCode, Long userId) throws HzzBizException {
+
+        CustomerbaseinfoVo userInfo = lambdaQuery().eq(CustomerbaseinfoVo::getCbiId, userId).one();
+        if (userInfo == null || StringUtils.isNotBlank(userInfo.getCbiShareurl()))
+            throw new HzzBizException(HzzExceptionEnum.HAD_SET_INVITATION);
+
+        CustomerbaseinfoVo parent = getUserInfoByInvitationCode(invitationCode);
+        if (parent == null) {
+            throw new HzzBizException(HzzExceptionEnum.INVITATION_INVALID);
+        }
+        CustomerbaseinfoVo vo = new CustomerbaseinfoVo();
+        vo.setCbiId(userId);
+        vo.setCbiShareurl(invitationCode);
+        vo.setCbiJointime(LocalDateTime.now());
+        vo.setCbiParentid(parent.getCbiId());
+        if (!updateById(vo)) {
+            throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
+        }
     }
 }

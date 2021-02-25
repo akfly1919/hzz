@@ -31,6 +31,8 @@ public enum HzzExceptionEnum {
     TASK_NOT_CONFIG_ERROR("1022", "未配置商品任务信息"),
     WULIAO_CANNOT_BUY_ERROR("1023", "商品库存不足"),
     SPECIAL_BUY_MORE_ERROR("1024", "超出完成任务可购买的特价商品数量"),
+    HAD_SET_INVITATION("1025", "已经设置过邀请码"),
+    INVITATION_INVALID("1026", "邀请码无效"),
 
     /* 业务异常定义以2-8开头，顺序往下排号 */
     PARAM_INVALID("2000","参数不合法"),
