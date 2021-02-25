@@ -149,9 +149,10 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         tp.setTpiUpdatetime(LocalDateTime.now());
         tp.setTpiServicefee(totalFeeInit.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
         tp.setTpiSucessnum(0);
-        tp.setTpiGoodstype(1);
         if(isOnSale){
             tp.setTpiGoodstype(3);
+        } else {
+            tp.setTpiGoodstype(gi.getGbiType());
         }
 
         tp.setTpiStatus(TradepredictinfoVo.STATUS_ENTRUST);

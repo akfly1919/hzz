@@ -1,11 +1,13 @@
 package com.akfly.hzz.conroller;
 
 
-import com.akfly.hzz.dto.BaseRspDto;
-import com.akfly.hzz.dto.HadSystemSellDto;
+import com.akfly.hzz.dto.*;
+import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
+import com.akfly.hzz.service.GoodsbaseinfoService;
 import com.akfly.hzz.service.TradegoodsellService;
 import com.akfly.hzz.service.TradepredictinfoService;
+import com.akfly.hzz.vo.GoodsbaseinfoVo;
 import com.akfly.hzz.vo.TradegoodsellVo;
 import com.akfly.hzz.vo.TradepredictinfoVo;
 import io.swagger.annotations.ApiImplicitParam;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -33,6 +36,10 @@ public class TradeDetailController {
 
     @Resource
     private TradegoodsellService tradegoodsellService;
+
+    @Resource
+    private GoodsbaseinfoService goodsbaseinfoService;
+
 
 
     @ApiOperation(value="获取是否有系统预卖单",notes="不要求用户登录(0代表没有系统预卖单，1代表有)")
@@ -64,15 +71,26 @@ public class TradeDetailController {
             @ApiImplicitParam(name="size",value="每页展示多少条数据",required=true)
     })
     @PostMapping(value = "/getSellDetails")
-    public BaseRspDto<List<TradegoodsellVo>> getSellDetails(@RequestParam @NotNull Long gbiid,
-                                                       @RequestParam @Digits(integer = 10,fraction = 0) Integer beg,
-                                                       @RequestParam @Digits(integer = 10,fraction = 0) Integer size) {
+    public BaseRspDto<SellTradeDetailDto> getSellDetails(@RequestParam @NotNull Long gbiid,
+                                                         @RequestParam @Digits(integer = 10,fraction = 0) Integer beg,
+                                                         @RequestParam @Digits(integer = 10,fraction = 0) Integer size) {
 
-        BaseRspDto<List<TradegoodsellVo>> rsp = new BaseRspDto<List<TradegoodsellVo>>();
+        BaseRspDto<SellTradeDetailDto> rsp = new BaseRspDto<SellTradeDetailDto>();
         try {
+            if (gbiid == null) {
+                throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
+            }
             List<TradegoodsellVo> tradegoodsellVoList = tradegoodsellService.getSellDetail(gbiid,size, beg);
-            HadSystemSellDto dto = new HadSystemSellDto();
-            rsp.setData(tradegoodsellVoList);
+            SellTradeDetailDto dto = new SellTradeDetailDto();
+            dto.setTradeGoodSells(tradegoodsellVoList);
+            GoodsbaseinfoVo vo = goodsbaseinfoService.getGoodsbaseinfoWithRedis(gbiid);
+            dto.setGoodsBaseInfo(vo);
+
+            rsp.setData(dto);
+        } catch (HzzBizException e) {
+            log.error("获取指定商品的预卖单明细业务异常", e);
+            rsp.setCode(e.getErrorCode());
+            rsp.setMsg(e.getErrorMsg());
         } catch (Exception e) {
             log.error("获取指定商品的预卖单明细系统异常", e);
             rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
@@ -89,20 +107,53 @@ public class TradeDetailController {
             @ApiImplicitParam(name="size",value="每页展示多少条数据",required=true)
     })
     @PostMapping(value = "/getBuyDetails")
-    public BaseRspDto<List<TradepredictinfoVo>> getBuyDetails(@RequestParam @NotNull Long gbiid,
+    public BaseRspDto<BuyTradeDetailDto> getBuyDetails(@RequestParam @NotNull Long gbiid,
                                                       @RequestParam @Digits(integer = 10,fraction = 0) Integer beg,
                                                       @RequestParam @Digits(integer = 10,fraction = 0) Integer size) {
 
-        BaseRspDto<List<TradepredictinfoVo>> rsp = new BaseRspDto<List<TradepredictinfoVo>>();
+        BaseRspDto<BuyTradeDetailDto> rsp = new BaseRspDto<BuyTradeDetailDto>();
         try {
+            if (gbiid == null) {
+                throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
+            }
             List<TradepredictinfoVo> tradepredictinfoVoList = tradepredictinfoService.getBuyDetails(gbiid, size, beg);
-            rsp.setData(tradepredictinfoVoList);
+            BuyTradeDetailDto dto = new BuyTradeDetailDto();
+            dto.setTradePredictInfos(tradepredictinfoVoList);
+            GoodsbaseinfoVo vo = goodsbaseinfoService.getGoodsbaseinfoWithRedis(gbiid);
+            dto.setGoodsBaseInfo(vo);
+            rsp.setData(dto);
+        } catch (HzzBizException e) {
+            log.error("获取指定商品的预买单明细业务异常", e);
+            rsp.setCode(e.getErrorCode());
+            rsp.setMsg(e.getErrorMsg());
         } catch (Exception e) {
             log.error("获取指定商品的预买单明细系统异常", e);
             rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
             rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
         }
         return rsp;
+    }
+
+
+    private List<TradegoodsellVo> buildSellTradeRespList(List<TradegoodsellVo> list) throws HzzBizException {
+
+        List<TradegoodsellVo> tradegoodsellVoList = new ArrayList<TradegoodsellVo>();
+        for (TradegoodsellVo vo : list) {
+            if (vo.getTgsStatus() == 0) {
+                vo.setTgsStatus(1);
+            } else if (vo.getTgsStatus() == 2) {
+                vo.setTgsStatus(4);
+            } else if (vo.getTgsStatus() == 3) {
+                vo.setTgsStatus(2);
+            } else if (vo.getTgsStatus() == 4) {
+                vo.setTgsStatus(5);
+            } else if (vo.getTgsStatus() == 1) {
+                vo.setTgsStatus(6);
+            }
+            tradegoodsellVoList.add(vo);
+        }
+        return list;
+
     }
 
 }
