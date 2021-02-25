@@ -315,7 +315,11 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
                 toi.setToiUpdatetime(LocalDateTime.now());
                 toi.setToiBuyservicefee(fee.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
                 toi.setToiSellservicefee(tg.getTgsServicefee());
-                toi.setToiType(TradeorderinfoVo.TYPE_NOMAL);
+                if (isOnSale) {
+                    toi.setToiType(3);
+                } else {
+                    toi.setToiType(tp.getTpiGoodstype());
+                }
                 toi.setTpiId(tp.getTpiId());
                 saveTradeorderinfo(toi);
 

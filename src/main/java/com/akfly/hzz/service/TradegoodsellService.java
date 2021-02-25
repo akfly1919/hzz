@@ -4,6 +4,7 @@ import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.vo.TradegoodsellVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -27,4 +28,6 @@ public interface TradegoodsellService extends IService<TradegoodsellVo> {
     int hadSystemSell(long gbid);
 
     List<TradegoodsellVo> getSellDetail(long gbiid, int pageSize, int pageNum) throws HzzBizException;
+
+    void tradeTask(Date beginTime, Date endTime);
 }
