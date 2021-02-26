@@ -100,6 +100,8 @@ public class CustomerbaseinfoVo implements Serializable {
 
     private String cbiShareurl;
 
+    private LocalDateTime cbiJointime;
+
     @TableField(exist = false)
     private Integer stock;
 

@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 
@@ -467,6 +468,36 @@ public class UserController {
 		//	rsp.setMsg(e.getErrorMsg());
 		} catch (Exception e) {
 			log.error("联系我们系统异常", e);
+			rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
+			rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
+		}
+		return rsp;
+	}
+
+	@ApiOperation(value="新增邀请码",notes="个人中心-新增邀请码")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name="invitationCode",value="邀请码",required=true)
+	})
+	@PostMapping(value = "/addInvitationCode")
+	@VerifyToken
+	public BaseRspDto addInvitationCode(@RequestParam @NotNull String invitationCode) {
+
+		BaseRspDto rsp = new BaseRspDto();
+		try {
+			if (StringUtils.isBlank(invitationCode)) {
+				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
+			}
+			CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+			Long userId = userInfo.getCbiId();
+			log.info("addInvitationCode invitationCode={},userId={}", invitationCode, userId);
+
+			customerbaseinfoService.addInvitationCode(invitationCode, userId);
+		} catch (HzzBizException e) {
+			log.error("addInvitationCode msg={}", e.getErrorMsg(), e);
+			rsp.setCode(e.getErrorCode());
+			rsp.setMsg(e.getErrorMsg());
+		} catch (Exception e) {
+			log.error("addInvitationCode", e);
 			rsp.setCode(HzzExceptionEnum.SYSTEM_ERROR.getErrorCode());
 			rsp.setMsg(HzzExceptionEnum.SYSTEM_ERROR.getErrorMsg());
 		}

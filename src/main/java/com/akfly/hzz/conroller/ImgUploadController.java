@@ -109,7 +109,7 @@ public class ImgUploadController {
                 vo.setCiiIdcardfront(fileNameRemote);
             } else {
                 object = new JSONObject();
-                customeridcardinfoService.saveCardInfo(userInfo.getCbiId(), null, fileNameRemote);
+                //customeridcardinfoService.saveCardInfo(userInfo.getCbiId(), null, fileNameRemote);
                 vo.setCiiIdcardback(fileNameRemote);
             }
             customeridcardinfoService.saveOrUpdateIdCard(vo);

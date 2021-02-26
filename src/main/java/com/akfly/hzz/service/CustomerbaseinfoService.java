@@ -35,4 +35,6 @@ public interface CustomerbaseinfoService extends IService<CustomerbaseinfoVo> {
 
     CustomerbaseinfoVo getUserInfoByIdInDb(long cbiId) throws HzzBizException;
 
+    void addInvitationCode(String invitationCode, Long userId) throws HzzBizException;
+
 }

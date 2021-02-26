@@ -31,18 +31,20 @@ class HzzApplicationTests {
 		//BigDecimal totalFeeInit = new BigDecimal("0.398");
 		//System.out.println(totalFeeInit.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
 
-		int buyConfig = 10;
-		int pickUpConfig = 2;
-		int buy = 12/buyConfig;
-		int pickUp = 1/pickUpConfig;
-		int buy1 = 15/buyConfig;
-		int pickUp1 = 3/pickUpConfig;
-		int buy2 = 17/buyConfig;
-		int pickUp2 = 5/pickUpConfig;
-		System.out.println(buy + "====" + pickUp);
-		System.out.println(buy1 + "====" + pickUp1);
-		System.out.println(buy2 + "====" + pickUp2);
-		System.out.println(LocalDate.now());
+		//int buyConfig = 10;
+		//int pickUpConfig = 2;
+		//int buy = 12/buyConfig;
+		//int pickUp = 1/pickUpConfig;
+		//int buy1 = 15/buyConfig;
+		//int pickUp1 = 3/pickUpConfig;
+		//int buy2 = 17/buyConfig;
+		//int pickUp2 = 5/pickUpConfig;
+		//System.out.println(buy + "====" + pickUp);
+		//System.out.println(buy1 + "====" + pickUp1);
+		//System.out.println(buy2 + "====" + pickUp2);
+		//System.out.println(LocalDate.now());
+
+		System.out.println((20019 -1) >> 1);
 
 	}
 

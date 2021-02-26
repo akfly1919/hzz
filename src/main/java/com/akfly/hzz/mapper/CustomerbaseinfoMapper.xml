@@ -23,6 +23,7 @@
         <result column="cbi_isnew" property="cbiIsnew" />
         <result column="cbi_goodsnum" property="cbiGoodsnum" />
         <result column="cbi_shareurl" property="cbiShareurl" />
+        <result column="cbi_jointime" property="cbiJointime" />
     </resultMap>
 
 </mapper>
