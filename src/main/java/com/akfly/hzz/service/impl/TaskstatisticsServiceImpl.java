@@ -37,7 +37,7 @@ public class TaskstatisticsServiceImpl extends ServiceImpl<TaskstatisticsMapper,
         try {
             GoodstaskinfoVo goodstaskinfoVo = goodstaskinfoService.getGoodstaskinfoVo(gbid);
             TaskstatisticsVo voInDb = lambdaQuery().eq(TaskstatisticsVo::getGbiId, gbid)
-                    .eq(TaskstatisticsVo::getCbiId, cbiid).one();
+                    .eq(TaskstatisticsVo::getCbiId, cbiid).ge(TaskstatisticsVo::getToiCreatetime, LocalDate.now()).one();
             if (voInDb == null) {
                 TaskstatisticsVo vo = new TaskstatisticsVo();
                 vo.setGbiId(gbid);
