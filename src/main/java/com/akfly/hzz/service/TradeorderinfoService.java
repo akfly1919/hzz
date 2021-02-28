@@ -1,5 +1,6 @@
 package com.akfly.hzz.service;
 
+import com.akfly.hzz.dto.HistoryTradeDto;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
 import com.akfly.hzz.vo.TradeconfigVo;
@@ -7,6 +8,7 @@ import com.akfly.hzz.vo.TradeorderinfoVo;
 import com.akfly.hzz.vo.TradepredictinfoVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -32,4 +34,18 @@ public interface TradeorderinfoService extends IService<TradeorderinfoVo> {
 
 
     List<TradeorderinfoVo> getBuyNoSpecialTrade(long userid);
+
+    int getActiveUser(List<Long> userIds);
+
+    /**
+     *
+     * @param userIds
+     * @param flag 0: 普通商品和新手商品  1: 特价商品
+     * @param flag 0: 买  1: 卖
+     * @return
+     */
+    BigDecimal getAmount(List<Long> userIds, int flag, int direction);
+
+
+    HistoryTradeDto getSumAmount(Long userIds, boolean isCurrentDay);
 }

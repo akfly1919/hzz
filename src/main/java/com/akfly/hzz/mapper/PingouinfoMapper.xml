@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akfly.hzz.mapper.PingouinfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.PingouinfoVo">
+        <id column="pgi_id" property="pgiId" />
+        <result column="pgi_key" property="pgiKey" />
+        <result column="pgi_date" property="pgiDate" />
+        <result column="cbi_id" property="cbiId" />
+        <result column="gbi_id" property="gbiId" />
+        <result column="gbi_num" property="gbiNum" />
+        <result column="gbi_price" property="gbiPrice" />
+        <result column="gbi_value" property="gbiValue" />
+        <result column="pgi_status" property="pgiStatus" />
+        <result column="pgi_createtime" property="pgiCreatetime" />
+        <result column="pgi_updatetime" property="pgiUpdatetime" />
+        <result column="pgi_level1" property="pgiLevel1" />
+        <result column="pgi_level2" property="pgiLevel2" />
+        <result column="pgi_reward1" property="pgiReward1" />
+        <result column="pgi_reward2" property="pgiReward2" />
+    </resultMap>
+
+</mapper>

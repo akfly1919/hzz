@@ -2,6 +2,7 @@ package com.akfly.hzz.service.impl;
 
 import com.akfly.hzz.constant.CbrClassEnum;
 import com.akfly.hzz.constant.InOrOutTypeEnum;
+import com.akfly.hzz.dto.HistoryTradeDto;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.mapper.CustomerbaseinfoMapper;
@@ -82,6 +83,9 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
 
     @Resource
     private GoodstaskinfoService goodstaskinfoService;
+
+    @Resource
+    private CustomerpickupinfoService customerpickupinfoService;
 
     @Override
     public List<TradeorderinfoVo> getTradeorderinfoVo(int pageNum, int pageSize, long cbiid, Date beginTime, Date endTime) throws HzzBizException {
@@ -420,6 +424,47 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
 
     }
 
+    @Override
+    public int getActiveUser(List<Long> userIds) {
+
+        int count = lambdaQuery().in(TradeorderinfoVo::getTgsBuyerid, userIds).or().eq(TradeorderinfoVo::getToiSellerid, userIds)
+                .ge(TradeorderinfoVo::getToiTradetime, LocalDate.now()).count();
+        return count;
+    }
+
+    @Override
+    public BigDecimal getAmount(List<Long> userIds, int flag, int direction) {
+
+        QueryWrapper<TradeorderinfoVo> contract_wrapper = new QueryWrapper<TradeorderinfoVo>();
+
+        if (direction == 0) {
+            if (flag == 0) {
+                contract_wrapper.in("tgs_buyerid", userIds);
+                contract_wrapper.in("toi_type", 1, 2);
+            } else {
+                contract_wrapper.in("tgs_buyerid", userIds);
+                contract_wrapper.eq("toi_type", 3);
+            }
+        } else {
+            contract_wrapper.in("toi_sellerid", userIds);
+        }
+        contract_wrapper.select("ifnull(sum(toi_price),0) as total_money ");
+        Map<String, Object> map = getMap(contract_wrapper);
+        BigDecimal total_amount = new BigDecimal(String.valueOf(map.get("total_money"))).setScale(2, BigDecimal.ROUND_HALF_UP);
+        return total_amount;
+    }
+
+    @Override
+    public HistoryTradeDto getSumAmount(Long userId, boolean isCurrentDay) {
+
+        HistoryTradeDto dto = new HistoryTradeDto();
+        dto.setBuyNum(getAmount(userId, 0, 0, isCurrentDay));
+        dto.setSellNum(getAmount(userId, 0, 1, isCurrentDay));
+        dto.setPickupNum(customerpickupinfoService.getPickUpAmountOne(userId, isCurrentDay));
+        dto.setSpecialBuyNum(getAmount(userId, 1, 0, isCurrentDay));
+        return dto;
+    }
+
     public void saveTradeorderinfo(TradeorderinfoVo tradeorderinfoVo) throws HzzBizException {
         if(!saveOrUpdate(tradeorderinfoVo)) {
             throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
@@ -450,6 +495,37 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
                 .between(TradeorderinfoVo::getToiTradetime, beginTime, now).count();
         if(gbiLimitPerson < (buyCount + need)){
             throw new HzzBizException(HzzExceptionEnum.LIMIT_PERSON_ERROR);
+        }
+
+    }
+
+    private BigDecimal getAmount(long userId, int flag, int direction, boolean isCurrentDay) {
+
+        QueryWrapper<TradeorderinfoVo> wrapper = new QueryWrapper<TradeorderinfoVo>();
+        if (isCurrentDay) {
+            wrapper.ge("toi_tradetime", LocalDate.now());
+        } else {
+            wrapper.lt("toi_tradetime", LocalDate.now());
+        }
+        buildQueryWrapper(userId, flag, direction, wrapper);
+        wrapper.select("ifnull(sum(toi_price),0) as total_money ");
+        Map<String, Object> map = getMap(wrapper);
+        BigDecimal total_amount = new BigDecimal(String.valueOf(map.get("total_money"))).setScale(2, BigDecimal.ROUND_HALF_UP);
+        return total_amount;
+    }
+
+    private void buildQueryWrapper(long userId, int flag, int direction,  QueryWrapper<TradeorderinfoVo> wrapper) {
+
+        if (direction == 0) {
+            if (flag == 0) {
+                wrapper.eq("tgs_buyerid", userId);
+                wrapper.in("toi_type", 1, 2);
+            } else {
+                wrapper.in("tgs_buyerid", userId);
+                wrapper.eq("toi_type", 3);
+            }
+        } else {
+            wrapper.in("toi_sellerid", userId);
         }
 
     }

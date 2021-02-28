@@ -9,6 +9,7 @@ import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.mapper.CustomerbaseinfoMapper;
 import com.akfly.hzz.service.CustomerbaseinfoService;
+import com.akfly.hzz.service.CustomerbillrelatedService;
 import com.akfly.hzz.service.CustomergoodsrelatedService;
 import com.akfly.hzz.util.JsonUtils;
 import com.akfly.hzz.util.RedisUtils;
@@ -53,6 +54,9 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
 
     @Resource
     private CustomergoodsrelatedService customergoodsrelatedService;
+
+    @Resource
+    private CustomerbillrelatedService customerbillrelatedService;
 
     @Override
     public CustomerbaseinfoVo userLoginByPsw(String phoneNum, String psw) throws HzzBizException {
@@ -110,7 +114,11 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
         vo.setCbiFrozen(0d);
         CustomerbaseinfoVo parentVo = getUserInfoByInvitationCode(invitationCode);
         if (parentVo != null) {
+            vo.setCbiJointime(LocalDateTime.now());
             vo.setCbiParentid(parentVo.getCbiId());
+            vo.setCbiShareurl(invitationCode);
+        } else {
+            throw new HzzBizException(HzzExceptionEnum.INVITATION_INVALID);
         }
         if (!save(vo)) {
             throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
@@ -233,6 +241,10 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
         BigDecimal balance = dto.getAsset().add(BigDecimal.valueOf(vo.getCbiBalance()));
         vo.setCbiTotal(total.doubleValue());
         vo.setCbiBalance(balance.doubleValue());
+        BigDecimal goodsAmount = customerbillrelatedService.sumAmount(cbiId, 10);
+        BigDecimal commissionAmount = customerbillrelatedService.sumAmount(cbiId, 11);
+        vo.setGoodsAmount(goodsAmount);
+        vo.setCommissionAmount(commissionAmount);
         return vo;
     }
 

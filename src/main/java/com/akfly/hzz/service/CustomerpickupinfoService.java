@@ -4,6 +4,7 @@ import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.vo.CustomerpickupinfoVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -25,4 +26,8 @@ public interface CustomerpickupinfoService extends IService<CustomerpickupinfoVo
     List<CustomerpickupinfoVo> getCustomerpickupinfos(long cbiid, int pageNum, int pageSize) throws HzzBizException;
 
     int getPickUpNum(long cbiid, long gbid);
+
+    BigDecimal getPickUpAmount(List<Long> userIds);
+
+    BigDecimal getPickUpAmountOne(Long userId, boolean isCurrentDay);
 }

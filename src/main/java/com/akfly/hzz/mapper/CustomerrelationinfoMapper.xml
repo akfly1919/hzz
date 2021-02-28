@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.akfly.hzz.mapper.CustomerrelationinfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.akfly.hzz.vo.CustomerrelationinfoVo">
+        <id column="id" property="id" />
+        <result column="cbi_id" property="cbiId" />
+        <result column="cri_member" property="criMember" />
+        <result column="cri_level" property="criLevel" />
+        <result column="cri_isidentify" property="criIsidentify" />
+        <result column="cri_isvalid" property="criIsvalid" />
+        <result column="cri_jointime" property="criJointime" />
+        <result column="cri_createtime" property="criCreatetime" />
+        <result column="cri_scale" property="criScale" />
+    </resultMap>
+
+</mapper>

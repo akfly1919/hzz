@@ -7,6 +7,7 @@ import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.vo.CustomerbillrelatedVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -30,4 +31,24 @@ public interface CustomerbillrelatedService extends IService<Customerbillrelated
     public List<CustomerbillrelatedVo> getCustomerbillrelatedById(Long id, int pageSize, int pageNum, int flag);
 
     void saveBills(long userId, String orderId, double amount, InOrOutTypeEnum type, CbrClassEnum cbrClass) throws HzzBizException;
+
+    /**
+     * 汇总商品值和累计佣金
+     * @param userId
+     * @param cbrClass  10 商品值 11 佣金
+     * @return
+     */
+    BigDecimal sumAmount(long userId, int cbrClass);
+
+    /**
+     * 根据用户id和type获取账单流水
+     * @param userId
+     * @param pageSize
+     * @param pageNum
+     * @param cbrClass 10 商品值 11 佣金
+     * @return
+     */
+    List<CustomerbillrelatedVo> getCustomerbillById(Long userId, int pageSize, int pageNum, int cbrClass);
+
+
 }

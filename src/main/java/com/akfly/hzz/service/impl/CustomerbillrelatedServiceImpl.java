@@ -9,6 +9,8 @@ import com.akfly.hzz.service.CustomerbillrelatedService;
 import com.akfly.hzz.util.DateUtil;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
 import com.akfly.hzz.vo.CustomerbillrelatedVo;
+import com.akfly.hzz.vo.ReporttradedateVo;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -16,11 +18,13 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.checkerframework.checker.units.qual.C;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -72,5 +76,36 @@ public class CustomerbillrelatedServiceImpl extends ServiceImpl<Customerbillrela
             throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
         }
 
+    }
+
+    @Override
+    public BigDecimal sumAmount(long userId, int cbrClass) {
+
+        BigDecimal total_amount = BigDecimal.ZERO;
+        try {
+            QueryWrapper<CustomerbillrelatedVo> contract_wrapper = new QueryWrapper<CustomerbillrelatedVo>();
+            contract_wrapper.eq("cbi_id", userId);
+            contract_wrapper.eq("cbr_class", cbrClass);
+            contract_wrapper.select("ifnull(sum(cbr_money),0) as total_money ");
+            Map<String, Object> map = getMap(contract_wrapper);
+            total_amount = new BigDecimal(String.valueOf(map.get("total_money"))).setScale(2, BigDecimal.ROUND_HALF_UP);
+            //total_amount.setScale(2, BigDecimal.ROUND_HALF_UP);
+        } catch (Exception e) {
+            log.error("查询交易行情数据数据库异常", e);
+        }
+        return total_amount;
+
+    }
+
+    @Override
+    public List<CustomerbillrelatedVo> getCustomerbillById(Long userId, int pageSize, int pageNum, int cbrClass) {
+
+        List<CustomerbillrelatedVo> list = lambdaQuery()
+                .eq(CustomerbillrelatedVo::getCbiId, userId)
+                .eq(CustomerbillrelatedVo::getCbrClass, cbrClass).last("limit " + pageNum * pageSize + "," + pageSize + " ")
+                .orderByDesc(CustomerbillrelatedVo::getCbrCreatetime)
+                .list();
+
+        return list;
     }
 }

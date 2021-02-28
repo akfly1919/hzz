@@ -1,29 +1,24 @@
 package com.akfly.hzz.service.impl;
 
-import com.akfly.hzz.dto.UserGoodsDto;
 import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.mapper.CustomergoodsrelatedMapper;
-import com.akfly.hzz.service.*;
-import com.akfly.hzz.util.DateUtil;
-import com.akfly.hzz.util.RandomGenUtils;
-import com.akfly.hzz.vo.*;
 import com.akfly.hzz.mapper.CustomerpickupinfoMapper;
+import com.akfly.hzz.service.*;
+import com.akfly.hzz.vo.CustomeraddressinfoVo;
+import com.akfly.hzz.vo.CustomergoodsrelatedVo;
+import com.akfly.hzz.vo.CustomerpickupinfoVo;
+import com.akfly.hzz.vo.GoodsbaseinfoVo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.text.SimpleDateFormat;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.time.temporal.TemporalUnit;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +32,7 @@ import java.util.Map;
  * @since 2021-01-18
  */
 @Service
+@Slf4j
 public class CustomerpickupinfoServiceImpl extends ServiceImpl<CustomerpickupinfoMapper, CustomerpickupinfoVo> implements CustomerpickupinfoService {
 
     @Resource
@@ -142,6 +138,59 @@ public class CustomerpickupinfoServiceImpl extends ServiceImpl<Customerpickupinf
         int num = Integer.parseInt(String.valueOf(map.get("total_num")));
 
         return num;
+    }
+
+    @Override
+    public BigDecimal getPickUpAmount(List<Long> userIds) {
+
+        QueryWrapper<CustomerpickupinfoVo> queryWrapper = new QueryWrapper<CustomerpickupinfoVo>();
+
+        queryWrapper.in("cbi_id", userIds);
+        queryWrapper.in("cpui_status", 0, 1);
+        queryWrapper.select("gbi_id, ifnull(sum(cpui_num),0) as cpui_num ");
+        queryWrapper.groupBy("cbi_id", "gbi_id");
+        List<CustomerpickupinfoVo> list = baseMapper.selectList(queryWrapper);
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        for (CustomerpickupinfoVo vo : list) {
+            try {
+                GoodsbaseinfoVo goods = goodsbaseinfoService.getGoodsbaseinfoWithRedis(vo.getGbiId());
+                BigDecimal price = BigDecimal.valueOf(goods.getGbiPrice()).setScale(2, BigDecimal.ROUND_HALF_UP);
+                BigDecimal goodsTotal = price.multiply(BigDecimal.valueOf(vo.getCpuiNum()));
+                totalAmount.add(goodsTotal);
+            } catch (HzzBizException e) {
+                log.error("获取商品信息异常 gbiId={} msg={}", vo.getGbiId(), e.getErrorMsg(), e);
+            }
+        }
+        return totalAmount;
+    }
+
+    @Override
+    public BigDecimal getPickUpAmountOne(Long userId, boolean isCurrentDay) {
+
+        QueryWrapper<CustomerpickupinfoVo> queryWrapper = new QueryWrapper<CustomerpickupinfoVo>();
+
+        queryWrapper.eq("cbi_id", userId);
+        queryWrapper.in("cpui_status", 0, 1);
+        if (isCurrentDay) {
+            queryWrapper.ge("cpui_createtime", LocalDate.now());
+        } else {
+            queryWrapper.lt("cpui_createtime", LocalDate.now());
+        }
+        queryWrapper.select("gbi_id, ifnull(sum(cpui_num),0) as cpui_num ");
+        queryWrapper.groupBy("gbi_id");
+        List<CustomerpickupinfoVo> list = baseMapper.selectList(queryWrapper);
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        for (CustomerpickupinfoVo vo : list) {
+            try {
+                GoodsbaseinfoVo goods = goodsbaseinfoService.getGoodsbaseinfoWithRedis(vo.getGbiId());
+                BigDecimal price = BigDecimal.valueOf(goods.getGbiPrice()).setScale(2, BigDecimal.ROUND_HALF_UP);
+                BigDecimal goodsTotal = price.multiply(BigDecimal.valueOf(vo.getCpuiNum()));
+                totalAmount.add(goodsTotal);
+            } catch (HzzBizException e) {
+                log.error("获取商品信息异常 gbiId={} msg={}", vo.getGbiId(), e.getErrorMsg(), e);
+            }
+        }
+        return totalAmount;
     }
 
     public long insert(long num, long cbiid, long gbId, int caiId) {

@@ -194,7 +194,7 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
 
         int num = lambdaQuery().eq(TradegoodsellVo::getGbiId, gbid).eq(TradegoodsellVo::getTgsStatus, 0)
                 .eq(TradegoodsellVo::getTgsSaleable, 1).eq(TradegoodsellVo::getTgsOwntype, 1)
-                .in(TradegoodsellVo::getTgsSelltype, 1, 2).count();
+                .in(TradegoodsellVo::getTgsType, 1, 2).count();
         if (num > 0) {
             return 1;
         } else {
