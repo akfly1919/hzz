@@ -215,6 +215,7 @@ public class PingouinfoController {
                 HistoryTradeDto historyDto = tradeorderinfoService.getSumAmount(Long.valueOf(vo.getCriMember()), false);
                 PinGouTradeDetailDto dto = new PinGouTradeDetailDto();
                 CustomerbaseinfoVo user = customerbaseinfoService.getUserInfoById(vo.getCriMember());
+                dto.setCbiId(user.getCbiId());
                 dto.setCbiUsername(user.getCbiUsername());
                 dto.setHistoryDay(historyDto);
                 dto.setCurrentDay(currentDto);

@@ -17,6 +17,8 @@ import lombok.Data;
 @Data
 public class PinGouTradeDetailDto {
 
+    private Long cbiId;
+
     private String cbiUsername;
 
     private HistoryTradeDto currentDay;
