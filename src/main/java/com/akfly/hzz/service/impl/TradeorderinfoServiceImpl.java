@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import springfox.documentation.spring.web.json.Json;
 
 import javax.annotation.Resource;
@@ -106,96 +107,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
 
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public void nomalBuy(CustomerbaseinfoVo userInfo, long gbid,int num,double price,boolean isOnSale,int type) throws HzzBizException {
-        GoodsbaseinfoVo gi = goodsbaseinfoService.getGoodsbaseinfoVo(gbid);
-        //if (gi.getGbiPrice() != price){
-        //    //TODO 价格不正确
-        //    price = gi.getGbiPrice();
-        //}
-        long cbiid = userInfo.getCbiId();
-        if (userInfo.getCbiIsnew() == 0 && gi.getGbiType() == 2) {
-            throw new HzzBizException(HzzExceptionEnum.CANNOT_BUY_NEWMAN_ERROR);
-        }
-        HashMap<String, LocalDateTime> timeMap = tradetimeService.getRealTradeStartTime();
-        if (isOnSale) {
-            price = gi.getGbiDiscountprice();
-            TaskstatisticsVo task = taskstatisticsService.getTaskInfo(cbiid, gbid);
-            if (task == null) throw new HzzBizException(HzzExceptionEnum.SPECIAL_BUY_MORE_ERROR);
-            GoodstaskinfoVo goodstaskinfoVo = goodstaskinfoService.getGoodstaskinfoVo(gbid);
-            int buyLeft = task.getBuyNum() - task.getUsedBuyNum() - (num/goodstaskinfoVo.getGtiDiscountnum()) * goodstaskinfoVo.getGtiBuynum();
-            int pickUpLeft = task.getPickupNum() - task.getUsedPickupNum() - (num/goodstaskinfoVo.getGtiDiscountnum()) * goodstaskinfoVo.getGtiPickupnum();
-            if (buyLeft < 0 || pickUpLeft < 0) {
-                throw new HzzBizException(HzzExceptionEnum.SPECIAL_BUY_MORE_ERROR);
-            }
-        } else {
-            price = gi.getGbiPrice();
-        }
-        TradeconfigVo tc = tradeconfigService.getTradeconfig(TradeconfigVo.TCTYPE_BUY);
-        BigDecimal priceB=new BigDecimal(price);
-        BigDecimal totalFeeInit = priceB.multiply(BigDecimal.valueOf(tc.getTcRate())).multiply(BigDecimal.valueOf(num));
-        log.info("初始化服务费 totalFeeInit={}", totalFeeInit);
-        BigDecimal totalB = priceB.multiply(BigDecimal.valueOf(num)).add(totalFeeInit);
-        //冻账
-        customerbaseinfoService.frozenAccount(cbiid,totalB.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-        //创建一条预购记录
-        TradepredictinfoVo tp=new TradepredictinfoVo();
-        tp.setTpiId(RandomGenUtils.genFlowNo("TPI"));
-        tp.setGbiId(gbid);
-        tp.setTpiBuyerid(cbiid);
-        tp.setTpiPrice(price);
-        tp.setTpiNum(num);
-        tp.setTpiStatus(0);
-        tp.setTpiCreatetime(LocalDateTime.now());
-        tp.setTpiBuytime(timeMap.get("startTime"));
-        tp.setTpiFinishtime(timeMap.get("finishTime"));
-        tp.setTpiTradetime(LocalDateTime.now());
-        tp.setTpiUpdatetime(LocalDateTime.now());
-        tp.setTpiServicefee(totalFeeInit.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-        tp.setTpiSucessnum(0);
-        if(isOnSale){
-            tp.setTpiGoodstype(3);
-        } else {
-            tp.setTpiGoodstype(gi.getGbiType());
-        }
-
-        tp.setTpiStatus(TradepredictinfoVo.STATUS_ENTRUST);
-        //判断是否在交易时间
-        String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-        if(tradetimeService.isInTradeTime(nowTime)){
-            tp.setTpiType(type);
-            //tradepredictinfoService.saveTradepredictinfoVo(tp);
-            dealSold(tp,tc,isOnSale);
-        }else{
-            if(type!=TradepredictinfoVo.TYPE_ENTRUST){
-                throw new HzzBizException(HzzExceptionEnum.TRADE_TIME_ERROR);
-            }
-            tp.setTpiType(TradepredictinfoVo.TYPE_ENTRUST);
-            checkBuyNum(gi.getGbiLimitperson(), tp);
-            tradepredictinfoService.saveTradepredictinfoVo(tp);
-        }
-        if(isOnSale){
-            //特价品
-            boolean release=tradepredictinfoService.releaseOne(tp.getTpiId(),5);
-            if(release){
-                //释放成功说明没有买入成功
-                throw new HzzBizException(HzzExceptionEnum.STOCK_ERROR);
-            } else {
-                taskstatisticsService.saveOrUpdateForNoSpecial(cbiid, gbid, num);
-                // 特价商品购买成功后，更新用户为非新手用户
-                if (userInfo.getCbiIsnew() == 1) {
-                    userInfo.setCbiIsnew(0);
-                    customerbaseinfoService.updateUserInfo(userInfo);
-                }
-            }
-        }
-    }
-
     @Override
-    public void dealSold(TradepredictinfoVo tp, TradeconfigVo tc) throws HzzBizException {
-        dealSold(tp,tc,false);
-    }
-
     @Transactional(rollbackFor = Exception.class)
     public void dealSold(TradepredictinfoVo tp,TradeconfigVo tc,boolean isOnSale) throws HzzBizException {
         if(tp.getId()!=null){
@@ -231,11 +143,16 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         wrapper.orderByAsc("tgs_owntype");//价格相同，系统用户在前
         wrapper.orderByAsc("tgs_tradetime");
         wrapper.last("limit " + need + " for update");
-        List<TradegoodsellVo> list = tradegoodsellMapper.selectList(wrapper);
         log.info("tpiId={}, tpiNum={}, successNum={}, need={}", tp.getTpiId(), tp.getTpiNum(), tp.getTpiSucessnum(), need);
+        List<TradegoodsellVo> list = tradegoodsellMapper.selectList(wrapper);
         if(isOnSale){
             if(list==null||list.size()<need){
                 throw new HzzBizException(HzzExceptionEnum.STOCK_ERROR);
+            }
+        } else {
+            if(CollectionUtils.isEmpty(list)){
+                log.info("没有匹配该买入订单的卖单, 买单信息为tp={}", JsonUtils.toJson(tp));
+                return;
             }
         }
         {
@@ -249,7 +166,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
                 successNum = tp.getTpiSucessnum() + need;
                 tp.setTpiStatus(TradepredictinfoVo.STATUS_SUCCESS);
             }
-            log.info("本次匹配成功数量 successNum={}", successNum);
+            log.info("本次匹配成功数量,买单订单号tpiId={},successNum={}", tp.getTpiId(), successNum);
             if (successNum > 0) {
                 BigDecimal successNumB = BigDecimal.valueOf(successNum);
                 BigDecimal totalFeeSuccess = BigDecimal.valueOf(tp.getTpiPrice()).multiply(BigDecimal.valueOf(tc.getTcRate())).multiply(successNumB);
@@ -258,9 +175,6 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
             }
             tp.setTpiUpdatetime(LocalDateTime.now());
             tradepredictinfoService.saveTradepredictinfoVo(tp);
-        }
-        if(list.size()==0){
-            return;
         }
         BigDecimal goodsprice=new BigDecimal("0");
         BigDecimal feeprice=new BigDecimal("0");
@@ -406,6 +320,91 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
                     feeprice.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue(), InOrOutTypeEnum.OUT, CbrClassEnum.BUYFEE);
         }
 
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void nomalBuy(CustomerbaseinfoVo userInfo, long gbid,int num,double price,boolean isOnSale,int type) throws HzzBizException {
+        GoodsbaseinfoVo gi = goodsbaseinfoService.getGoodsbaseinfoVo(gbid);
+        //if (gi.getGbiPrice() != price){
+        //    //TODO 价格不正确
+        //    price = gi.getGbiPrice();
+        //}
+        long cbiid = userInfo.getCbiId();
+        if (userInfo.getCbiIsnew() == 0 && gi.getGbiType() == 2) {
+            throw new HzzBizException(HzzExceptionEnum.CANNOT_BUY_NEWMAN_ERROR);
+        }
+        if (isOnSale) {
+            price = gi.getGbiDiscountprice();
+            TaskstatisticsVo task = taskstatisticsService.getTaskInfo(cbiid, gbid);
+            if (task == null) throw new HzzBizException(HzzExceptionEnum.SPECIAL_BUY_MORE_ERROR);
+            GoodstaskinfoVo goodstaskinfoVo = goodstaskinfoService.getGoodstaskinfoVo(gbid);
+            int buyLeft = task.getBuyNum() - task.getUsedBuyNum() - (num/goodstaskinfoVo.getGtiDiscountnum()) * goodstaskinfoVo.getGtiBuynum();
+            int pickUpLeft = task.getPickupNum() - task.getUsedPickupNum() - (num/goodstaskinfoVo.getGtiDiscountnum()) * goodstaskinfoVo.getGtiPickupnum();
+            if (buyLeft < 0 || pickUpLeft < 0) {
+                throw new HzzBizException(HzzExceptionEnum.SPECIAL_BUY_MORE_ERROR);
+            }
+        } else {
+            price = gi.getGbiPrice();
+        }
+        TradeconfigVo tc = tradeconfigService.getTradeconfig(TradeconfigVo.TCTYPE_BUY);
+        BigDecimal priceB=new BigDecimal(price);
+        BigDecimal totalFeeInit = priceB.multiply(BigDecimal.valueOf(tc.getTcRate())).multiply(BigDecimal.valueOf(num));
+        log.info("初始化服务费 totalFeeInit={}", totalFeeInit);
+        BigDecimal totalB = priceB.multiply(BigDecimal.valueOf(num)).add(totalFeeInit);
+        //冻账
+        customerbaseinfoService.frozenAccount(cbiid,totalB.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+        //创建一条预购记录
+        TradepredictinfoVo tp=new TradepredictinfoVo();
+        tp.setTpiId(RandomGenUtils.genFlowNo("TPI"));
+        tp.setGbiId(gbid);
+        tp.setTpiBuyerid(cbiid);
+        tp.setTpiPrice(price);
+        tp.setTpiNum(num);
+        tp.setTpiStatus(0);
+        tp.setTpiCreatetime(LocalDateTime.now());
+        HashMap<String, LocalDateTime> timeMap = tradetimeService.getRealTradeStartTime();
+        tp.setTpiBuytime(timeMap.get("startTime"));
+        tp.setTpiFinishtime(timeMap.get("finishTime"));
+        tp.setTpiTradetime(LocalDateTime.now());
+        tp.setTpiUpdatetime(LocalDateTime.now());
+        tp.setTpiServicefee(totalFeeInit.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+        tp.setTpiSucessnum(0);
+        if(isOnSale){
+            tp.setTpiGoodstype(3);
+        } else {
+            tp.setTpiGoodstype(gi.getGbiType());
+        }
+
+        tp.setTpiStatus(TradepredictinfoVo.STATUS_ENTRUST);
+        //判断是否在交易时间
+        String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        if(tradetimeService.isInTradeTime(nowTime)){
+            tp.setTpiType(type);
+            //tradepredictinfoService.saveTradepredictinfoVo(tp);
+            dealSold(tp,tc,isOnSale);
+        }else{
+            if(type!=TradepredictinfoVo.TYPE_ENTRUST){
+                throw new HzzBizException(HzzExceptionEnum.TRADE_TIME_ERROR);
+            }
+            tp.setTpiType(TradepredictinfoVo.TYPE_ENTRUST);
+            checkBuyNum(gi.getGbiLimitperson(), tp);
+            tradepredictinfoService.saveTradepredictinfoVo(tp);
+        }
+        if(isOnSale){
+            //特价品
+            boolean release=tradepredictinfoService.releaseOne(tp.getTpiId(),5);
+            if(release){
+                //释放成功说明没有买入成功
+                throw new HzzBizException(HzzExceptionEnum.STOCK_ERROR);
+            } else {
+                taskstatisticsService.saveOrUpdateForNoSpecial(cbiid, gbid, num);
+                // 特价商品购买成功后，更新用户为非新手用户
+                if (userInfo.getCbiIsnew() == 1) {
+                    userInfo.setCbiIsnew(0);
+                    customerbaseinfoService.updateUserInfo(userInfo);
+                }
+            }
+        }
     }
 
     @Override

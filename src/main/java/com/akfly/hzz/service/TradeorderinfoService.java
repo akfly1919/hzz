@@ -28,9 +28,9 @@ public interface TradeorderinfoService extends IService<TradeorderinfoVo> {
 
     void updateTradeOrder(TradeorderinfoVo vo) throws HzzBizException;
 
-    public void nomalBuy(CustomerbaseinfoVo userInfo, long gbid, int num, double price, boolean isOnSale, int type) throws HzzBizException;
+    void nomalBuy(CustomerbaseinfoVo userInfo, long gbid, int num, double price, boolean isOnSale, int type) throws HzzBizException;
 
-    public void dealSold(TradepredictinfoVo tp, TradeconfigVo tc) throws HzzBizException;
+    void dealSold(TradepredictinfoVo tp, TradeconfigVo tc, boolean isOnSale) throws HzzBizException;
 
 
     List<TradeorderinfoVo> getBuyNoSpecialTrade(long userid);

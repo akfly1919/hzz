@@ -7,6 +7,7 @@ import com.akfly.hzz.service.TradepredictinfoService;
 import com.akfly.hzz.service.TradetimeService;
 import com.akfly.hzz.util.DateUtil;
 import com.akfly.hzz.vo.TradetimeVo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +38,7 @@ import java.util.*;
 @Configuration
 @EnableScheduling
 @EnableAsync
+@Slf4j
 public class ScheduleTask implements SchedulingConfigurer {
 
     //或直接指定时间间隔，例如：5秒
@@ -94,6 +96,7 @@ public class ScheduleTask implements SchedulingConfigurer {
 
         Date endTime = new Date();
         Date beginTime = DateUtils.addDays(endTime, -7);  // 扫描最近7天的卖出挂单，来触发定时撮合交易
+        log.info("撮合交易定时任务触发 beginTime={},endTime={}", beginTime, endTime);
         tradegoodsellService.tradeTask(beginTime, endTime);
     }
 
