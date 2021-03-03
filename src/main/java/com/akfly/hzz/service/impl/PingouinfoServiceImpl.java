@@ -144,24 +144,26 @@ public class PingouinfoServiceImpl extends ServiceImpl<PingouinfoMapper, Pingoui
         for (CustomerrelationinfoVo vo : list) {
             userIds.add(Long.valueOf(vo.getCriMember()));
         }
-        LocalDate now = LocalDate.now();
-        String date = now.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        int finishedNum = getFinishedNum(date, userIds);
-        MyTeamDto myTeamDto = new MyTeamDto();
-        myTeamDto.setNum(list.size());
-        myTeamDto.setFinishedNum(finishedNum);
-
-        CustomerrelationinfoVo teamVo = customerrelationinfoService.getTeamLevel(cbiId);
-        myTeamDto.setLevel(teamVo.getCriLevel() == 1 ? "常规" : "未知");
-        myTeamDto.setActiveNum(tradeorderinfoService.getActiveUser(userIds));
-        HistoryTradeDto historyTradeDto = new HistoryTradeDto();
-        historyTradeDto.setBuyNum(tradeorderinfoService.getAmount(userIds, 0, 0));
-        historyTradeDto.setSellNum(tradeorderinfoService.getAmount(userIds, 0, 1));
-        historyTradeDto.setSpecialBuyNum(tradeorderinfoService.getAmount(userIds, 1, 0));
-        historyTradeDto.setPickupNum(customerpickupinfoService.getPickUpAmount(userIds));
         TeamAndTradeDto teamAndTradeDto = new TeamAndTradeDto();
-        teamAndTradeDto.setMyTeamDto(myTeamDto);
-        teamAndTradeDto.setHistoryTradeDto(historyTradeDto);
+        if (userIds.size() > 0) {
+            LocalDate now = LocalDate.now();
+            String date = now.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            int finishedNum = getFinishedNum(date, userIds);
+            MyTeamDto myTeamDto = new MyTeamDto();
+            myTeamDto.setNum(list.size());
+            myTeamDto.setFinishedNum(finishedNum);
+
+            CustomerrelationinfoVo teamVo = customerrelationinfoService.getTeamLevel(cbiId);
+            myTeamDto.setLevel(teamVo.getCriLevel() == 1 ? "常规" : "未知");
+            myTeamDto.setActiveNum(tradeorderinfoService.getActiveUser(userIds));
+            HistoryTradeDto historyTradeDto = new HistoryTradeDto();
+            historyTradeDto.setBuyNum(tradeorderinfoService.getAmount(userIds, 0, 0));
+            historyTradeDto.setSellNum(tradeorderinfoService.getAmount(userIds, 0, 1));
+            historyTradeDto.setSpecialBuyNum(tradeorderinfoService.getAmount(userIds, 1, 0));
+            historyTradeDto.setPickupNum(customerpickupinfoService.getPickUpAmount(userIds));
+            teamAndTradeDto.setMyTeamDto(myTeamDto);
+            teamAndTradeDto.setHistoryTradeDto(historyTradeDto);
+        }
         return teamAndTradeDto;
     }
 

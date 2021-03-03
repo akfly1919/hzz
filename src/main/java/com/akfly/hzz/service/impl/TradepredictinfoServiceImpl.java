@@ -124,6 +124,9 @@ public class TradepredictinfoServiceImpl extends ServiceImpl<TradepredictinfoMap
     public List<TradepredictinfoVo> getBuyDetails(long gbiId, int pageSize, int pageNum) throws HzzBizException {
 
         List<TradepredictinfoVo> list = lambdaQuery().eq(TradepredictinfoVo::getGbiId, gbiId)
+                .le(TradepredictinfoVo::getTpiBuytime, LocalDateTime.now())
+                .ge(TradepredictinfoVo::getTpiFinishtime, LocalDateTime.now())
+                .in(TradepredictinfoVo::getTpiGoodstype, 1, 2)
                 .orderByDesc(TradepredictinfoVo::getTpiCreatetime)
                 .last("limit " + pageNum * pageSize + "," + pageSize + " ").list();
         return list;

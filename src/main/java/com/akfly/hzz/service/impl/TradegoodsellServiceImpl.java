@@ -229,6 +229,9 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
     public List<TradegoodsellVo> getSellDetail(long gbiid, int pageSize, int pageNum) throws HzzBizException {
 
         List<TradegoodsellVo> list = lambdaQuery().eq(TradegoodsellVo::getGiiId, gbiid)
+                .le(TradegoodsellVo::getTgsPublishtime, LocalDateTime.now())
+                .ge(TradegoodsellVo::getTgsFinshitime, LocalDateTime.now())
+                .in(TradegoodsellVo::getTgsType, 1, 2)
                 .orderByDesc(TradegoodsellVo::getTgsCreatetime)
                 .last("limit " + pageNum * pageSize + "," + pageSize + " ").list();
         return list;
