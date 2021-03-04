@@ -93,9 +93,9 @@ public class PingouinfoServiceImpl extends ServiceImpl<PingouinfoMapper, Pingoui
             PinGouSumDto dto = new PinGouSumDto();
             dto.setGbiId(vo.getGbiId());
             PingouinfoVo finished = getFinished(cbiId, vo.getGbiId(), date);
-            int isFinished = (finished.getGbiNum() >= 5) ? 1 : 0;
-            dto.setIsFinished(isFinished);
-            dto.setUnFinishedNum(finished.getGbiNum() % 5);
+            //int isFinished = (finished.getGbiNum() >= 5) ? 1 : 0;
+            dto.setIsFinished(1);
+            dto.setUnFinishedNum(5 - finished.getGbiNum() % 5);
             dto.setFinishedNum(finished.getGbiNum());
             dto.setRewordNum(finished.getGbiNum() / 5 + 1);
             try {
@@ -122,7 +122,7 @@ public class PingouinfoServiceImpl extends ServiceImpl<PingouinfoMapper, Pingoui
             PingouinfoVo finishedL1 = getFinishedLevel(cbiId, vo.getGbiId(), date, 1);
             dto.setIsFinished(1);
             dto.setOneLevelFinishedNum(finishedL1.getGbiNum());
-            PingouinfoVo finishedL2 = getFinishedLevel(cbiId, vo.getGbiId(), date, 1);
+            PingouinfoVo finishedL2 = getFinishedLevel(cbiId, vo.getGbiId(), date, 2);
             dto.setTowLevelFinishedNum(finishedL2.getGbiNum());
             try {
                 GoodsbaseinfoVo goods = goodsbaseinfoService.getGoodsbaseinfoWithRedis(vo.getGbiId());

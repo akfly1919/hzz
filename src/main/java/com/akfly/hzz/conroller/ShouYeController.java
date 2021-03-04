@@ -93,13 +93,13 @@ public class ShouYeController {
             BaseRspDto<List<GoodsbaseinfoVo>> rsp = new BaseRspDto<List<GoodsbaseinfoVo>>();
             List<GoodsbaseinfoVo> zcgoods = goodsbaseinfoService.lambdaQuery()
                     .eq(GoodsbaseinfoVo::getGbiValid, 1)
-                    .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit " + beg + "," + size + " ").list();
+                    .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit " + beg * size + "," + size + " ").list();
             rsp.setData(zcgoods);
             return JsonUtils.toJson(rsp);
         } else if (gbiType == 3) {
             BaseRspDto<List<GoodsbaseinfoDto>> rsp = new BaseRspDto<List<GoodsbaseinfoDto>>();
             List<GoodsbaseinfoVo> zcgoods = goodsbaseinfoService.lambdaQuery().eq(GoodsbaseinfoVo::getGbiValid, 1)
-                    .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit " + beg + "," + size + " ").list();
+                    .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit " + beg * size + "," + size + " ").list();
             List<GoodsbaseinfoDto> dtos = new ArrayList<>();
             for (GoodsbaseinfoVo vo : zcgoods) {
                 GoodsbaseinfoDto dto = new GoodsbaseinfoDto();
@@ -115,7 +115,7 @@ public class ShouYeController {
             BaseRspDto<List<GoodsbaseinfoVo>> rsp = new BaseRspDto<List<GoodsbaseinfoVo>>();
             List<GoodsbaseinfoVo> zcgoods = goodsbaseinfoService.lambdaQuery()
                     .eq(GoodsbaseinfoVo::getGbiType, gbiType).eq(GoodsbaseinfoVo::getGbiValid, 1)
-                    .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit " + beg + "," + size + " ").list();
+                    .orderByDesc(GoodsbaseinfoVo::getGbiSort).last("limit " + beg * size + "," + size + " ").list();
             rsp.setData(zcgoods);
             return JsonUtils.toJson(rsp);
         }

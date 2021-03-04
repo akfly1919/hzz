@@ -19,6 +19,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -75,7 +76,7 @@ public class CustomerrelationinfoController {
                 TeamDetailsDto dto = new TeamDetailsDto();
                 dto.setCustomerrelationinfoVo(vo);
                 CustomerbaseinfoVo pinGouUserInfo = customerbaseinfoService.getUserInfoById(vo.getCriMember());
-                dto.setCbiUsername(pinGouUserInfo.getCbiUsername());
+                dto.setCbiUsername(nameSensitive(pinGouUserInfo.getCbiName(), pinGouUserInfo.getCbiUsername()));
                 dto.setPhoneNum(pinGouUserInfo.getCbiPhonenum());
                 BigDecimal rechargeAmount = customerbillrelatedService.sumAmount(Long.parseLong(vo.getCriMember()), 1);
                 dto.setRechargeAmount(rechargeAmount);
@@ -90,6 +91,22 @@ public class CustomerrelationinfoController {
         return rsp;
     }
 
+    private String nameSensitive(String userName, String loginName) {
 
+        if (StringUtils.isBlank(userName)) {
+            if (loginName.length() <= 2) {
+                return loginName.charAt(0) + "*";
+            } else {
+                return loginName.charAt(0) + "*" + loginName.charAt(loginName.length() - 1);
+            }
+        } else {
+            if (loginName.length() <= 2) {
+                return userName.charAt(0) + "*";
+            } else {
+                return userName.charAt(0) + "*" + userName.charAt(userName.length() - 1);
+            }
+        }
+
+    }
 }
 
