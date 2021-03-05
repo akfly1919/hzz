@@ -185,7 +185,7 @@ public class PingouinfoServiceImpl extends ServiceImpl<PingouinfoMapper, Pingoui
         queryWrapper.eq("pgi_level1", cbiId);
         queryWrapper.eq("gbi_id", gbiId);
         queryWrapper.eq("pgi_date", date);
-        queryWrapper.eq("pgi_status", 2);
+        //queryWrapper.eq("pgi_status", 2);  2021-03-05 需求方说去掉状态
         queryWrapper.select(" gbi_id, count(pgi_key) as gbi_num ");
         PingouinfoVo vo = baseMapper.selectOne(queryWrapper);
         return vo;

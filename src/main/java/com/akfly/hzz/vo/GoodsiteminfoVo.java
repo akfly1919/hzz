@@ -55,5 +55,7 @@ public class GoodsiteminfoVo implements Serializable {
 
     private LocalDateTime giiUpdatetime;
 
+    private Integer giiIsshow;
+
 
 }
