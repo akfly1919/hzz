@@ -124,7 +124,8 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
                 for(TradepredictinfoVo tp:list){
                     try {
                         log.info("撮合交易开始,预买单订单信息tp={}", JsonUtils.toJson(tp));
-                        tradeorderinfoService.dealSold(tp, false);
+                        boolean isOnSale = (tp.getTpiGoodstype() == 3);
+                        tradeorderinfoService.dealSold(tp, isOnSale);
                     } catch(Exception e) {
                         log.error("卖出商品交易异常 cbiid={}", cbiid, e);
                     }

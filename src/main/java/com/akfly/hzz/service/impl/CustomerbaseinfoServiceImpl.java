@@ -133,7 +133,7 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
             throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
         } else {
             String key = CommonConstant.USER_PREFIX + customerbaseinfoVo.getCbiId();
-            CustomerbaseinfoVo userInDB = getUserInfo(customerbaseinfoVo.getCbiPhonenum());
+            CustomerbaseinfoVo userInDB = lambdaQuery().eq(CustomerbaseinfoVo::getCbiId, customerbaseinfoVo.getCbiId()).one();
             redisUtils.set(key, JsonUtils.toJson(userInDB), 30 *60);
         }
 
