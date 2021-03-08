@@ -71,9 +71,9 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
         //    price=gi.getGbiPrice().doubleValue();
         //}
         price = gi.getGbiPrice();
-        TradeconfigVo tc = tradeconfigService.getTradeconfig(TradeconfigVo.TCTYPE_SELL);
+        //TradeconfigVo tc = tradeconfigService.getTradeconfig(TradeconfigVo.TCTYPE_SELL);
         BigDecimal priceB=new BigDecimal(price);
-        BigDecimal feeB=priceB.multiply(new BigDecimal(tc.getTcRate()));
+        BigDecimal feeB=priceB.multiply(new BigDecimal(gi.getGbiSellservicerate()));
         lockStock(cbiid,gbid,num,price,feeB.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue(), type);
 
         String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
@@ -124,7 +124,8 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
                 for(TradepredictinfoVo tp:list){
                     try {
                         log.info("撮合交易开始,预买单订单信息tp={}", JsonUtils.toJson(tp));
-                        tradeorderinfoService.dealSold(tp,null, false);
+                        boolean isOnSale = (tp.getTpiGoodstype() == 3);
+                        tradeorderinfoService.dealSold(tp, isOnSale);
                     } catch(Exception e) {
                         log.error("卖出商品交易异常 cbiid={}", cbiid, e);
                     }

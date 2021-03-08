@@ -4,9 +4,11 @@ import com.akfly.hzz.exception.HzzBizException;
 import com.akfly.hzz.exception.HzzExceptionEnum;
 import com.akfly.hzz.mapper.CustomerbaseinfoMapper;
 import com.akfly.hzz.service.CustomerbaseinfoService;
+import com.akfly.hzz.service.GoodsbaseinfoService;
 import com.akfly.hzz.service.TradetimeService;
 import com.akfly.hzz.util.DateUtil;
 import com.akfly.hzz.vo.CustomerbaseinfoVo;
+import com.akfly.hzz.vo.GoodsbaseinfoVo;
 import com.akfly.hzz.vo.TradepredictinfoVo;
 import com.akfly.hzz.mapper.TradepredictinfoMapper;
 import com.akfly.hzz.service.TradepredictinfoService;
@@ -39,6 +41,9 @@ public class TradepredictinfoServiceImpl extends ServiceImpl<TradepredictinfoMap
     private CustomerbaseinfoMapper customerbaseinfoMapper;
     @Resource
     private CustomerbaseinfoService customerbaseinfoService;
+
+    @Resource
+    private GoodsbaseinfoService goodsbaseinfoService;
 
 
     public void saveTradepredictinfoVo(TradepredictinfoVo tradepredictinfoVo) throws HzzBizException {
@@ -98,9 +103,16 @@ public class TradepredictinfoServiceImpl extends ServiceImpl<TradepredictinfoMap
         Double fronze=customerbaseinfoVo.getCbiFrozen();
         BigDecimal balanceB=BigDecimal.valueOf(balance!=null?balance:0);
         BigDecimal fronzeB=BigDecimal.valueOf(fronze!=null?fronze:0);
-        int leftnum=tpi.getTpiNum()-tpi.getTpiSucessnum();
+        int successNum = tpi.getTpiSucessnum();
+        int leftnum = tpi.getTpiNum() - successNum;
         BigDecimal priceB=BigDecimal.valueOf(tpi.getTpiPrice()).multiply(BigDecimal.valueOf(leftnum));
-        BigDecimal feeB=BigDecimal.valueOf(tpi.getTpiServicefee()).multiply(BigDecimal.valueOf(leftnum));
+        BigDecimal feeB;
+        if (successNum == 0) {
+            feeB=BigDecimal.valueOf(tpi.getTpiServicefee());
+        } else {
+            GoodsbaseinfoVo goods = goodsbaseinfoService.getGoodsbaseinfoWithRedis(tpi.getGbiId());
+            feeB=BigDecimal.valueOf(goods.getGbiBuyservicerate()).multiply(BigDecimal.valueOf(leftnum)).multiply(BigDecimal.valueOf(tpi.getTpiPrice()));
+        }
         balanceB=balanceB.add(feeB).add(priceB);
         fronzeB=fronzeB.subtract(feeB).subtract(priceB);
         customerbaseinfoVo.setCbiFrozen(fronzeB.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());

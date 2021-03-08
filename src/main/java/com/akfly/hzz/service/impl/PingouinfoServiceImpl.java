@@ -93,9 +93,9 @@ public class PingouinfoServiceImpl extends ServiceImpl<PingouinfoMapper, Pingoui
             PinGouSumDto dto = new PinGouSumDto();
             dto.setGbiId(vo.getGbiId());
             PingouinfoVo finished = getFinished(cbiId, vo.getGbiId(), date);
-            int isFinished = (finished.getGbiNum() >= 5) ? 1 : 0;
-            dto.setIsFinished(isFinished);
-            dto.setUnFinishedNum(finished.getGbiNum() % 5);
+            //int isFinished = (finished.getGbiNum() >= 5) ? 1 : 0;
+            dto.setIsFinished(1);
+            dto.setUnFinishedNum(5 - finished.getGbiNum() % 5);
             dto.setFinishedNum(finished.getGbiNum());
             dto.setRewordNum(finished.getGbiNum() / 5 + 1);
             try {
@@ -122,7 +122,7 @@ public class PingouinfoServiceImpl extends ServiceImpl<PingouinfoMapper, Pingoui
             PingouinfoVo finishedL1 = getFinishedLevel(cbiId, vo.getGbiId(), date, 1);
             dto.setIsFinished(1);
             dto.setOneLevelFinishedNum(finishedL1.getGbiNum());
-            PingouinfoVo finishedL2 = getFinishedLevel(cbiId, vo.getGbiId(), date, 1);
+            PingouinfoVo finishedL2 = getFinishedLevel(cbiId, vo.getGbiId(), date, 2);
             dto.setTowLevelFinishedNum(finishedL2.getGbiNum());
             try {
                 GoodsbaseinfoVo goods = goodsbaseinfoService.getGoodsbaseinfoWithRedis(vo.getGbiId());
@@ -185,7 +185,7 @@ public class PingouinfoServiceImpl extends ServiceImpl<PingouinfoMapper, Pingoui
         queryWrapper.eq("pgi_level1", cbiId);
         queryWrapper.eq("gbi_id", gbiId);
         queryWrapper.eq("pgi_date", date);
-        queryWrapper.eq("pgi_status", 2);
+        //queryWrapper.eq("pgi_status", 2);  2021-03-05 需求方说去掉状态
         queryWrapper.select(" gbi_id, count(pgi_key) as gbi_num ");
         PingouinfoVo vo = baseMapper.selectOne(queryWrapper);
         return vo;

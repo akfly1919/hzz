@@ -12,6 +12,7 @@
         <result column="gii_pickuptime" property="giiPickuptime" />
         <result column="gii_receivetime" property="giiReceivetime" />
         <result column="gii_updatetime" property="giiUpdatetime" />
+        <result column="gii_isshow" property="giiIsshow" />
     </resultMap>
 
 </mapper>

@@ -45,8 +45,8 @@ public enum HzzExceptionEnum {
     TRADE_TIME_ERROR("3004","不在交易时间内"),
     /* 未知异常定义以9开头 */
     SYSTEM_ERROR("9000", "系统繁忙"),
-    DB_ERROR("9001", "数据库异常"),
-    UNKNOWN_ERROR("9999", "其他异常"),
+    DB_ERROR("9001", "系统繁忙"),
+    UNKNOWN_ERROR("9999", "系统开小差了"),
 
     TEMP_ERROR("", "");////这个必须要留着
 

@@ -109,7 +109,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void dealSold(TradepredictinfoVo tp,TradeconfigVo tc,boolean isOnSale) throws HzzBizException {
+    public void dealSold(TradepredictinfoVo tp, boolean isOnSale) throws HzzBizException {
         if(tp.getId()!=null){
             //这里是已存在而非新创建的
             tp= tradepredictinfoService.getById(tp.getId());
@@ -118,13 +118,13 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
             //预下单状态已变更，无需继续处理
             return;
         }
-        if(tc==null){
-            tc=tradeconfigService.getTradeconfig(TradeconfigVo.TCTYPE_BUY);
-        }
+        //if(tc==null){
+        //    tc=tradeconfigService.getTradeconfig(TradeconfigVo.TCTYPE_BUY);
+        //}
         GoodsbaseinfoVo gi = goodsbaseinfoService.getGoodsbaseinfoVo(tp.getGbiId());
 
         // 校验当天购买量不能超出商品基本信息上面的当日限制购买量
-        checkBuyNum(gi.getGbiLimitperson(), tp);
+        checkBuyNum(gi.getGbiLimitperson(), tp, isOnSale);
 
         int need = tp.getTpiNum() - tp.getTpiSucessnum();
         QueryWrapper<TradegoodsellVo> wrapper = new QueryWrapper<TradegoodsellVo>();
@@ -164,7 +164,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
             log.info("本次匹配成功数量,买单订单号tpiId={},successNum={}", tp.getTpiId(), successNum);
             if (successNum > 0) {
                 BigDecimal successNumB = BigDecimal.valueOf(successNum);
-                BigDecimal totalFeeSuccess = BigDecimal.valueOf(tp.getTpiPrice()).multiply(BigDecimal.valueOf(tc.getTcRate())).multiply(successNumB);
+                BigDecimal totalFeeSuccess = BigDecimal.valueOf(tp.getTpiPrice()).multiply(BigDecimal.valueOf(gi.getGbiBuyservicerate())).multiply(successNumB);
                 tp.setTpiServicefee(totalFeeSuccess.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
                 tp.setTpiSucessnum(successNum);
             }
@@ -216,7 +216,7 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
             {
                 //生成买单
                 BigDecimal price=new BigDecimal(tg.getTgsPrice());
-                BigDecimal fee=price.multiply(new BigDecimal(tc.getTcRate()));
+                BigDecimal fee=price.multiply(new BigDecimal(gi.getGbiBuyservicerate()));
                 goodsprice=goodsprice.add(price);
                 feeprice=feeprice.add(fee);
                 TradeorderinfoVo toi=new TradeorderinfoVo();
@@ -345,9 +345,9 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         } else {
             price = gi.getGbiPrice();
         }
-        TradeconfigVo tc = tradeconfigService.getTradeconfig(TradeconfigVo.TCTYPE_BUY);
+        //TradeconfigVo tc = tradeconfigService.getTradeconfig(TradeconfigVo.TCTYPE_BUY);
         BigDecimal priceB=new BigDecimal(price);
-        BigDecimal totalFeeInit = priceB.multiply(BigDecimal.valueOf(tc.getTcRate())).multiply(BigDecimal.valueOf(num));
+        BigDecimal totalFeeInit = priceB.multiply(BigDecimal.valueOf(gi.getGbiBuyservicerate())).multiply(BigDecimal.valueOf(num));
         log.info("初始化服务费 totalFeeInit={}", totalFeeInit);
         BigDecimal totalB = priceB.multiply(BigDecimal.valueOf(num)).add(totalFeeInit);
         //冻账
@@ -380,13 +380,13 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         if(tradetimeService.isInTradeTime(nowTime)){
             tp.setTpiType(type);
             //tradepredictinfoService.saveTradepredictinfoVo(tp);
-            dealSold(tp,tc,isOnSale);
+            dealSold(tp, isOnSale);
         }else{
             if(type!=TradepredictinfoVo.TYPE_ENTRUST){
                 throw new HzzBizException(HzzExceptionEnum.TRADE_TIME_ERROR);
             }
             tp.setTpiType(TradepredictinfoVo.TYPE_ENTRUST);
-            checkBuyNum(gi.getGbiLimitperson(), tp);
+            checkBuyNum(gi.getGbiLimitperson(), tp, isOnSale);
             tradepredictinfoService.saveTradepredictinfoVo(tp);
         }
         if(isOnSale){
@@ -425,9 +425,25 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
     @Override
     public int getActiveUser(List<Long> userIds) {
 
-        int count = lambdaQuery().in(TradeorderinfoVo::getTgsBuyerid, userIds).or().eq(TradeorderinfoVo::getToiSellerid, userIds)
-                .ge(TradeorderinfoVo::getToiTradetime, LocalDate.now()).count();
-        return count;
+        QueryWrapper<TradeorderinfoVo> wrapper = new QueryWrapper<TradeorderinfoVo>();
+        wrapper.in("tgs_buyerid", userIds).or().in("toi_sellerid", userIds);
+        wrapper.ge("toi_tradetime",LocalDate.now());
+        wrapper.select("DISTINCT tgs_buyerid, toi_sellerid");
+        List<TradeorderinfoVo> list = getBaseMapper().selectList(wrapper);
+        if (CollectionUtils.isEmpty(list)) {
+            return 0;
+        } else {
+            Set<Long> userId = new HashSet<Long>();
+            for (TradeorderinfoVo vo : list) {
+                userId.add(vo.getTgsBuyerid());
+                userId.add(vo.getToiSellerid());
+            }
+            return userId.size();
+        }
+        //
+        //int count = lambdaQuery().in(TradeorderinfoVo::getTgsBuyerid, userIds).or().eq(TradeorderinfoVo::getToiSellerid, userIds)
+        //        .ge(TradeorderinfoVo::getToiTradetime, LocalDate.now()).count();
+        //return count;
     }
 
     @Override
@@ -470,9 +486,9 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
     }
 
 
-    public void checkBuyNum(Integer gbiLimitPerson, TradepredictinfoVo tp) throws HzzBizException {
+    public void checkBuyNum(Integer gbiLimitPerson, TradepredictinfoVo tp, boolean isOnSale) throws HzzBizException {
 
-        if (gbiLimitPerson == null ) return; // 没有配置的话，不限制个人当天购买数量
+        if (isOnSale || gbiLimitPerson == null) return; // 没有配置的话，不限制个人当天购买数量, 特价商品也不限制
         int need = tp.getTpiNum() - tp.getTpiSucessnum();
         //{  校验所有该产品的购买量
         //    QueryWrapper wrapper_c=new QueryWrapper();
@@ -490,7 +506,8 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
         Date now = new Date();
         Date beginTime = DateUtil.getDateBegin(now);
         int buyCount = lambdaQuery().eq(TradeorderinfoVo::getGbiId, tp.getGbiId()).eq(TradeorderinfoVo::getTgsBuyerid, tp.getTpiBuyerid())
-                .between(TradeorderinfoVo::getToiTradetime, beginTime, now).count();
+                .between(TradeorderinfoVo::getToiTradetime, beginTime, now)
+                .in(TradeorderinfoVo::getToiType, 1, 2).count();
         if(gbiLimitPerson < (buyCount + need)){
             throw new HzzBizException(HzzExceptionEnum.LIMIT_PERSON_ERROR);
         }
