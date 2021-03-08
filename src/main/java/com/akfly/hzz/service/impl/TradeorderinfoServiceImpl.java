@@ -149,11 +149,6 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
             if(list==null||list.size()<need){
                 throw new HzzBizException(HzzExceptionEnum.STOCK_ERROR);
             }
-        } else {
-            if(CollectionUtils.isEmpty(list)){
-                log.info("没有匹配该买入订单的卖单, 买单信息为tp={}", JsonUtils.toJson(tp));
-                return;
-            }
         }
         {
             int successNum = 0;
@@ -175,6 +170,10 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
             }
             tp.setTpiUpdatetime(LocalDateTime.now());
             tradepredictinfoService.saveTradepredictinfoVo(tp);
+        }
+        if(CollectionUtils.isEmpty(list)){
+            log.info("没有匹配该买入订单的卖单, 买单信息为tp={}", JsonUtils.toJson(tp));
+            return;
         }
         BigDecimal goodsprice=new BigDecimal("0");
         BigDecimal feeprice=new BigDecimal("0");
