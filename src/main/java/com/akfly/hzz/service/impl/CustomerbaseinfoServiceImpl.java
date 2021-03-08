@@ -238,9 +238,9 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
         UserAllAssetDto dto = customergoodsrelatedService.getMyAsset(cbiId);
         vo.setStock(dto.getStock());
         BigDecimal total = dto.getAsset().add(BigDecimal.valueOf(vo.getCbiTotal()));
-        BigDecimal balance = dto.getAsset().add(BigDecimal.valueOf(vo.getCbiBalance()));
+        //BigDecimal balance = dto.getAsset().add(BigDecimal.valueOf(vo.getCbiBalance()));
         vo.setCbiTotal(total.doubleValue());
-        vo.setCbiBalance(balance.doubleValue());
+        vo.setCbiBalance(vo.getCbiBalance());
         BigDecimal goodsAmount = customerbillrelatedService.sumAmount(cbiId, 10);
         BigDecimal commissionAmount = customerbillrelatedService.sumAmount(cbiId, 11);
         vo.setGoodsAmount(goodsAmount);
