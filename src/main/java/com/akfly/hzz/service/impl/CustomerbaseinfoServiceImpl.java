@@ -112,13 +112,15 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
         vo.setCbiTotal(0d);
         vo.setCbiBalance(0d);
         vo.setCbiFrozen(0d);
-        CustomerbaseinfoVo parentVo = getUserInfoByInvitationCode(invitationCode);
-        if (parentVo != null) {
-            vo.setCbiJointime(LocalDateTime.now());
-            vo.setCbiParentid(parentVo.getCbiId());
-            vo.setCbiShareurl(invitationCode);
-        } else {
-            throw new HzzBizException(HzzExceptionEnum.INVITATION_INVALID);
+        if (!StringUtils.isBlank(invitationCode)) {
+            CustomerbaseinfoVo parentVo = getUserInfoByInvitationCode(invitationCode);
+            if (parentVo != null) {
+                vo.setCbiJointime(LocalDateTime.now());
+                vo.setCbiParentid(parentVo.getCbiId());
+                vo.setCbiShareurl(invitationCode);
+            } else {
+                throw new HzzBizException(HzzExceptionEnum.INVITATION_INVALID);
+            }
         }
         if (!save(vo)) {
             throw new HzzBizException(HzzExceptionEnum.DB_ERROR);
