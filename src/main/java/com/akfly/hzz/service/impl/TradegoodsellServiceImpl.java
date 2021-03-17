@@ -78,7 +78,7 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
 
         String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         if(tradetimeService.isInTradeTime(nowTime)){
-            dealSold(cbiid,gbid,num,price);
+            dealSold(cbiid,gbid,num,price, false);
         }
     }
 
@@ -101,25 +101,27 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
 
 
     @Transactional(rollbackFor = Exception.class)
-    public void dealSold(long cbiid,long gbid,int num,double price) throws HzzBizException {
+    public void dealSold(long cbiid,long gbid,int num,double price, boolean isTask) throws HzzBizException {
 
         if (lock.tryLock()) {
             try {
-                QueryWrapper<TradepredictinfoVo> wrapper_c=new QueryWrapper<TradepredictinfoVo>();
-                wrapper_c.eq("gbi_id",gbid);
-                wrapper_c.eq("tpi_status",1);
-                wrapper_c.ge("tpi_price",price);
-                wrapper_c.ne("tpi_buyerid",cbiid);
-                wrapper_c.orderByAsc("tpi_createtime");
-                wrapper_c.last(" for update");
-                List<TradepredictinfoVo> list = tradepredictinfoMapper.selectList(wrapper_c);
-                if(CollectionUtils.isEmpty(list)){
+                List<TradepredictinfoVo> list;
+                if (isTask) {
                     QueryWrapper<TradepredictinfoVo> wrapper = new QueryWrapper<TradepredictinfoVo>();
                     wrapper.eq("tpi_status",1);
                     wrapper.ge("tpi_price",price);
                     wrapper.orderByAsc("tpi_createtime");
-                    wrapper.last(" limit 30 for update"); // 一次最多撮合30笔交易
+                    wrapper.last(" limit 300 for update"); // 一次最多撮合30笔交易
                     list = tradepredictinfoMapper.selectList(wrapper);
+                } else {
+                    QueryWrapper<TradepredictinfoVo> wrapper_c=new QueryWrapper<TradepredictinfoVo>();
+                    wrapper_c.eq("gbi_id",gbid);
+                    wrapper_c.eq("tpi_status",1);
+                    wrapper_c.ge("tpi_price",price);
+                    wrapper_c.ne("tpi_buyerid",cbiid);
+                    wrapper_c.orderByAsc("tpi_createtime");
+                    wrapper_c.last(" for update");
+                    list = tradepredictinfoMapper.selectList(wrapper_c);
                 }
                 for(TradepredictinfoVo tp:list){
                     try {
@@ -259,7 +261,7 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
                 return;
             }
             TradegoodsellVo vo = list.get(0);
-            dealSold(vo.getTgsSellerid(), vo.getGbiId(), 1, vo.getTgsPrice());
+            dealSold(vo.getTgsSellerid(), vo.getGbiId(), 1, vo.getTgsPrice(), true);
         } catch (HzzBizException e) {
             log.error("交易撮合定时任务异常 msg={}", e.getErrorMsg(), e);
         }

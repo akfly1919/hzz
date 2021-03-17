@@ -33,6 +33,8 @@ public enum HzzExceptionEnum {
     SPECIAL_BUY_MORE_ERROR("1024", "超出完成任务可购买的特价商品数量"),
     HAD_SET_INVITATION("1025", "已经设置过邀请码"),
     INVITATION_INVALID("1026", "邀请码无效"),
+    HAD_REALNAME_ERROR("1027", "该身份证已认证"),
+
 
     /* 业务异常定义以2-8开头，顺序往下排号 */
     PARAM_INVALID("2000","参数不合法"),

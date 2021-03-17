@@ -51,20 +51,46 @@ public class TradetimeServiceImpl extends ServiceImpl<TradetimeMapper, Tradetime
         LocalDateTime now =LocalDateTime.now();
         TradetimeVo tt=this.getTradeTime();
         String nowTime=now.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-        if(!isInTradeTime(nowTime)){
-            //不在交易时间
+        int range = timeRange(nowTime);
+        if(range == 1){
+            // 当前时间晚于下午交易结束时间则加一天
             now=now.plusDays(1);
 
         }
         String date=now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         String starttime=date+" "+tt.getTtTimeAmStart();
         String finishtime=date+" "+tt.getTtTimePmEnd();
+        if (range == 0) {
+            starttime = date + " " + tt.getTtTimePmStart();
+        }
         DateTimeFormatter df =DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         LocalDateTime start = LocalDateTime.parse(starttime,df);
         LocalDateTime finish = LocalDateTime.parse(finishtime,df);
         timemap.put("startTime",start);
         timemap.put("finishTime",finish);
         return timemap;
+    }
+
+    /**
+     * 将时间段分为三段  -1表示小于当天最早交易开始时间  0表示在上午结束时间和下午开始时间之间
+     * 1表示大于当天最晚交易结束时间,2表示在正常交易时间段内
+     * @param time
+     * @return
+     * @throws HzzBizException
+     */
+    public int timeRange(String time) throws HzzBizException {
+
+        TradetimeVo tt=this.getTradeTime();
+        if(DateUtil.compareOnlyByTime(time, tt.getTtTimePmEnd()) >= 0){
+            return 1;
+        } else if (DateUtil.compareOnlyByTime(time, tt.getTtTimeAmStart()) < 0) {
+            return -1;
+        } else if (DateUtil.isEffectiveTime(time, tt.getTtTimeAmEnd(), tt.getTtTimePmStart())) {
+            return 0;
+        } else {
+            return 2;
+        }
+
     }
 
 }

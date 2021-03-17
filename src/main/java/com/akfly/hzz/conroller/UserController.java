@@ -280,6 +280,11 @@ public class UserController {
 				throw new HzzBizException(HzzExceptionEnum.PARAM_INVALID);
 			}
 			CustomerbaseinfoVo userInfo = AuthInterceptor.getUserInfo();
+
+			CustomeridcardinfoVo idCard = customeridcardinfoService.getCardInfo(userInfo.getCbiId()); // 获取不到抛出了异常
+			if (idCard.getCiiStatus() == 2) {
+				throw new HzzBizException(HzzExceptionEnum.HAD_REALNAME_ERROR);
+			}
 			CustomerbaseinfoVo vo = new CustomerbaseinfoVo();
 			vo.setCbiId(userInfo.getCbiId());
 			vo.setCbiName(realNameReqDto.getName());
