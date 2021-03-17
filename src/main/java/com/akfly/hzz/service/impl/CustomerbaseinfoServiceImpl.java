@@ -220,7 +220,7 @@ public class CustomerbaseinfoServiceImpl extends ServiceImpl<CustomerbaseinfoMap
         customerbaseinfoVo.setCbiBalance(balanceB.subtract(totalB).doubleValue());
         customerbaseinfoVo.setCbiFrozen(fronzeB.add(totalB).doubleValue());
         customerbaseinfoVo.setCbiUpdatetime(LocalDateTime.now());
-        if(balanceB.compareTo(new BigDecimal("0.0"))<0){
+        if(BigDecimal.valueOf(customerbaseinfoVo.getCbiBalance()).compareTo(new BigDecimal("0.0"))<0){
             throw new HzzBizException(HzzExceptionEnum.ACCOUNT_BALACE_ERROR);
         }
         updateUserInfo(customerbaseinfoVo);

@@ -137,7 +137,11 @@ public class TradeorderinfoServiceImpl extends ServiceImpl<TradeorderinfoMapper,
             wrapper.eq("tgs_type",3);
         }else{
             //wrapper.eq("tgs_type",1);
-            wrapper.in("tgs_type", Arrays.asList(1, 2));
+            if (gi.getGbiType() == null) {
+                wrapper.in("tgs_type", 1, 2);
+            } else {
+                wrapper.eq("tgs_type", gi.getGbiType());
+            }
         }
         wrapper.orderByAsc("tgs_price");
         wrapper.orderByAsc("tgs_owntype");//价格相同，系统用户在前
