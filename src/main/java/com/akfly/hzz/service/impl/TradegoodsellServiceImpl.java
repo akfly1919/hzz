@@ -109,7 +109,7 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
                 if (isTask) {
                     QueryWrapper<TradepredictinfoVo> wrapper = new QueryWrapper<TradepredictinfoVo>();
                     wrapper.eq("tpi_status",1);
-                    wrapper.ge("tpi_price",price);
+                    //wrapper.ge("tpi_price",price);
                     wrapper.orderByAsc("tpi_createtime");
                     wrapper.last(" limit 300 for update"); // 一次最多撮合30笔交易
                     list = tradepredictinfoMapper.selectList(wrapper);
