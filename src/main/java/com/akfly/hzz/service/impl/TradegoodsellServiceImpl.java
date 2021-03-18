@@ -65,6 +65,13 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
     }
 
     public void sell(long cbiid,long gbid,int num,double price, int type) throws HzzBizException {
+
+        String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        boolean flag = tradetimeService.isInTradeTime(nowTime);
+        if (!flag) {
+            if (type == 2)
+                throw new HzzBizException(HzzExceptionEnum.TRADE_TIME_ERROR);
+        }
         GoodsbaseinfoVo gi = goodsbaseinfoService.getGoodsbaseinfoVo(gbid);
         //if (gi.getGbiPrice().doubleValue()!=price){
         //    //TODO 价格不正确
@@ -76,8 +83,7 @@ public class TradegoodsellServiceImpl extends ServiceImpl<TradegoodsellMapper, T
         BigDecimal feeB=priceB.multiply(new BigDecimal(gi.getGbiSellservicerate()));
         lockStock(cbiid,gbid,num,price,feeB.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue(), type);
 
-        String nowTime=LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-        if(tradetimeService.isInTradeTime(nowTime)){
+        if(flag){
             dealSold(cbiid,gbid,num,price, false);
         }
     }
